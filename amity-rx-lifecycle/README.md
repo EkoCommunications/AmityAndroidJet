@@ -12,7 +12,7 @@ What happens if a parameter of a subscription is a mutatable object?, when it mu
 
 Keep an instance of a subscription and manually `dispose` is one way. This works perfectly fine but it definately destroys a beauty of one line magic, what will happen if there are multiple subscriptions in one class? not so handy any more huh?
 
-Another way to solve this problem is to convert a mutatable parameter to an active stream of data, aka "`Observable`" so you now are able to connect it with a later stream. This works perfectly fine as well in case you are in charge and be able to modify a source of data, you choose a solution for your problem. **If both solutions are not good enough for you, keep reading!**
+Another way to solve this problem is to convert a mutatable parameter to an active stream of data, aka "`Observable`" so you now are able to connect it with a later stream. This works perfectly fine as well in case you are in charge and be able to modify a source of data, you choose a solution for your problem.
 
 ```text
 var disposable: Disposable? = null
@@ -47,6 +47,8 @@ BehaviorSubject.create<String> { subject ->
         .bindToLifecycle(this)
         .subscribe()
 ```
+
+**If both solutions are not good enough for you, keep reading!**
 
 #### Unfinished tasks
 

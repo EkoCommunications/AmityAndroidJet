@@ -1,12 +1,12 @@
 # PROBLEM!
 
-Using `RxJava` is incredibly good (no doubt) but leaving number of unused/unnecessary subscriptions active runs to a risk of slowness issues or memory leaking issues. Luckily, We have two handy libraries that make life much more easier. [RxLifeCycle](http://reactivex.io/documentation/operators/takeuntil.html) and [AutoDispose](https://uber.github.io/AutoDispose) are both serve a purpose of making sure that any subscriptions are not left active when they are no longer needed, but both come with limitations.
+Using `RxJava` is incredibly good (no doubt) but leaving a number of unused/unnecessary subscriptions active runs to a risk of slowness issues or memory leaking issues. Luckily, We have two handy libraries that make life much more easier. [RxLifeCycle](http://reactivex.io/documentation/operators/takeuntil.html) and [AutoDispose](https://uber.github.io/AutoDispose) are both serve a purpose of making sure that any subscriptions are not left active when they are no longer needed, but both come with limitations.
 
 #### Mutable object
 
 What happens if a parameter of a subscription is a mutatable object?, when it mutates you would propably need to `dispose` of a current subscription and `subscribe` to a new one with a new updated parameter, this kind of process can happen again and again during a lifecycle and we only need to keep a latest subscription with a updated parameter. 
 
-Keep an instance of a subscription and manually dispose is one way. This works perfectly fine but it definately destroys a beauty of one line magic, what will happen if there are multiple subscriptions in one class? not so handy any more huh?
+Keep an instance of a subscription and manually `dispose` is one way. This works perfectly fine but it definately destroys a beauty of one line magic, what will happen if there are multiple subscriptions in one class? not so handy any more huh?
 
 Another way to solve this problem is to convert a mutatable parameter to an active stream of data, aka "`Observable`" so you now are able to connect it with a later stream. This works perfectly fine as well in case you are in charge and be able to modify a source of data, you choose a solution for your problem.
 
@@ -46,7 +46,7 @@ BehaviorSubject.create<String> { subject ->
 
 #### Unfinished tasks
 
-What happens if tasks are left unfinished? `Single` and `Completable` are a kind of `Observable` that expects an item to be emitted or work to be done, if a lifecycle is ended before `Single` and `Completable` have a chance to do so (we find it true, a lot of time) an upstream will emit `CancellationException` without a proper error handler on a downstream the app is crashed.
+What happens if tasks are left unfinished? `Single` and `Completable` are a kind of `Observable` that expects an item to be emitted or work to be done, if a lifecycle is ended before `Single` and `Completable` have a chance to do so (we find it true, a lot of time) an upstream will emit `CancellationException` without a proper error handler on a downstream, the app is crashed.
 
 We find many cases on this scenario (not all) that an error handler likes an alert dialog or a toast is no use 'cause the lifecycle is ended. (a user has closed a particular screen that an error has occured and no one cares! but an error log may still be useful 🙂 likes I said, not all of the cases)
 
@@ -54,7 +54,7 @@ We find many cases on this scenario (not all) that an error handler likes an ale
 
 We decide to extend the functionalities of `RxLifeCycle` to be able to solve previusly mentioned problems and remain the beauty of one line magic.
 
-## Usage
+## Kotlin extensions
 
 We introduce 4 kotlin extentions under `Flowable`, `Single`, `Maybe` and `Completable`.
 
@@ -80,13 +80,13 @@ fun <E> Completable.untilLifecycleEnd(
 )
 ```
 
-These extension are used for binding subscriptions with theirs holder's lifecycles. To prevent a memory leaks, subscriptions must be ended when theirs holders are destroyed!
+These extension are used for binding any subscriptions with theirs holder's lifecycles. To prevent a memory leaks, subscriptions must be ended when theirs holders are destroyed!
 
 ### Parameters
 
 #### lifecycleProvider
 
-In order to have an access to the `LifeCycleProvider` your `Activity` and `Fragment` need to extend theirs base classes \(`RxAppCompatActivity`, `RxFragment` and etc.\) or else define your own lifecycle by implementing the `LifeCycleProvider` interface.
+In order to have an access to the `LifeCycleProvider` your `Activity` and `Fragment` need to extend rx classes \(`RxAppCompatActivity`, `RxFragment` and etc.\) or else define your own lifecycle by implementing the `LifeCycleProvider` interface.
 
 #### uniqueId (Optional)
 
@@ -136,10 +136,6 @@ completable.doOnComplete { }
     .untilLifecycleEnd(lifecycleProvider = this)
     .subscribe()
 ```
-
-### Lost functionality
-
-TODO
 
 ### Bind to the Activity's lifecycle
 

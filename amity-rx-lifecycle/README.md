@@ -1,6 +1,12 @@
-# Bind a subscription with its holder's lifecycle!
+# PROBLEM!
 
-## Rx Kotlin extensions
+Using `RxJava` is incredibly good (no doubt) but leaving number of unused/unnecessary subscriptions active runs to a risk of slowness issues or memory leaking issues. Luckily, We have two exceptional libraries that make my life much more easier. [RxLifeCycle](http://reactivex.io/documentation/operators/takeuntil.html) and [AutoDispose](https://uber.github.io/AutoDispose) are both serve a purpose of making sure that any subscriptions are not left active when they are no longer needed, but both come with limitations.
+
+# SOLUTION!
+
+TODO
+
+## Usage
 
 ```text
 fun <E> Flowable.untilLifecycleEnd(

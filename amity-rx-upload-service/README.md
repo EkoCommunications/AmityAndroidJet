@@ -60,9 +60,9 @@ RxUploadService.properties(uploadId)
    .subscribe()
 ```
 
-### Pre-xxx
+## Pre-xxx
 
-## Base url
+### Base url
 
 Define the base url of your application.
 
@@ -70,7 +70,7 @@ Define the base url of your application.
 RxUploadService.init("baseUrl" = baseUrl) 
 ```
 
-## Inject Http intercepter
+### Inject Http intercepter
 
 We also allow you to inject request intercepters.
 
@@ -78,7 +78,7 @@ We also allow you to inject request intercepters.
 RxUploadService.init("interceptors" = interceptors) 
 ```
 
-## Unsupport file type, maximun file size and timeouts
+### Unsupport file type, maximun file size and timeouts
 
 You are able to define a list of supported mime types and a maximum file size, please keep in mind that this is just only for a pre-validation on the extension, failure to comply will result in an error before uploading, any constrains on your backend side we have no control over that.
 
@@ -98,22 +98,18 @@ val settings = Settings.Builder
 RxUploadService.init("settings" = settings) 
 ```
 
-### Parameters
+## Parameters
 
-## Path
+### Path
 
-## Http header
+### Http header
 ```text
 ```
 
-## Request body
+### Request body
 ```text
 ```
 
-## Upload id
-```text
-``` 
-
-## Cancel request
+### Upload id & cancel upload
 ```text
 ```

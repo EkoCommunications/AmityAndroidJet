@@ -15,14 +15,14 @@ var disposable2: Disposable? = null
 textView.doAfterTextChanged {
     disposable?.dispose()
     disposable = functionASingle(it)
-        .doOnNext { // do something }
+        .doOnSuccess { // do something }
         .bindToLifecycle(this)
         .subscribe()
     }
     
     disposable2?.dispose()
     disposable2 = functionBSingle(it)
-        .doOnNext { // do something }
+        .doOnSuccess { // do something }
         .bindToLifecycle(this)
         .subscribe()
     }
@@ -92,7 +92,7 @@ var disposable: Disposable? = null
 textView.doAfterTextChanged {
     disposable?.dispose()
     disposable = searchFunctionSingle(it)
-        .doOnNext { // search results }
+        .doOnSuccess { // search results }
         .bindToLifecycle(this)
         .subscribe()
     }
@@ -106,7 +106,7 @@ textView.doAfterTextChanged {
     // this line can be executed many times
     // but only the latest will remain binded with the lifecycle.   
     searchFunctionSingle(it)
-        .doOnNext { // search results }
+        .doOnSuccess { // search results }
         .untilLifecycleEnd(lifecycleProvider = this, uniqueId = "id")
         .subscribe()
     }
@@ -114,6 +114,22 @@ textView.doAfterTextChanged {
 ```
 
 ### Cancellable Single and Completable
+
+`Single` and `Completable` are a kind of `Observable` that expects an item to be emitted or work to be done, if a lifecycle is ended before `Single` and `Completable` have a chance to do so (we find it true, a lot of time) an upstream will emit `CancellationException` unless these following extention functions are appied.
+
+ ```text
+single.doOnSuccess { }
+    .allowEmpty()
+    .untilLifecycleEnd(lifecycleProvider = this)
+    .subscribe()
+    
+completable.doOnComplete { }
+    .allowInComplete()
+    .untilLifecycleEnd(lifecycleProvider = this)
+    .subscribe()
+```
+
+### Lost functionality
 
 TODO
 
@@ -187,7 +203,3 @@ This operation automatically detects which state of the `Activity` , the `Fragme
 #### bindUntilEvent
 
 Unlike `bindToLifeCycle` It lets us tells it where should the `Observable` ends regardless of the current `Activity`, `Fragment` or `View` state you are on.
-
-### Lost functionality
-
-TODO

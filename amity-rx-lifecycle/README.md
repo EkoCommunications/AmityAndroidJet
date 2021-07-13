@@ -46,7 +46,9 @@ BehaviorSubject.create<String> { subject ->
 
 #### Unfinished tasks
 
-What happens if tasks are left unfinished? `Single` and `Completable` are a kind of `Observable` that expects an item to be emitted or work to be done, if a lifecycle is ended before `Single` and `Completable` have a chance to do so (we find it true, a lot of time) an upstream will emit `CancellationException` without a proper error handler on a downstream the app is crashed. We find many cases on this scenario (not all) that an error handler likes an alert dialog or a toast is no use 'cause the lifecycle is ended. (a user has closed a particular screen that an error has occured and no one cares! but an error log may still be useful 🙂 likes I said, not all of the cases)
+What happens if tasks are left unfinished? `Single` and `Completable` are a kind of `Observable` that expects an item to be emitted or work to be done, if a lifecycle is ended before `Single` and `Completable` have a chance to do so (we find it true, a lot of time) an upstream will emit `CancellationException` without a proper error handler on a downstream the app is crashed.
+
+We find many cases on this scenario (not all) that an error handler likes an alert dialog or a toast is no use 'cause the lifecycle is ended. (a user has closed a particular screen that an error has occured and no one cares! but an error log may still be useful 🙂 likes I said, not all of the cases)
 
 # WHAT WE OFFER!
 

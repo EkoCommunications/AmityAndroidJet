@@ -75,7 +75,7 @@ RxUploadService.init("baseUrl" = baseUrl)
 We also allow you to inject request intercepters.
 
 ```text
-RxUploadService.init(baseUrl, "interceptors" = interceptors) 
+RxUploadService.init("interceptors" = interceptors) 
 ```
 
 ### Unsupport file type, maximun file size and timeouts
@@ -103,10 +103,11 @@ RxUploadService.init("settings" = settings)
 ```text
 Uri.upload(context: Context, 
             path: String,  // a url path (baseUrl + path).
-            headers: Map<String, Any>, // any required http headers specified in the `Map.
-            params: Map<String, Any>, // any required parameters (request body) specified in the `Map`.
-            id: String? = null, // an option id used for cancel a request and acquire a request progress.
-            multipartDataKey: String): Flowable<FileProperties>
+            headers: Map<String, Any> = emptyMap(), // any required http headers specified in the `Map.
+            params: Map<String, Any> = emptyMap(), // any required parameters (request body) specified in the `Map`.
+            id: String? = null, // an optional upload id used for cancel a request and acquire a request progress.
+            multipartDataKey: String = "file") // define a custome form-data
+            : Flowable<FileProperties>
 ```
 
 ## Cancel upload

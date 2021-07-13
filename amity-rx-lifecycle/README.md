@@ -1,5 +1,7 @@
 # RxLifecycle Kotlin Extensions
 
+We are the kotlin extensions under `Flowable`, `Single`, `Maybe` and `Completable` that allows user to easily one-lined bind any subscriptions to any lifecycles.
+
 ## PROBLEM!
 
 Using `RxJava` is incredibly good (no doubt) but leaving a number of unused/unnecessary subscriptions active runs to a risk of slowness issues or memory leaking issues. Luckily, We have two handy libraries that make life much more easier. [RxLifeCycle](http://reactivex.io/documentation/operators/takeuntil.html) and [AutoDispose](https://uber.github.io/AutoDispose) are both serve a purpose of making sure that any subscriptions are not left active when they are no longer needed, but both come with limitations.

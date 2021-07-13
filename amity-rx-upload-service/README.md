@@ -21,7 +21,7 @@ data class FileProperties(
 )
 ```
 
-You can excute upload directly from `Uri` and you also have the access to file informations, bytes written and an upload progress directly from `Flowable<FileProperties>`.
+You can excute upload directly from `Uri` and you also have the access to file informations, bytes written and an upload progress directly from `FileProperties`.
 
 ```text
 //Fragment A

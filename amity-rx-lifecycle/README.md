@@ -52,7 +52,7 @@ We find many cases on this scenario (not all) that an error handler likes an ale
 
 # WHAT WE OFFER!
 
-We decide to extend the functionalities of `RxLifeCycle` to be able to solve previusly mentioned problems and remain the beauty of one line magic.
+We decide to extend the functionalities of `RxLifeCycle` to be able to solve previusly mentioned problems and remain the beauty of one line magic that applicable to `Actity`, `Fragment`, `View` and `ViewHolder`.
 
 ## Kotlin extensions
 

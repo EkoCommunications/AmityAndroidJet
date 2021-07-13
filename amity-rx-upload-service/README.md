@@ -1,6 +1,6 @@
 # RxUpload Kotlin Extension
 
-we are the kotlin extension under `Uri` class that allows user to upload a single object as a set of parts (Multipart upload) and be able to easily track the progress directly from a rx stream of progresses.
+we are the kotlin extension under `Uri` class that allows user to upload a single object as a set of parts (Multipart upload) and be able to easily track the progress directly from a rx stream of upload progresses.
 
 ## HOW!
 
@@ -21,7 +21,7 @@ data class FileProperties(
 )
 ```
 
-You can excute upload directly from `Uri` and you also have the access to file informations, bytes written and an upload progress directly from `Flowable` of `FileProperties`
+You can excute upload directly from `Uri` and you also have the access to file informations, bytes written and an upload progress directly from `Flowable` of `FileProperties`.
 
 ```text
 //Fragment A
@@ -60,22 +60,60 @@ RxUploadService.properties(uploadId)
    .subscribe()
 ```
 
+### Pre-xxx
 
+## Base url
 
-## Upload Url
-TODO
+Define the base url of your application.
 
-## HTTP Header
-TODO
+```text
+RxUploadService.init("baseUrl" = baseUrl) 
+```
 
-## Request Body
-TODO
+## Inject Http intercepter
 
-## Upload Id
-TODO 
+We also allow you to inject request intercepters.
 
-## Unsupport file type, maximun File size and timeouts
-TODO
+```text
+RxUploadService.init("interceptors" = interceptors) 
+```
 
-## Cancel upload
-TODO
+## Unsupport file type, maximun file size and timeouts
+
+You are able to define a list of supported mime types and a maximum file size, please keep in mind that this is just only for a pre-validation on the extension, failure to comply will result in an error before uploading, any constrains on your backend side we have no control over that.
+
+You also are able to define connect timeout, read timeout and write timeout.  
+
+this is a optional step the extension accepts all mime types, up to 1000MB file size and 60s timeouts as default
+
+```text
+val settings = Settings.Builder
+                    .supportedMimeTypes(mimeTypes)
+                    .maximumFileSize(fileSize)
+                    .connectTimeOutMillis(connectTimeOut)
+                    .readTimeOutMillis(readTimeOut)
+                    .writeTimeOutMillis(writeTimeOut)
+                    .build()
+                    
+RxUploadService.init("settings" = settings) 
+```
+
+### Parameters
+
+## Path
+
+## Http header
+```text
+```
+
+## Request body
+```text
+```
+
+## Upload id
+```text
+``` 
+
+## Cancel request
+```text
+```

@@ -113,6 +113,10 @@ textView.doAfterTextChanged {
 }
 ```
 
+### Cancellable Single and Completable
+
+TODO
+
 ### Bind to the Activity's lifecycle
 
 ```text
@@ -183,3 +187,7 @@ This operation automatically detects which state of the `Activity` , the `Fragme
 #### bindUntilEvent
 
 Unlike `bindToLifeCycle` It lets us tells it where should the `Observable` ends regardless of the current `Activity`, `Fragment` or `View` state you are on.
+
+#### lost functionality
+
+TODO

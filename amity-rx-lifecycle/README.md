@@ -1,4 +1,6 @@
-# PROBLEM!
+# RxLifecycle Kotlin Extensions
+
+## PROBLEM!
 
 Using `RxJava` is incredibly good (no doubt) but leaving a number of unused/unnecessary subscriptions active runs to a risk of slowness issues or memory leaking issues. Luckily, We have two handy libraries that make life much more easier. [RxLifeCycle](http://reactivex.io/documentation/operators/takeuntil.html) and [AutoDispose](https://uber.github.io/AutoDispose) are both serve a purpose of making sure that any subscriptions are not left active when they are no longer needed, but both come with limitations.
 
@@ -50,11 +52,11 @@ What happens if tasks are left unfinished? `Single` and `Completable` are a kind
 
 We find many cases on this scenario (not all) that an error handler likes an alert dialog or a toast is no use 'cause the lifecycle is ended. (a user has closed a particular screen that an error has occured and no one cares! but an error log may still be useful 🙂 likes I said, not all of the cases)
 
-# WHAT WE OFFER!
+## WHAT WE OFFER!
 
 We decide to extend the functionalities of `RxLifeCycle` to be able to solve previusly mentioned problems and remain the beauty of one line magic that applicable to `Flowable`, `Single`, `Maybe` and `Completable` on `Actity`, `Fragment`, `View` and `ViewHolder`.
 
-## Kotlin extensions
+### Kotlin extensions
 
 We introduce 4 kotlin extentions under `Flowable`, `Single`, `Maybe` and `Completable`.
 

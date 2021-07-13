@@ -32,7 +32,7 @@ In order to have an access to the `LifeCycleProvider` your `Activity` and `Fragm
 
 ### The unique id
 
-As you can see above, the `uniqueId` is optional. It requires when you wanna make sure that there should be **only one** active subscription under this particular `uniqueId`. For example, you need to make a network search function where it binds to user typing actions, for each action you need to make a network request but you don't want all of them to bind with the lifecycle just only the latest is enough so with the same `uniqueId` all those requests before the latest one will be canceled.
+As you can see above, the `uniqueId` is optional. It requires when you wanna make sure that there should be **only one** active subscription under this particular `uniqueId`. For example, you need to make a network search function where it binds to user typing actions, for each action you need to make a network request but you don't want all of them to bind with the lifecycle just only the latest is enough so with the same `uniqueId` all those requests before the latest one will be canceled/disposed.
 
 #### The old way
 

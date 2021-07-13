@@ -90,9 +90,9 @@ You also are able to define connect timeout, read timeout and write timeout.
 val settings = Settings.Builder
                     .supportedMimeTypes(mimeTypes)
                     .maximumFileSize(fileSize)
-                    .connectTimeOutMillis(connectTimeOut)
-                    .readTimeOutMillis(readTimeOut)
-                    .writeTimeOutMillis(writeTimeOut)
+                    .connectTimeOutMillis(connectTimeout)
+                    .readTimeOutMillis(readTimeout)
+                    .writeTimeOutMillis(writeTimeout)
                     .build()
                     
 RxUploadService.init("settings" = settings) 
@@ -115,4 +115,4 @@ Uri.upload(context: Context,
 RxUploadService.cancel(uploadId) 
 ```
 
-**NOTE:** Dispose or cancel the `Flowable` from `upload` method won't stop uploading. it will sliently continue upload as normal.
+**NOTE:** Dispose or cancel the `Flowable` from `upload` method won't stop the upload. it will sliently continue upload as normal.

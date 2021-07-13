@@ -2,17 +2,17 @@
 
 Using `RxJava` is incredibly good (no doubt) but leaving number of unused/unnecessary subscriptions active runs to a risk of slowness issues or memory leaking issues. Luckily, We have two handy libraries that make life much more easier. [RxLifeCycle](http://reactivex.io/documentation/operators/takeuntil.html) and [AutoDispose](https://uber.github.io/AutoDispose) are both serve a purpose of making sure that any subscriptions are not left active when they are no longer needed, but both come with limitations.
 
-**What happens** if a parameter of a subscription is a mutable object?, when it mutates you would propably need to `dispose` of a current subscription and `subscribe` to a new one with a new updated parameter, this kind of process can happen again and again during a lifecycle and we only need to keep a latest subscription with a updated parameter. 
+**What happens** if a parameter of a subscription is a mutatable object?, when it mutates you would propably need to `dispose` of a current subscription and `subscribe` to a new one with a new updated parameter, this kind of process can happen again and again during a lifecycle and we only need to keep a latest subscription with a updated parameter. 
 
-Keep an instance of a subscription and manually dispose is one way. But it definately destroys the beauty of one line magic, what will happen if there are multiple subscriptions in one class? not so handy any more huh?
+Keep an instance of a subscription and manually dispose is one way. This works perfectly fine but it definately destroys the beauty of one line magic, what will happen if there are multiple subscriptions in one class? not so handy any more huh?
 
-Another way to solve this problem is to convert a mutate parameter to an active stream of data, aka "Observable" so you now are able to connect it with a later stream.
+Another way to solve this problem is to convert a mutatable parameter to an active stream of data, aka "`Observable`" so you now are able to connect it with a later stream. This works perfectly fine as well in case you are in charge and be able to modify a source of data, you choose a solution for your problem.
 
 ```text
 var disposable: Disposable? = null
 var disposable2: Disposable? = null
 
-doAfterTextChanged {
+textView.doAfterTextChanged {
     disposable?.dispose()
     disposable = singleA(it)
         .doOnNext { // do something }
@@ -31,7 +31,7 @@ doAfterTextChanged {
 // or 
 
 BehaviorSubject.create<String> { subject ->
-            doAfterTextChanged {
+            textView.doAfterTextChanged {
                 subject.onNext(string)
             }
         }
@@ -42,7 +42,7 @@ BehaviorSubject.create<String> { subject ->
         .subscribe()
 ```
 
-# SOLUTION!
+# WHAT WE OFFER!
 
 TODO
 
@@ -89,7 +89,7 @@ As you can see above, the `uniqueId` is optional. It requires when you wanna mak
 ```text
 var disposable: Disposable? = null
 
-doAfterTextChanged {
+textView.doAfterTextChanged {
     disposable?.dispose()
     disposable = searchFunctionSingle(it)
         .doOnNext { // search results }
@@ -102,7 +102,7 @@ doAfterTextChanged {
 #### The new way
 
 ```text
-doAfterTextChanged {
+textView.doAfterTextChanged {
     // this line can be executed many times
     // but only the latest will remain binded with the lifecycle.   
     searchFunctionSingle(it)

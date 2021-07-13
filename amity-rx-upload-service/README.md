@@ -60,7 +60,7 @@ RxUploadService.properties(uploadId)
    .subscribe()
 ```
 
-## Pre-xxx
+## Prerequisite
 
 ### Base url
 
@@ -75,7 +75,7 @@ RxUploadService.init("baseUrl" = baseUrl)
 We also allow you to inject request intercepters.
 
 ```text
-RxUploadService.init("interceptors" = interceptors) 
+RxUploadService.init(baseUrl, "interceptors" = interceptors) 
 ```
 
 ### Unsupport file type, maximun file size and timeouts
@@ -84,7 +84,7 @@ You are able to define a list of supported mime types and a maximum file size, p
 
 You also are able to define connect timeout, read timeout and write timeout.  
 
-this is a optional step the extension accepts all mime types, up to 1000MB file size and 60s timeouts as default
+**NOTE:** this is a optional step, the extension accepts all mime types, up to 1000MB file size and 60s timeouts by default
 
 ```text
 val settings = Settings.Builder
@@ -98,18 +98,21 @@ val settings = Settings.Builder
 RxUploadService.init("settings" = settings) 
 ```
 
-## Parameters
+## Upload parameters
 
-### Path
-
-### Http header
 ```text
+Uri.upload(context: Context, 
+            path: String,  // a url path (baseUrl + path).
+            headers: Map<String, Any>, // any required http headers specified in the `Map.
+            params: Map<String, Any>, // any required parameters (request body) specified in the `Map`.
+            id: String? = null, // an option id used for cancel a request and acquire a request progress.
+            multipartDataKey: String): Flowable<FileProperties>
 ```
 
-### Request body
+## Cancel upload
+
 ```text
+RxUploadService.cancel(uploadId) 
 ```
 
-### Upload id & cancel upload
-```text
-```
+**NOTE:** Dispose or cancel the `Flowable` from `upload` method won't stop uploading. it will sliently continue upload as normal.

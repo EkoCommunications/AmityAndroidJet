@@ -72,7 +72,7 @@ fun <E> Completable.untilLifecycleEnd(
 )
 ```
 
-These extension are used for binding subscriptions with theirs holder's lifecycles. To prevent a memory leaks, subscriptions must be ended when theirs holder are destroyed!
+These extension are used for binding subscriptions with theirs holder's lifecycles. To prevent a memory leaks, subscriptions must be ended when theirs holders are destroyed!
 
 ### Parameters
 

@@ -14,6 +14,8 @@ Keep an instance of a subscription and manually `dispose` is one way. This works
 
 Another way to solve this problem is to convert a mutatable parameter to an active stream of data, aka "`Observable`" so you now are able to connect it with a later stream. This works perfectly fine as well in case you are in charge and be able to modify a source of data, you choose a solution for your problem.
 
+If both solution are not good enough for you, keep reading!
+
 ```text
 var disposable: Disposable? = null
 var disposable2: Disposable? = null

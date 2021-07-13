@@ -84,7 +84,7 @@ You are able to define a list of supported mime types and a maximum file size, p
 
 You also are able to define connect timeout, read timeout and write timeout.  
 
-**NOTE:** this is a optional step, the extension accepts all mime types, up to 1000MB file size and 60s timeouts by default
+**NOTE:** this is a optional step, the extension accepts all mime types, up to 1000MB file size and 60 seconds timeouts by default
 
 ```text
 val settings = Settings.Builder

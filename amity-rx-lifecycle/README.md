@@ -4,7 +4,7 @@ Using `RxJava` is incredibly good (no doubt) but leaving number of unused/unnece
 
 **What happens** if a parameter of a subscription is a mutatable object?, when it mutates you would propably need to `dispose` of a current subscription and `subscribe` to a new one with a new updated parameter, this kind of process can happen again and again during a lifecycle and we only need to keep a latest subscription with a updated parameter. 
 
-Keep an instance of a subscription and manually dispose is one way. This works perfectly fine but it definately destroys the beauty of one line magic, what will happen if there are multiple subscriptions in one class? not so handy any more huh?
+Keep an instance of a subscription and manually dispose is one way. This works perfectly fine but it definately destroys a beauty of one line magic, what will happen if there are multiple subscriptions in one class? not so handy any more huh?
 
 Another way to solve this problem is to convert a mutatable parameter to an active stream of data, aka "`Observable`" so you now are able to connect it with a later stream. This works perfectly fine as well in case you are in charge and be able to modify a source of data, you choose a solution for your problem.
 
@@ -14,14 +14,14 @@ var disposable2: Disposable? = null
 
 textView.doAfterTextChanged {
     disposable?.dispose()
-    disposable = singleA(it)
+    disposable = functionASingle(it)
         .doOnNext { // do something }
         .bindToLifecycle(this)
         .subscribe()
     }
     
     disposable2?.dispose()
-    disposable2 = singleB(it)
+    disposable2 = functionBSingle(it)
         .doOnNext { // do something }
         .bindToLifecycle(this)
         .subscribe()
@@ -36,7 +36,7 @@ BehaviorSubject.create<String> { subject ->
             }
         }
         .toFlowable(BackpressureStrategy.BUFFER)
-        .flatMap { flowableA(it) }
+        .flatMap { functionCFlowable(it) }
         .doOnNext { // do something }
         .bindToLifecycle(this)
         .subscribe()
@@ -44,7 +44,7 @@ BehaviorSubject.create<String> { subject ->
 
 # WHAT WE OFFER!
 
-TODO
+We decide to extend the functionalities of `RxLifeCycle` to be able to solve previusly mentioned problems and remain the beauty of one line magic.
 
 ## Usage
 

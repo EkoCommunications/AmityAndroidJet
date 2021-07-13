@@ -98,16 +98,15 @@ val settings = Settings.Builder
 RxUploadService.init("settings" = settings) 
 ```
 
-## Upload parameters
+## Additional parameters
 
 ```text
 Uri.upload(context: Context, 
-            path: String,  // a url path (baseUrl + path).
-            headers: Map<String, Any> = emptyMap(), // any required http headers specified in the `Map.
-            params: Map<String, Any> = emptyMap(), // any required parameters (request body) specified in the `Map`.
-            id: String? = null, // an optional upload id used for cancel a request and acquire a request progress.
-            multipartDataKey: String = "file") // define a custome form-data
-            : Flowable<FileProperties>
+            path: String,                             // a url path (baseUrl + path).
+            headers: Map<String, Any> = emptyMap(),   // any required http headers specified in the `Map.
+            params: Map<String, Any> = emptyMap(),    // any required parameters (request body) specified in the `Map`.
+            id: String? = null,                       // an optional upload id used for cancel a request and acquire a request progress.
+            multipartDataKey: String = "file"): Flowable<FileProperties>        // define a custome form-data
 ```
 
 ## Cancel upload

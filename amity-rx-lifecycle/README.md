@@ -1,12 +1,39 @@
 # PROBLEM!
 
-Using `RxJava` is incredibly good (no doubt) but leaving number of unused/unnecessary subscriptions active runs to a risk of slowness issues or memory leaking issues. Luckily, We have two exceptional libraries that make my life much more easier. [RxLifeCycle](http://reactivex.io/documentation/operators/takeuntil.html) and [AutoDispose](https://uber.github.io/AutoDispose) are both serve a purpose of making sure that any subscriptions are not left active when they are no longer needed, but both come with limitations.
+Using `RxJava` is incredibly good (no doubt) but leaving number of unused/unnecessary subscriptions active runs to a risk of slowness issues or memory leaking issues. Luckily, We have two handy libraries that make life much more easier. [RxLifeCycle](http://reactivex.io/documentation/operators/takeuntil.html) and [AutoDispose](https://uber.github.io/AutoDispose) are both serve a purpose of making sure that any subscriptions are not left active when they are no longer needed, but both come with limitations.
+
+What happens if a parameter of a subscription is a mutable object?, when it mutates you would propably need to `dispose` of a current subscription and `subscribe` to a new one with a new updated parameter, this kind of process can happen again and again during a lifecycle and we only need to keep a latest subscription with a updated parameter. 
+
+Keep an instance of a subscription and manually dispose is one way. But it definately destroys the beauty of one line magic, what will happen if there are multiple subscriptions in one class? not so handy/clean any more huh? 
+
+```text
+var disposable: Disposable? = null
+var disposable2: Disposable? = null
+
+doAfterTextChanged {
+    disposable?.dispose()
+    disposable = singleA(it)
+        .doOnNext { // do something }
+        .bindToLifecycle(this)
+        .subscribe()
+    }
+    
+    disposable2?.dispose()
+    disposable2 = singleB(it)
+        .doOnNext { // do something }
+        .bindToLifecycle(this)
+        .subscribe()
+    }
+}
+```
 
 # SOLUTION!
 
 TODO
 
 ## Usage
+
+We introduce 4 kotlin extentions under `Flowable`, `Single`, `Maybe` and `Completable`.
 
 ```text
 fun <E> Flowable.untilLifecycleEnd(
@@ -32,11 +59,13 @@ fun <E> Completable.untilLifecycleEnd(
 
 These extension are used for binding subscriptions with theirs holder's lifecycles. To prevent a memory leaks, subscriptions must be ended when theirs holder are destroyed!
 
-### The life cycle provider
+### Parameters
+
+#### lifecycleProvider
 
 In order to have an access to the `LifeCycleProvider` your `Activity` and `Fragment` need to extend theirs base classes \(`RxAppCompatActivity`, `RxFragment` and etc.\) or else define your own lifecycle by implementing the `LifeCycleProvider` interface.
 
-### The unique id
+#### uniqueId (Optional)
 
 As you can see above, the `uniqueId` is optional. It requires when you wanna make sure that there should be **only one** active subscription under this particular `uniqueId`. For example, you need to make a network search function where it binds to user typing actions, for each action you need to make a network request but you don't want all of them to bind with the lifecycle just only the latest is enough so with the same `uniqueId` all those requests before the latest one will be canceled/disposed.
 

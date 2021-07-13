@@ -168,7 +168,7 @@ The `Single` ends after the `ItemView` reaches `ON_DETACHED` state. it means the
 
 {% embed url="https://github.com/trello/RxLifecycle" %}
 
-### how does it work underneath?
+### How does it work underneath?
 
 `RxLifeCycle` provides `lifeCycleSubject` on the base `Activity` classes and the base `Fragment` classes which is used to bind to the `Observable` using `takeUntil` operation.  [\(Read more for takeUntil operation\)](http://reactivex.io/documentation/operators/takeuntil.html)
 
@@ -188,6 +188,6 @@ This operation automatically detects which state of the `Activity` , the `Fragme
 
 Unlike `bindToLifeCycle` It lets us tells it where should the `Observable` ends regardless of the current `Activity`, `Fragment` or `View` state you are on.
 
-#### lost functionality
+### Lost functionality
 
 TODO

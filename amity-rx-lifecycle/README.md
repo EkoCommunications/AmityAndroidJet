@@ -8,11 +8,11 @@ Using `RxJava` is incredibly good (no doubt) but leaving a number of unused/unne
 
 #### Mutable object
 
-What happens if a parameter of a subscription is a mutatable object?, when it mutates you would propably need to `dispose` of a current subscription and `subscribe` to a new one with a new updated parameter, this kind of process can happen again and again during a lifecycle and we only need to keep a latest subscription with a updated parameter. 
+What happens if a parameter of a subscription is a mutable object?, when it mutates you would propably need to `dispose` of a current subscription and `subscribe` to a new one with a new updated parameter, this kind of process can happen again and again during a lifecycle and we only need to keep a latest subscription with a updated parameter. 
 
 Keep an instance of a subscription and manually `dispose` is one way. This works perfectly fine but it definately destroys a beauty of one line magic, what will happen if there are multiple subscriptions in one class? not so handy any more huh?
 
-Another way to solve this problem is to convert a mutatable parameter to an active stream of data, aka "`Observable`" so you now are able to connect it with a later stream. This works perfectly fine as well in case you are in charge and be able to modify a source of data, you choose a solution for your problem.
+Another way to solve this problem is to convert a mutable parameter to an active stream of data, aka "`Observable`" so you now are able to connect it with a later stream. This works perfectly fine as well in case you are in charge and be able to modify a source of data, you choose a solution for your problem.
 
 ```text
 var disposable: Disposable? = null

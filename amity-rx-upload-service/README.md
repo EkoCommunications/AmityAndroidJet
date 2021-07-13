@@ -44,7 +44,7 @@ val uploadId = "id"
 
 //Fragment A
 
-uri.upload("id" = uploadId)
+uri.upload(uploadId)
    .subscribe()
    
 //Fragment B
@@ -67,7 +67,7 @@ RxUploadService.properties(uploadId)
 Define the base url of your application.
 
 ```text
-RxUploadService.init("baseUrl" = baseUrl) 
+RxUploadService.init(baseUrl) 
 ```
 
 ### Inject Http intercepter
@@ -75,7 +75,7 @@ RxUploadService.init("baseUrl" = baseUrl)
 We also allow you to inject request intercepters.
 
 ```text
-RxUploadService.init("interceptors" = interceptors) 
+RxUploadService.init(interceptors) 
 ```
 
 ### Unsupport file type, maximun file size and timeouts
@@ -95,7 +95,7 @@ val settings = Settings.Builder
                     .writeTimeOutMillis(writeTimeout)
                     .build()
                     
-RxUploadService.init("settings" = settings) 
+RxUploadService.init(settings) 
 ```
 
 ## Upload parameters

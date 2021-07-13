@@ -1,6 +1,6 @@
 # RxLifecycle Kotlin Extensions
 
-We are the kotlin extensions under `Flowable`, `Single`, `Maybe` and `Completable` that allows user to easily one-lined bind any subscriptions to any lifecycles.
+We are the kotlin extensions under `Flowable`, `Single`, `Maybe` and `Completable` that allow user to easily one-lined bind any subscriptions to any lifecycles.
 
 ## PROBLEM!
 

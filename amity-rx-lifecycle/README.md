@@ -2,7 +2,9 @@
 
 Using `RxJava` is incredibly good (no doubt) but leaving number of unused/unnecessary subscriptions active runs to a risk of slowness issues or memory leaking issues. Luckily, We have two handy libraries that make life much more easier. [RxLifeCycle](http://reactivex.io/documentation/operators/takeuntil.html) and [AutoDispose](https://uber.github.io/AutoDispose) are both serve a purpose of making sure that any subscriptions are not left active when they are no longer needed, but both come with limitations.
 
-**What happens** if a parameter of a subscription is a mutatable object?, when it mutates you would propably need to `dispose` of a current subscription and `subscribe` to a new one with a new updated parameter, this kind of process can happen again and again during a lifecycle and we only need to keep a latest subscription with a updated parameter. 
+#### Mutable object
+
+What happens if a parameter of a subscription is a mutatable object?, when it mutates you would propably need to `dispose` of a current subscription and `subscribe` to a new one with a new updated parameter, this kind of process can happen again and again during a lifecycle and we only need to keep a latest subscription with a updated parameter. 
 
 Keep an instance of a subscription and manually dispose is one way. This works perfectly fine but it definately destroys a beauty of one line magic, what will happen if there are multiple subscriptions in one class? not so handy any more huh?
 
@@ -41,6 +43,10 @@ BehaviorSubject.create<String> { subject ->
         .bindToLifecycle(this)
         .subscribe()
 ```
+
+#### Unfinished tasks
+
+What happens if tasks are left unfinished? `Single` and `Completable` are a kind of `Observable` that expects an item to be emitted or work to be done, if a lifecycle is ended before `Single` and `Completable` have a chance to do so (we find it true, a lot of time) an upstream will emit `CancellationException` without a proper error handler on a downupstream the app is crashed. We find many case on this scenario (not all) that an error handler likes an error popup dialog or toast is no use 'cause when the lifecycle is ended (user has closed that particular screen that an error has occured).
 
 # WHAT WE OFFER!
 
@@ -115,7 +121,7 @@ textView.doAfterTextChanged {
 
 ### Cancellable Single and Completable
 
-`Single` and `Completable` are a kind of `Observable` that expects an item to be emitted or work to be done, if a lifecycle is ended before `Single` and `Completable` have a chance to do so (we find it true, a lot of time) an upstream will emit `CancellationException` unless these following extention functions are appied.
+Without a proper error handler, if `Single` and `Completable` are disposed/canceled before it has a chance to finish thiers works. The app is crashed unless the following kotlin extensions are appied.
 
  ```text
 single.doOnSuccess { }

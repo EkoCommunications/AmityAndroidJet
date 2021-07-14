@@ -58,7 +58,7 @@ This is another `Room` entity required to keep query parameters (filters), creat
 
 #### PARAMS_DAO : AmityQueryParamsDao<PARAMS>
     
-In order for us to have access to query parameters we need to get a hand on its DAO, create a new DAO make sure it extends `AmityQueryParamsDao`, all required sql queries and transactions are on the `Interface` already.
+In order for us to have access to query parameters we need to get a hand on its `Dao`, create a new `Dao` make sure it extends `AmityQueryParamsDao`, all required sql queries and transactions are on the `Interface` already.
     
 #### Samples
 

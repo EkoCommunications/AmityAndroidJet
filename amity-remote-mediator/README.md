@@ -45,7 +45,14 @@ TODO
 ## Positional Remote Mediator
 
 ```text
-abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>>
+abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>> {
+
+    abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>    
+
+    abstract fun tableName(): String
+    
+    abstract fun primaryKeys(): Map<String, Any>
+}
 ```
 
 ### Type arguments
@@ -60,6 +67,10 @@ This is another `Room` entity required to keep query parameters (filters), creat
     
 In order for us to have access to query parameters we need to get a hand on its `Dao`, create a new `Dao` make sure it extends `AmityQueryParamsDao` and pass it on along with `Context` on a class contructor, all required sql queries and transactions are on the `Interface` already.
     
-#### Samples
+### Abstract functions
+    
+TODO
+   
+### Samples
 
 TODO

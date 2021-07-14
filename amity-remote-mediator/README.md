@@ -1,12 +1,10 @@
 # Amity Remote Mediator
 
-We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items with given filters as user scrolls, and `insert` / `query` required information into / from database, for example, previous tokens or next tokens for fetching previous pages, next pages or refresh a current page later.
+We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items with given filters as user scrolls, and `insert` / `query` necessarily information into / from database, for example, previous tokens or next tokens for later fetching more previous pages or more next pages.
 
-TODO
-- find a missing item.
-- insert a newly added item.
+Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted or moved, so without a full data comparison or a reliable real-time event from server we end up showing outdated data which no longer exists on `AmityRemoteMediator`
 
-## Type of mediator
+## First, pick the right mediator.
 
 We support 3 types of mediator, it depends on how exactly do you query data from a pagined source.
 

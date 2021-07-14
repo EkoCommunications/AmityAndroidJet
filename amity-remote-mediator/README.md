@@ -18,15 +18,29 @@ using information from the items themselves to fetch more data.
 
 using tokens to load previous or next pages (each response has next/previous token).
 
-## Samples
-
-On this sample, we assume we have access to network database and we need to fetch data from a pagined source and also numbers need to be appied.
-
 ## Positional Remote Mediator
 
 ```text
-TODO
+abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>>(
+    val context: Context, val paramsDao: PARAMS_DAO
+)
 ```
+
+#### ENTITY : Any
+
+define a type of an item (`Room` entity).
+
+#### PARAMS : AmityQueryParams
+
+This is where we keep query parameters (filters), extend and add more query parameters, if any. So we have the same set of query paramers on next queries.
+
+TODO: primary keys
+
+#### PARAMS_DAO : AmityQueryParamsDao<PARAMS>
+
+#### Samples
+
+On this sample, we assume we have access to network database and we need to fetch data from a pagined source and also numbers need to be appied.
 
 ## Item-keyed Remote Mediator
 
@@ -39,3 +53,7 @@ TODO
 ```text
 TODO
 ```
+
+#### Samples
+
+TODO

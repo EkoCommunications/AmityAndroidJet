@@ -74,6 +74,10 @@ A key/value `Map` of query parameters.
 ##### stackFromEnd
     
 set to `False` if the first page is on the top (top-down fetching) or `True` if the first page is on the bottom (bottom-up fetching)
+    
+### Sample
+
+TODO
 
 ## Positional Remote Mediator
 
@@ -114,7 +118,7 @@ A query parameter table name.
     
 A key/value `Map` of query parameters.
    
-### Samples
+### Sample
 
 TODO
     

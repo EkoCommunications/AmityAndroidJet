@@ -1,6 +1,6 @@
 # Amity Remote Mediator
 
-We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items with given filters as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, previous tokens or next tokens for fetching previous pages or next pages later.
+We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items with given filters as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, next tokens for fetching next pages later.
 
 Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from server we end up showing outdated data and I'll tell what? you don't need to worry about it on `AmityRemoteMediator`.
 
@@ -14,7 +14,7 @@ using information from the items themselves to fetch more data.
 
 #### Page-keyed Remote Mediator
 
-using tokens to load previous or next pages (each response has next/previous token).
+using tokens to load next or previous pages (each response has next or previous token).
 
 #### Positional Remote Mediator
 
@@ -31,14 +31,10 @@ TODO
 ```text
 abstract class PagedKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : AmityPagingTokenDao<TOKEN>> {
 
-    abstract fun fetchFirstPage(pageSize: Int): Maybe<TOKEN>
-
-    abstract fun fetchPage(pageNumber: Int, pageSize: Int): Maybe<TOKEN>
+    abstract fun fetchFirstPage(): Maybe<TOKEN>
         
-    abstract fun fetchNextPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
+    abstract fun fetch(token: TOKEN): Maybe<TOKEN>
     
-    open fun fetchPreviousPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
-
     abstract fun tableName(): String
     
     abstract fun primaryKeys(): Map<String, Any>
@@ -61,19 +57,11 @@ TODO
 
 ##### fetchFirstPage
     
-Trigger a network request to load the first page.
+Trigger a network request to fetch the first page.
     
-##### fetchPage
+##### fetch
     
-Trigger a network request to load a specific page (refresh) to make sure that items stay updated, this function is called by `AmityPagingDataRefresher`
-
-##### fetchNextPage
-    
-Trigger a network request to load a next page when a user has reached the last page on database.
-
-##### fetchPreviousPage
-    
-Trigger a network request to load a previous page when a user has reached the last page on database.    
+Trigger a network request to fetch a next page.
 
 ##### tableName
     

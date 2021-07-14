@@ -37,7 +37,9 @@ This is where we keep query parameters (filters), extend and add more query para
 TODO: primary keys
 
 #### PARAMS_DAO : AmityQueryParamsDao<PARAMS>
-
+    
+TODO
+    
 #### Samples
 
 On this sample, we assume we have access to network database and we need to fetch data from a pagined source and also numbers need to be appied.

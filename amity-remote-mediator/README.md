@@ -67,7 +67,7 @@ In order for us to have access to query parameters we need to get a hand on its 
     
 ##### fetch
     
-TODO
+Trigger a network request with a specific length control by`skip` and `limit`.
     
 ##### tableName
     

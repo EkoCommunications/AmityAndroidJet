@@ -57,11 +57,11 @@ TODO
 
 ##### fetchFirstPage
     
-Trigger a network request to fetch the first page.
+Trigger a network request to fetch the first page to acquire the first next and previous tokens.
     
 ##### fetch
     
-Trigger a network request to fetch a next page.
+Trigger a network request with a specific token.
 
 ##### tableName
     

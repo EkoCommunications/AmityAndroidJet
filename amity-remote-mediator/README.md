@@ -2,7 +2,7 @@
 
 We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items with given filters as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, previous tokens or next tokens for fetching previous pages or next pages later.
 
-Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted or moved, so without a full data comparison or a reliable real-time event from server we end up showing outdated data and I'll tell what? you don't need to worry about it on `AmityRemoteMediator`.
+Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from server we end up showing outdated data and I'll tell what? you don't need to worry about it on `AmityRemoteMediator`.
 
 ## First, pick the right mediator.
 
@@ -31,13 +31,13 @@ TODO
 ```text
 abstract class PagedKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : AmityPagingTokenDao<TOKEN>> {
 
-    abstract fun loadPage(pageNumber: Int, pageSize: Int): Maybe<TOKEN>
+    abstract fun fetchFirstPage(pageSize: Int): Maybe<TOKEN>
+
+    abstract fun fetchPage(pageNumber: Int, pageSize: Int): Maybe<TOKEN>
+        
+    abstract fun fetchNextPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
     
-    abstract fun loadFirstPage(pageSize: Int): Maybe<TOKEN>
-    
-    abstract fun loadNextPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
-    
-    open fun loadPreviousPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
+    open fun fetchPreviousPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
 
     abstract fun tableName(): String
     
@@ -57,21 +57,21 @@ TODO
 
 TODO
 
-### Abstract functions
+### Functions overriding
 
-***loadPage:*** TODO    
+***fetchFirstPage:*** Trigger a network request to load the first page.
+    
+***fetchPage:*** Trigger a network request to load a specific page (refresh) to make sure that items stay updated, this is called by by `AmityPagingDataRefresher`
 
-***loadFirstPage:*** TODO    
+***fetchNextPage:*** Trigger a network request to load a next page when a user has reached the last page on database.
 
-***loadNextPage:*** TODO    
-
-***loadPreviousPage:*** TODO    
+***fetchPreviousPage:*** Trigger a network request to load a previous page when a user has reached the last page on database.    
 
 ***tableName:*** A query token table name.
     
 ***primaryKeys:*** A key/value `Map` of query parameters.
     
-***stackFromEnd:*** TODO
+***stackFromEnd:*** set to `False` if the first page is on the top (top-down fetching) or `True` if the first page is on the bottom (bottom-up fetching)
 
 ## Positional Remote Mediator
 
@@ -98,13 +98,17 @@ This is another `Room` entity required to keep query parameters (filters), creat
     
 In order for us to have access to query parameters we need to get a hand on its `Dao`, create a new `Dao` make sure it extends `AmityQueryParamsDao` and pass it on via a class contructor, all required sql queries and transactions are on the `Interface` already.
     
-### Abstract functions
+### Functions overriding
     
 ***fetch:*** Trigger a network request with a specific length control by `skip` and `limit`.
 
 ***tableName:*** A query parameter table name.
     
 ***primaryKeys:*** A key/value `Map` of query parameters.
+    
+### Refresh
+    
+TODO
    
 ### Samples
 

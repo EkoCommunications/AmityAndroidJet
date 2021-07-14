@@ -34,13 +34,9 @@ TODO
 
 ### Type arguments
 
-#### ENTITY : Any
+##### ENTITY : Any
 
 define a type of an item (`Room` entity).
-
-#### Samples
-
-TODO
 
 ## Positional Remote Mediator
 
@@ -57,13 +53,13 @@ abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : 
 
 ### Type arguments
 
-#### PARAMS : AmityQueryParams
+##### PARAMS : AmityQueryParams
 
 This is another `Room` entity required to keep query parameters (filters), create a new `Room` entity, make sure it extends `AmityQueryParams` and add more query parameters, if any. So we have the same set of query paramers on next queries.
 
 **Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters, so we need to keep these two separate on database and primary keys tell them apart.
 
-#### PARAMS_DAO : AmityQueryParamsDao<PARAMS>
+##### PARAMS_DAO : AmityQueryParamsDao<PARAMS>
     
 In order for us to have access to query parameters we need to get a hand on its `Dao`, create a new `Dao` make sure it extends `AmityQueryParamsDao` and pass it on along with `Context` on a class contructor, all required sql queries and transactions are on the `Interface` already.
     

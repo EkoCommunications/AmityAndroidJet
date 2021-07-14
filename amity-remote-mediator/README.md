@@ -41,36 +41,30 @@ abstract class PagedKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : Amity
 
 ### Type arguments
 
-```text
-TOKEN : EkoQueryToken
-```
+##### TOKEN : EkoQueryToken
+
 TODO
 
-```text
-TOKEN_DAO : AmityPagingTokenDao<TOKEN>>
-```
+##### TOKEN_DAO : AmityPagingTokenDao<TOKEN>>
+
 TODO
 
 ### Abstract functions
 
-```text    
-fun loadPage(pageNumber: Int, pageSize: Int): Maybe<TOKEN>
-```
+##### abstract fun loadPage(pageNumber: Int, pageSize: Int): Maybe<TOKEN>
+
 TODO
 
-```text    
-fun loadFirstPage(pageSize: Int): Maybe<TOKEN>
-```
+##### abstract abstract fun loadFirstPage(pageSize: Int): Maybe<TOKEN>
+
 TODO
 
-```text    
-fun loadNextPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
-```
+##### abstract fun loadNextPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
+
 TODO
 
-```text    
-fun loadPreviousPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
-```
+##### open fun loadPreviousPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
+
 TODO
 
 ## Positional Remote Mediator
@@ -88,35 +82,28 @@ abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : 
 
 ### Type arguments
 
-```text
-PARAMS : AmityQueryParams
-```
+##### PARAMS : AmityQueryParams
 
 This is another `Room` entity required to keep query parameters (filters), create a new `Room` entity, make sure it extends `AmityQueryParams` and add more query parameters, if any. So we have the same set of query paramers on next queries.
 
 **Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters, so we need to keep these two separate on database and primary keys tell them apart.
 
-```text
-PARAMS_DAO : AmityQueryParamsDao<PARAMS>
-```
+##### PARAMS_DAO : AmityQueryParamsDao<PARAMS>
     
 In order for us to have access to query parameters we need to get a hand on its `Dao`, create a new `Dao` make sure it extends `AmityQueryParamsDao` and pass it on via a class contructor, all required sql queries and transactions are on the `Interface` already.
     
 ### Abstract functions
     
-```text    
-abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>
-```   
+##### abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>
+
 Trigger a network request with a specific length control by `skip` and `limit`.
-    
-```text    
-abstract fun tableName(): String
-```
+
+##### abstract fun tableName(): String
+
 A query parameter table name.
     
-```text    
-abstract fun primaryKeys(): Map<String, Any>
-```
+##### abstract fun primaryKeys(): Map<String, Any>
+
 A key/value `Map` of query parameters.
    
 ### Samples

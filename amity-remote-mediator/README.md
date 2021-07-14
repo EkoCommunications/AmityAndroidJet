@@ -22,13 +22,13 @@ using `skip` and `limit` to specify where to begin returning results and the max
 
 ## Item-keyed Remote Mediator
 
-```text
+```code
 TODO
 ```
 
 ## Page-keyed Remote Mediator
 
-```text
+```code
 abstract class PagedKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : AmityPagingTokenDao<TOKEN>> {
 
     abstract fun fetchFirstPage(): Maybe<TOKEN>
@@ -77,7 +77,7 @@ set to `False` if the first page is on the top (top-down fetching) or `True` if 
 
 ## Positional Remote Mediator
 
-```text
+```code
 abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>> {
 
     abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>    
@@ -120,4 +120,8 @@ TODO
     
 ## Refresh
     
-TODO   
+As we mentioned the in the begining of the article, once items are inserted into database, `RemoteMediator` stops fetching any more items, without a full data comparison or a reliable real-time event from server the items will eventually be outdated. To prevent that we need to inject `AmityPagingDataRefresher` into a `RecyclerView`. `AmityPagingDataRefresher` forces `RemoteMediator` to re-fetching items again when a user scrolls pass through pages. Update the outdated items and get rid of the deleted items along the with process.
+    
+```code   
+channel_list_recyclerview.addOnScrollListener(AmityPagingDataRefresher())
+```

@@ -101,13 +101,23 @@ RxUploadService.init(settings)
 ## Upload parameters
 
 ```text
-Uri.upload(context: Context, 
-            path: String,                             // a url path (baseUrl + path).
-            headers: Map<String, Any> = emptyMap(),   // any required http headers specified in the Map.
-            params: Map<String, Any> = emptyMap(),    // any required parameters specified in the Map. (request body)
-            id: String? = null,                       // an optional upload id used for cancel a request and acquire a request progress.
-            multipartDataKey: String = "file"): Flowable<FileProperties>        // define a custome form-data
+Uri.upload(context: Context,
+            path: String,
+            headers: Map<String, Any> = emptyMap(),
+            params: Map<String, Any> = emptyMap(),
+            id: String? = null,
+            multipartDataKey: String = "file"): Flowable<FileProperties>
 ```
+
+**Path:** a url path (baseUrl + path).
+
+**Headers:** any required http headers specified in the Map.
+
+**Params:** any required parameters specified in the Map (request body).
+
+**Id:** an optional upload id used for cancel a request and acquire a request progress.
+
+**MultipartDataKey:** define a custome form-data.
 
 ## Cancel upload
 

@@ -34,6 +34,12 @@ TODO
 TODO
 ```
 
+### Type arguments
+
+#### ENTITY : Any
+
+define a type of an item (`Room` entity).
+
 #### Samples
 
 TODO
@@ -47,10 +53,6 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams,
 ```
 
 ### Type arguments
-
-#### ENTITY : Any
-
-define a type of an item (`Room` entity).
 
 #### PARAMS : AmityQueryParams
 

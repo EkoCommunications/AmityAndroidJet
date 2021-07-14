@@ -65,15 +65,21 @@ In order for us to have access to query parameters we need to get a hand on its 
     
 ### Abstract functions
     
-##### fetch
+```text    
+abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>
+```
     
-Trigger a network request with a specific length control by`skip` and `limit`.
+Trigger a network request with a specific length control by `skip` and `limit`.
     
-##### tableName
-    
+```text    
+abstract fun tableName(): String
+```
+
 A query parameter table name.
     
-##### primaryKeys
+```text    
+abstract fun primaryKeys(): Map<String, Any>
+```
     
 A key/value `Map` of query parameters.
    

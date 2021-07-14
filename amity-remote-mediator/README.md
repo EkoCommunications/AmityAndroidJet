@@ -6,15 +6,15 @@ We are the `RemoteMediator` for a DB + Network based `PagingData` stream which t
 
 We support 3 types of mediator, it depends on how exactly do you query data from a pagined source.
 
-### Positional Remote Mediator
+#### Positional Remote Mediator
 
 using `skip` and `limit` to specify where to begin returning results and the maximum number of results to be returned.
 
-### Item-keyed Remote Mediator (TODO)
+#### Item-keyed Remote Mediator (TODO)
 
 using information from the items themselves to fetch more data.
 
-### Page-keyed Remote Mediator
+#### Page-keyed Remote Mediator
 
 using tokens to load previous or next pages (each response has next/previous token).
 

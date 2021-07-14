@@ -105,11 +105,11 @@ In order for us to have access to query parameters we need to get a hand on its 
 ***tableName:*** A query parameter table name.
     
 ***primaryKeys:*** A key/value `Map` of query parameters.
-    
-### Refresh
-    
-TODO
    
 ### Samples
 
 TODO
+    
+## Refresh
+    
+TODO   

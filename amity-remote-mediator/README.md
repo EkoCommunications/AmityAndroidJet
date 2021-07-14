@@ -18,7 +18,7 @@ using information from the items themselves to fetch more data.
 
 using tokens to load previous or next pages (each response has next/previous token).
 
-## HOW?
+## Samples
 
 On this sample, we assume we have access to network database and we need to fetch data from a pagined source and also numbers need to be appied.
 

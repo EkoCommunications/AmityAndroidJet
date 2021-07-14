@@ -31,11 +31,19 @@ TODO
 ```text
 abstract class PagedKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : AmityPagingTokenDao<TOKEN>> {
 
-    abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>    
+    abstract fun loadPage(pageNumber: Int, pageSize: Int): Maybe<TOKEN>
+    
+    abstract fun loadFirstPage(pageSize: Int): Maybe<TOKEN>
+    
+    abstract fun loadNextPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
+    
+    open fun loadPreviousPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
 
     abstract fun tableName(): String
     
     abstract fun primaryKeys(): Map<String, Any>
+    
+    abstract fun stackFromEnd(): Boolean
 }
 ```
 
@@ -55,7 +63,7 @@ TODO
 
 TODO
 
-##### abstract abstract fun loadFirstPage(pageSize: Int): Maybe<TOKEN>
+##### abstract fun loadFirstPage(pageSize: Int): Maybe<TOKEN>
 
 TODO
 
@@ -64,6 +72,18 @@ TODO
 TODO
 
 ##### open fun loadPreviousPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
+
+TODO
+    
+##### abstract fun tableName(): String
+
+TODO
+    
+##### abstract fun primaryKeys(): Map<String, Any>
+
+TODO
+    
+##### abstract fun stackFromEnd(): Boolean
 
 TODO
 

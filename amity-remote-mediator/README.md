@@ -14,7 +14,7 @@ using information from the items themselves to fetch more data.
 
 #### Page-keyed Remote Mediator
 
-using tokens to load next or previous pages (each response has next or previous token).
+using tokens to load pages (each response has next/previous token).
 
 #### Positional Remote Mediator
 
@@ -57,7 +57,7 @@ TODO
 
 ##### fetchFirstPage
     
-Trigger a network request to fetch the first page to acquire the first next and previous tokens.
+Trigger a network request to fetch the first page to acquire the first next/previous token.
     
 ##### fetch
     

@@ -6,7 +6,7 @@ Another common difficulty of using `RemoteMediator` is once items are inserted i
 
 ## First, pick the right mediator
 
-We support 3 types of mediator, it depends on how do you query data from a pagined source.
+We support 3 types of mediator, it depends on how do you fetch data from a pagined source.
 
 #### Item-keyed Remote Mediator
 

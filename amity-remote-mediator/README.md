@@ -47,7 +47,7 @@ TODO
 ## Positional Remote Mediator
 
 ```text
-abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>>(
+abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>>(
     val context: Context, val paramsDao: PARAMS_DAO
 )
 ```

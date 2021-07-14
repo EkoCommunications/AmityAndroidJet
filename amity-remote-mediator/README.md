@@ -59,33 +59,19 @@ TODO
 
 ### Abstract functions
 
-##### abstract fun loadPage(pageNumber: Int, pageSize: Int): Maybe<TOKEN>
+***loadPage:*** TODO    
 
-TODO
+***loadFirstPage:*** TODO    
 
-##### abstract fun loadFirstPage(pageSize: Int): Maybe<TOKEN>
+***loadNextPage:*** TODO    
 
-TODO
+***loadPreviousPage:*** TODO    
 
-##### abstract fun loadNextPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
-
-TODO
-
-##### open fun loadPreviousPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
-
-TODO
+***tableName:*** TODO
     
-##### abstract fun tableName(): String
-
-TODO
+***primaryKeys:*** TODO
     
-##### abstract fun primaryKeys(): Map<String, Any>
-
-TODO
-    
-##### abstract fun stackFromEnd(): Boolean
-
-TODO
+***stackFromEnd:*** TODO
 
 ## Positional Remote Mediator
 
@@ -114,17 +100,11 @@ In order for us to have access to query parameters we need to get a hand on its 
     
 ### Abstract functions
     
-##### abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>
+***fetch:*** Trigger a network request with a specific length control by `skip` and `limit`.
 
-Trigger a network request with a specific length control by `skip` and `limit`.
-
-##### abstract fun tableName(): String
-
-A query parameter table name.
+***tableName:*** A query parameter table name.
     
-##### abstract fun primaryKeys(): Map<String, Any>
-
-A key/value `Map` of query parameters.
+***primaryKeys:*** A key/value `Map` of query parameters.
    
 ### Samples
 

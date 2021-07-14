@@ -1,4 +1,4 @@
-# Amity Remote Mediator
+# AmityRemoteMediator
 
 We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items with given filters as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, next tokens for fetching next pages later.
 
@@ -118,9 +118,9 @@ A key/value `Map` of query parameters.
 
 TODO
     
-## Refresh
+## AmityPagingDataRefresher
     
-As we mentioned the in the begining of the article, once items are inserted into database, `RemoteMediator` stops fetching any more items, without a full data comparison or a reliable real-time event from server the items will eventually be outdated. To prevent that we need to inject `AmityPagingDataRefresher` into a `RecyclerView`. `AmityPagingDataRefresher` forces `RemoteMediator` to re-fetching items again when a user scrolls pass through pages. Update the outdated items and get rid of the deleted items along the with process.
+As we mentioned in the begining of this article, once items are inserted into database, `RemoteMediator` stops fetching any more items, without a full data comparison or a reliable real-time event from server the items will eventually be outdated. To prevent that we need to inject `AmityPagingDataRefresher` into a `RecyclerView`. `AmityPagingDataRefresher` forces `RemoteMediator` to re-fetching items again when a user scrolls pass through pages. Update the outdated items, get rid of the deleted items or move the items new positions along with the process.
     
 ```code   
 recyclerview.addOnScrollListener(AmityPagingDataRefresher())

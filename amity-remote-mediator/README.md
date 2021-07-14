@@ -100,11 +100,17 @@ In order for us to have access to query parameters we need to get a hand on its 
     
 ### Functions overriding
     
-***fetch:*** Trigger a network request with a specific length control by `skip` and `limit`.
+##### fetch
 
-***tableName:*** A query parameter table name.
+Trigger a network request with a specific length control by `skip` and `limit`.
+
+##### tableName
     
-***primaryKeys:*** A key/value `Map` of query parameters.
+A query parameter table name.
+    
+##### primaryKeys
+    
+A key/value `Map` of query parameters.
    
 ### Samples
 

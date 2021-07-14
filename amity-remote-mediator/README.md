@@ -4,7 +4,7 @@ We are the `RemoteMediator` for a DB + Network based `PagingData` stream which t
 
 Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from server we end up showing outdated data and I'll tell what? you don't need to worry about it on `AmityRemoteMediator`.
 
-## First, pick the right mediator.
+## First, pick the right mediator
 
 We support 3 types of mediator, it depends on how exactly do you query data from a pagined source.
 
@@ -61,7 +61,7 @@ TODO
 
 ***fetchFirstPage:*** Trigger a network request to load the first page.
     
-***fetchPage:*** Trigger a network request to load a specific page (refresh) to make sure that items stay updated, this is called by by `AmityPagingDataRefresher`
+***fetchPage:*** Trigger a network request to load a specific page (refresh) to make sure that items stay updated, this function is called by `AmityPagingDataRefresher`
 
 ***fetchNextPage:*** Trigger a network request to load a next page when a user has reached the last page on database.
 

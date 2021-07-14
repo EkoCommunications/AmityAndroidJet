@@ -18,6 +18,10 @@ using information from the items themselves to fetch more data.
 
 using tokens to load previous or next pages (each response has next/previous token).
 
+## HOW?
+
+
+
 ## Positional Remote Mediator
 
 ```text

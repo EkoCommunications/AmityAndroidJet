@@ -2,7 +2,7 @@
 
 we are the kotlin extension under `Uri` class that allows user to upload a single object as a set of parts (Multipart upload) and be able to easily track the progress directly from a rx stream of upload progresses.
 
-## HOW!
+## HOW?
 
 ```text
 Uri.upload(context, path, headers, params): Flowable<FileProperties>

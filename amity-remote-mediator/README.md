@@ -34,7 +34,7 @@ define a type of an item (`Room` entity).
 
 This is another `Room` entity required to keep query parameters (filters), extend and add more query parameters, if any. So we have the same set of query paramers on next queries.
 
-TODO: primary keys
+**Note:** This is very importmant, we need to make sure that xxx are part of primary keys, xx
 
 #### PARAMS_DAO : AmityQueryParamsDao<PARAMS>
     

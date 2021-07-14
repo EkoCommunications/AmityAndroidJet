@@ -29,14 +29,49 @@ TODO
 ## Page-keyed Remote Mediator
 
 ```text
-TODO
+abstract class PagedKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : AmityPagingTokenDao<TOKEN>> {
+
+    abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>    
+
+    abstract fun tableName(): String
+    
+    abstract fun primaryKeys(): Map<String, Any>
+}
 ```
 
 ### Type arguments
 
-##### ENTITY : Any
+```text
+TOKEN : EkoQueryToken
+```
+TODO
 
-define a type of an item (`Room` entity).
+```text
+TOKEN_DAO : AmityPagingTokenDao<TOKEN>>
+```
+TODO
+
+### Abstract functions
+
+```text    
+fun loadPage(pageNumber: Int, pageSize: Int): Maybe<TOKEN>
+```
+TODO
+
+```text    
+fun loadFirstPage(pageSize: Int): Maybe<TOKEN>
+```
+TODO
+
+```text    
+fun loadNextPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
+```
+TODO
+
+```text    
+fun loadPreviousPage(token: TOKEN, pageSize: Int): Maybe<TOKEN>
+```
+TODO
 
 ## Positional Remote Mediator
 
@@ -65,26 +100,23 @@ This is another `Room` entity required to keep query parameters (filters), creat
 PARAMS_DAO : AmityQueryParamsDao<PARAMS>
 ```
     
-In order for us to have access to query parameters we need to get a hand on its `Dao`, create a new `Dao` make sure it extends `AmityQueryParamsDao` and pass it on along with `Context` on a class contructor, all required sql queries and transactions are on the `Interface` already.
+In order for us to have access to query parameters we need to get a hand on its `Dao`, create a new `Dao` make sure it extends `AmityQueryParamsDao` and pass it on via a class contructor, all required sql queries and transactions are on the `Interface` already.
     
 ### Abstract functions
     
 ```text    
 abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>
-```
-    
+```   
 Trigger a network request with a specific length control by `skip` and `limit`.
     
 ```text    
 abstract fun tableName(): String
 ```
-
 A query parameter table name.
     
 ```text    
 abstract fun primaryKeys(): Map<String, Any>
 ```
-    
 A key/value `Map` of query parameters.
    
 ### Samples

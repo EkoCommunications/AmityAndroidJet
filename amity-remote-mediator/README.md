@@ -32,7 +32,7 @@ define a type of an item (`Room` entity).
 
 #### PARAMS : AmityQueryParams
 
-This is where we keep query parameters (filters), extend and add more query parameters, if any. So we have the same set of query paramers on next queries.
+This is another `Room` entity required to keep query parameters (filters), extend and add more query parameters, if any. So we have the same set of query paramers on next queries.
 
 TODO: primary keys
 

@@ -45,22 +45,20 @@ TODO
 ## Positional Remote Mediator
 
 ```text
-abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>>(
-    val context: Context, val paramsDao: PARAMS_DAO
-)
+abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>>
 ```
 
 ### Type arguments
 
 #### PARAMS : AmityQueryParams
 
-This is another `Room` entity required to keep query parameters (filters), extend it and add more query parameters, if any. So we have the same set of query paramers on next queries.
+This is another `Room` entity required to keep query parameters (filters), create a new `Room` entity, make sure it extends `AmityQueryParams` and add more query parameters, if any. So we have the same set of query paramers on next queries.
 
-**Note:** This is very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters, so we need to keep these two separate on database and primary keys tell them apart.
+**Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters, so we need to keep these two separate on database and primary keys tell them apart.
 
 #### PARAMS_DAO : AmityQueryParamsDao<PARAMS>
     
-TODO
+In order for us to have access to query parameters we need to get a hand on its DAO, create a new DAO make sure it extends `AmityQueryParamsDao`, all required sql queries and transactions are on the `Interface` already.
     
 #### Samples
 

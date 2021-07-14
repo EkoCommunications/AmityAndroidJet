@@ -67,9 +67,9 @@ TODO
 
 ***loadPreviousPage:*** TODO    
 
-***tableName:*** TODO
+***tableName:*** A query token table name.
     
-***primaryKeys:*** TODO
+***primaryKeys:*** A key/value `Map` of query parameters.
     
 ***stackFromEnd:*** TODO
 

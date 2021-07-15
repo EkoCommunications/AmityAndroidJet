@@ -47,11 +47,11 @@ abstract class PageKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : AmityP
 
 ##### AmityQueryToken
 
-`AmityQueryToken` is a `Room` entity designed to keep a next token and a previous token of each page which is later used for fetching more pages and refreshing existing pages. Create a new `Room` entity, make sure it extends `AmityQueryToken` and add more query parameters, if any. So we have the same set of query paramers on next queries.
+`AmityQueryToken` is a `Room` entity designed to keep a next token and a previous token of each page which is later used for fetching more pages and refreshing existing pages. Create a new `Room` entity, make sure it extends `AmityQueryToken` and add more query parameters, if any. So we have the same set of query parameters on next queries.
 
-What are query parameters? why do we need it? TODO
+What are query parameters? why do we need it? query parameters are a set of filters, in different usecases, sets of filters are most likely different, so do query results, so do tokens, this is why we need to keep a bond between query parameters and tokens because each set of query parameters has a specific next token and a specific previous token.
 
-**Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters, so we need to keep these two separate on database and primary keys tell them apart.
+**Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters (filters), so we need to keep these two separate on database and primary keys tell them apart.
 
 ##### AmityPagingTokenDao<TOKEN>>
 
@@ -100,9 +100,9 @@ abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : 
 
 ##### AmityQueryParams
 
-`AmityQueryParams` is a `Room` entity designed to keep query parameters (filters). Create a new `Room` entity, make sure it extends `AmityQueryParams` and add more query parameters, if any. So we have the same set of query paramers on next queries.
+`AmityQueryParams` is a `Room` entity designed to keep query parameters (filters). Create a new `Room` entity, make sure it extends `AmityQueryParams` and add more query parameters, if any. So we have the same set of query parameters on next queries.
 
-**Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters, so we need to keep these two separate on database and primary keys tell them apart.
+**Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters (filters), so we need to keep these two separate on database and primary keys tell them apart.
 
 ##### AmityQueryParamsDao<PARAMS>
     

@@ -29,7 +29,7 @@ TODO
 ## Page-keyed Remote Mediator
 
 ```code
-abstract class PageKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : AmityPagingTokenDao<TOKEN>> {
+abstract class PageKeyedRemoteMediator<TOKEN : AmityQueryToken, TOKEN_DAO : AmityPagingTokenDao<TOKEN>> {
 
     abstract fun fetchFirstPage(): Maybe<TOKEN>
         

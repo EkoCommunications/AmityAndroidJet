@@ -37,7 +37,7 @@ uri.upload()
    .subscribe()
 ```
 
-or
+or upload and listen to an upload progress in different places.
 
 ```text
 val uploadId = "id"

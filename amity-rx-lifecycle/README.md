@@ -190,7 +190,7 @@ loadImageFunctionSingle(userId)
 
 The `Single` ends after the `ItemView` reaches `ON_DETACHED` state. it means the `ItemView` is being recycled and ready for another item or it can also means its parent \(the `RecyclerView`\) reaches `ON_DETACHED` state.
 
-## Long running tasks
+### Long running tasks
 
 We are aware that some of tasks are time-consuming tasks and we don't want them to bind to any lifecycles on some usecases, for example, a user tries to upload a big video file on one chat and switch to another chat while waiting, just because a fragment or a activity are closed/destroyed it doesn't always mean that an upload task should be canceled. On this particular usecase we recommemd that you consider using `timeout` function from `RxJava` and make sure you handler `TimeoutException` properly when a specified timeout duration is reached.
 

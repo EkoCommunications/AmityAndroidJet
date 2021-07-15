@@ -29,7 +29,7 @@ TODO
 ## Page-keyed Remote Mediator
 
 ```code
-abstract class PagedKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : AmityPagingTokenDao<TOKEN>> {
+abstract class PageKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : AmityPagingTokenDao<TOKEN>> {
 
     abstract fun fetchFirstPage(): Maybe<TOKEN>
         
@@ -45,9 +45,13 @@ abstract class PagedKeyedRemoteMediator<TOKEN : EkoQueryToken, TOKEN_DAO : Amity
 
 ### Type arguments
 
-##### EkoQueryToken
+##### AmityQueryToken
 
-TODO
+`AmityQueryToken` is a `Room` entity designed to keep a next token and a previous token of each page which is later used for fetching more pages and refreshing existing pages. Create a new `Room` entity, make sure it extends `AmityQueryToken` and add more query parameters, if any. So we have the same set of query paramers on next queries.
+
+What are query parameters? why do we need it? TODO
+
+**Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters, so we need to keep these two separate on database and primary keys tell them apart.
 
 ##### AmityPagingTokenDao<TOKEN>>
 
@@ -96,7 +100,7 @@ abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : 
 
 ##### AmityQueryParams
 
-This is `Room` entity designed to keep query parameters (filters), create a new `Room` entity, make sure it extends `AmityQueryParams` and add more query parameters, if any. So we have the same set of query paramers on next queries.
+`AmityQueryParams` is a `Room` entity designed to keep query parameters (filters). Create a new `Room` entity, make sure it extends `AmityQueryParams` and add more query parameters, if any. So we have the same set of query paramers on next queries.
 
 **Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters, so we need to keep these two separate on database and primary keys tell them apart.
 

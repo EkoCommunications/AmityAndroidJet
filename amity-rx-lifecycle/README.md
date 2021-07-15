@@ -1,6 +1,6 @@
 # RxLifecycle Kotlin Extensions
 
-We are the kotlin extensions under `Flowable`, `Single`, `Maybe` and `Completable` that allow user to easily one-lined bind any subscriptions to any lifecycles.
+We are the kotlin extensions under `Flowable`, `Single`, `Maybe` and `Completable` that allow a user to easily one-lined bind any subscriptions to any lifecycles.
 
 ## PROBLEM!
 
@@ -189,6 +189,22 @@ loadImageFunctionSingle(userId)
 ```
 
 The `Single` ends after the `ItemView` reaches `ON_DETACHED` state. it means the `ItemView` is being recycled and ready for another item or it can also means its parent \(the `RecyclerView`\) reaches `ON_DETACHED` state.
+
+## Long running tasks
+
+We are aware that some of tasks are time-consuming tasks and we don't want them to bind to any lifecycles on some usecases, for example, a user tries to upload a big video file on one chat and switch to another chat while waiting, just because a fragment or a activity are closed/destroyed it doesn't always mean that an upload task should be canceled. On this particular usecase we recommemd that you consider using `timeout` function from `RxJava` and make sure you handler `TimeoutException` properly when a specified timeout duration is reached.
+
+```text
+uploadVideoSingle()
+    .timeout(60, TimeUnit.SECONDS)
+    .doOnSuccess { // upload completed }
+    .doOnError {
+        if (it is TimeoutException) {
+            // upload failed
+        }
+    }
+    .subscribe()
+```
 
 ## Get to know how RxLifecycle from Trello works
 

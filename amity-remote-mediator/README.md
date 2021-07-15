@@ -55,7 +55,7 @@ What are query parameters? why do we need it? query parameters are a set of filt
 
 ##### AmityPagingTokenDao<TOKEN>>
 
-TODO
+In order for us to have access to tokens we need to get a hand on its Dao, create a new Dao make sure it extends AmityPagingTokenDao and pass it on via a class contructor, all required sql queries and transactions are on the Interface already.
 
 ### Functions overriding
 

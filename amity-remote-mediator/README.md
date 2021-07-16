@@ -43,9 +43,7 @@ abstract class PageKeyedRemoteMediator<TOKEN : AmityQueryToken, TOKEN_DAO : Amit
 }
 ```
 
-### Type arguments
-
-##### AmityQueryToken
+### AmityQueryToken
 
 `AmityQueryToken` is a `Room` entity designed to keep a next token and a previous token of each page which is later used for fetching more pages and refreshing existing pages. Create a new `Room` entity, make sure it extends `AmityQueryToken` and add more query parameters, if any. So we have the same set of query parameters on next queries.
 
@@ -57,16 +55,39 @@ What are query parameters? why do we need it? query parameters are a set of filt
 class BookQueryToken(next: String?, previous: String?) : AmityQueryToken(next, previous)
 ``` 
 
-##### AmityPagingTokenDao
+### AmityPagingTokenDao
 
 In order for us to have access to tokens we need to get a hand on its Dao, create a new Dao make sure it extends AmityPagingTokenDao and pass it on via a class contructor, all required sql queries and transactions are on the Interface already.
 
+##### queryToken
+    
+TODO
+
+##### insertToken
+    
+TODO
+
+##### tableName
+    
+A query token table name.
+
 ```code 
 @Dao
-interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken>
+interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken> {
+
+    @RawQuery(observedEntities = [Book::class])
+    override fun queryToken(query: SimpleSQLiteQuery): Maybe<BookQueryToken>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    override fun insertToken(token: BookQueryToken): Completable
+
+    override fun tableName(): String {
+        return "book"
+    }
+}
 ``` 
 
-### Functions overriding
+### AmityRxRemoteMediator
 
 ##### fetchFirstPage
     
@@ -75,10 +96,6 @@ Trigger a network request to fetch the first page to acquire the first next and 
 ##### fetch
     
 Trigger a network request with a specific token.
-
-##### tableName
-    
-A query token table name.
     
 ##### primaryKeys
 
@@ -88,8 +105,6 @@ A key/value `Map` of query parameters.
     
 set to `False` if the first page is on the top (top-down fetching) or `True` if the first page is on the bottom (bottom-up fetching)
     
-### RemoteMediator Implementation
-
 ```code 
 class BookRxRemoteMediator(tokenDao: BookQueryTokenDao) : AmityRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
 
@@ -103,7 +118,7 @@ class BookRxRemoteMediator(tokenDao: BookQueryTokenDao) : AmityRxRemoteMediator<
             }
     }
 
-    override fun fetchPage(token: BookQueryToken): Maybe<BookQueryToken> {
+    override fun fetch(token: BookQueryToken): Maybe<BookQueryToken> {
         return Maybe.never<JsonObject>()
             .map {
                 BookQueryToken(
@@ -141,17 +156,25 @@ abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : 
 
 ### Type arguments
 
-##### AmityQueryParams
+### AmityQueryParams
 
 `AmityQueryParams` is a `Room` entity designed to keep query parameters (filters). Create a new `Room` entity, make sure it extends `AmityQueryParams` and add more query parameters, if any. So we have the same set of query parameters on next queries.
 
 **Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters (filters), so we need to keep these two separate on database and primary keys tell them apart.
 
-##### AmityQueryParamsDao
+```code 
+TODO
+``` 
+
+### AmityQueryParamsDao
     
 In order for us to have access to query parameters we need to get a hand on its `Dao`, create a new `Dao` make sure it extends `AmityQueryParamsDao` and pass it on via a class contructor, all required sql queries and transactions are on the `Interface` already.
+
+```code 
+TODO
+``` 
     
-### Functions overriding
+### AmityRxRemoteMediator
     
 ##### fetch
 
@@ -164,10 +187,10 @@ A query parameter table name.
 ##### primaryKeys
     
 A key/value `Map` of query parameters.
-   
-### Sample
 
+```code 
 TODO
+``` 
     
 ## AmityPagingDataRefresher
     

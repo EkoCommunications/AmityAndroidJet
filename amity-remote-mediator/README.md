@@ -90,7 +90,7 @@ In order for us to have access to tokens we need to get hands on its `Dao`, crea
 
 ##### queryToken
     
-Execute a `BookQueryToken` query, a query string is contrusted by `Interface`
+Execute a `BookQueryToken` query, a query string is built by `Interface`
 
 ##### insertToken
     

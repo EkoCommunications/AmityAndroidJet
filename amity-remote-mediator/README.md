@@ -29,7 +29,7 @@ TODO
 ## Page-keyed Remote Mediator
 
 ```code
-abstract class AmityPageKeyedRxRemoteMediator<TOKEN : AmityQueryToken, TOKEN_DAO : AmityQueryTokenDao<TOKEN>> {
+abstract class AmityPageKeyedRxRemoteMediator<ENTITY:Any, TOKEN : AmityQueryToken, TOKEN_DAO : AmityQueryTokenDao<TOKEN>> {
 
     abstract fun fetchFirstPage(): Maybe<TOKEN>
         
@@ -139,7 +139,7 @@ set to `False` if the first page is on the top (top-down fetching) or `True` if 
 #### Sample
     
 ```code 
-class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val bookDao: BookDao, tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
+class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val bookDao: BookDao, tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<Book, BookQueryToken, BookQueryTokenDao>(tokenDao) {
 
     private fun fetchBooksByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
         // trigger a book network request by title and category
@@ -197,6 +197,9 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
     }
 }
 ``` 
+
+we are now ready to apply `PagingData` to `RecyclerView`
+
 ```code
         val pager = Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
@@ -210,9 +213,7 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
         ) { bookDao.queryBooks(title = "rxjava", category = "programing") }
 
         pager.flowable
-            .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { recyclerAdapter.submitData(this, it) }
-            .subscribeOn(Schedulers.io())
             .subscribe()
 ```
 

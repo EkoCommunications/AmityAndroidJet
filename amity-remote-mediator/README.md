@@ -114,18 +114,34 @@ set to `False` if the first page is on the top (top-down fetching) or `True` if 
 #### Sample
     
 ```code 
-class BookPageKeyedRxRemoteMediator(tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
+class BookPageKeyedRxRemoteMediator(val title: String, val category: String, tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
 
-    override fun fetchFirstPage(pageSize: Int): Maybe<BookQueryToken> {
-        return Maybe.never<JsonObject>()
+    private fun queryByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
+        // trigger a network request for books by title and category
+    }
+
+    private fun queryByToken(token: String): Maybe<JsonObject> {
+        // trigger a network request for a next page/previous page. 
+    }
+
+    override fun fetchFirstPage(): Maybe<BookQueryToken> {
+        return queryByTitleAndCategory(title, category, pageSize)
             .map {
+                // val books = it["book"].asJsonArray
+                // insert books into database
+
+                // return a next token
                 BookQueryToken(next = it.get("next").asString)
             }
     }
 
-    override fun fetch(token: BookQueryToken): Maybe<BookQueryToken> {
-        return Maybe.never<JsonObject>()
+    override fun fetchPage(token: BookQueryToken): Maybe<BookQueryToken> {
+        return queryByToken(title, category)
             .map {
+                // val books = it["book"].asJsonArray
+                // insert books into database
+
+                // return tokens
                 BookQueryToken(
                     next = it.get("next").asString,
                     previous = it.get("previous").asString

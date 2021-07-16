@@ -81,7 +81,63 @@ set to `False` if the first page is on the top (top-down fetching) or `True` if 
     
 ### Sample
 
-TODO
+##### BookQueryToken
+
+```code 
+class BookQueryToken(next: String?, previous: String?) : AmityQueryToken(next, previous)
+``` 
+
+##### BookQueryTokenDao
+
+```code 
+@Dao
+interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken>
+``` 
+
+##### BookQueryTokenDao
+
+```code 
+@Dao
+interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken>
+``` 
+
+##### BookRxRemoteMediator
+
+```code 
+class BookRxRemoteMediator(tokenDao: BookQueryTokenDao) : AmityRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
+
+    override fun fetchFirstPage(pageSize: Int): Maybe<BookQueryToken> {
+        return Maybe.never<JsonObject>()
+            .map {
+                BookQueryToken(
+                    next = it.get("next").asString,
+                    previous = it.get("previous").asString
+                )
+            }
+    }
+
+    override fun fetchPage(token: BookQueryToken): Maybe<BookQueryToken> {
+        return Maybe.never<JsonObject>()
+            .map {
+                BookQueryToken(
+                    next = it.get("next").asString,
+                    previous = it.get("previous").asString
+                )
+            }
+    }
+
+    override fun primaryKeys(): Map<String, Any> {
+        return mapOf(
+            "" to "",
+            "" to ""
+        )
+    }
+
+    override fun stackFromEnd(): Boolean {
+        return true
+    }
+}
+``` 
 
 ## Positional Remote Mediator
 

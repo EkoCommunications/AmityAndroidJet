@@ -2,11 +2,11 @@
 
 We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items with given filters as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, tokens for fetching more pages later.
 
-Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from a server we end up showing outdated data and I'll tell what? you don't need to worry about it on `AmityRxRemoteMediator`.
+Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from a server we end up showing outdated data and I'll tell what? we don't need to worry about it on `AmityRxRemoteMediator`.
 
 ## First, pick the right mediator
 
-We support 3 types of mediator, it depends on how do you fetch data from a pagined source.
+We support 3 types of mediator, it depends on how do we fetch data from a pagined source.
 
 #### Item-keyed Remote Mediator
 
@@ -90,7 +90,7 @@ In order for us to have access to tokens we need to get hands on its `Dao`, crea
 
 ##### queryToken
     
-Execute a `BookQueryToken` query, a query string is built by `Interface`
+Execute a `BookQueryToken` query, a query string is built for us by the `Interface` all we need to do is to annotate a function with `@RawQuery`.
 
 ##### insertToken
     

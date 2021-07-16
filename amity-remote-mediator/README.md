@@ -61,15 +61,15 @@ class BookQueryToken(next: String?, previous: String?) : AmityQueryToken(next, p
 
 ### AmityQueryTokenDao
 
-In order for us to have access to tokens we need to get a hand on its Dao, create a new Dao make sure it extends AmityPagingTokenDao and pass it on via a class contructor, all required sql queries and transactions are on the Interface already.
+In order for us to have access to tokens we need to get hands on its `Dao`, create a new `Dao` make sure it extends `AmityPagingTokenDao` and pass it on via a class contructor, implement all these following functions, any other additional sql queries and transactions are on the `Interface` already.
 
 ##### queryToken
     
-TODO
+Execute a `BookQueryToken` query that was contrusted by `AmityQueryTokenDao`
 
 ##### insertToken
     
-TODO
+Insert a `BookQueryToken` object into database for later usages, using `OnConflictStrategy.REPLACE` as a conflict strategy is recommended as tokens may change over time and outdate tokens should be replaced.
 
 ##### tableName
     
@@ -81,7 +81,7 @@ A query token table name.
 @Dao
 interface BookQueryTokenDao : AmityQueryTokenDao<BookQueryToken> {
 
-    @RawQuery(observedEntities = [Book::class])
+    @RawQuery(observedEntities = [BookQueryToken::class])
     override fun queryToken(query: SimpleSQLiteQuery): Maybe<BookQueryToken>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

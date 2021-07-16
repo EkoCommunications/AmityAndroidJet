@@ -54,6 +54,10 @@ What are query parameters? why do we need it? query parameters are a set of filt
 #### Sample
 
 ```code 
+@Entity(
+    tableName = "book_query_token",
+    primaryKeys = ["category", "title"]
+)
 class BookQueryToken(next: String?, previous: String?) : AmityQueryToken(next, previous)
 ``` 
 
@@ -86,7 +90,7 @@ interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken> {
     override fun insertToken(token: BookQueryToken): Completable
 
     override fun tableName(): String {
-        return "book"
+        return "book_query_token"
     }
 }
 ``` 

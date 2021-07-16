@@ -198,7 +198,7 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
 }
 ``` 
 
-We now have everything in place, we can then create `PagingData` stream using `RemoteMediator` and submit data into `RecyclerView` through its `Adapter`.
+We now have everything in place, we can then proceed to create a `PagingData` stream using `RemoteMediator` and submit data into `RecyclerView` through its `Adapter`.
 
 ```code
         val pagingData = Pager(

@@ -43,7 +43,7 @@ abstract class AmityPageKeyedRxRemoteMediator<TOKEN : AmityQueryToken, TOKEN_DAO
 
 #### Sample
 
-In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows user to only see a list of books with a specific title and category. First let's create a book `Entity` which has three arguments bookId, title and category and a book `Dao` with two basic functions query and insert.
+In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows user to only see a list of books with a specific title and category. First let's create a book `Entity` which has three arguments bookId, title and category and a book `Dao` with two basic functions, query and insert.
 
 ```code 
 @Entity(
@@ -139,7 +139,7 @@ set to `False` if the first page is on the top (top-down fetching) or `True` if 
 #### Sample
     
 ```code 
-class BookPageKeyedRxRemoteMediator(val title: String, val category: String, tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
+class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val bookDao: BookDao, tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
 
     private fun fetchBooksByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
         // trigger a book network request by title and category
@@ -150,27 +150,38 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, tok
     }
 
     override fun fetchFirstPage(): Maybe<BookQueryToken> {
-        return queryByTitleAndCategory(title, category, pageSize)
-            .map {
-                // val books = it["book"].asJsonArray
-                // insert books into database
-
-                // return a next token
-                BookQueryToken(next = it.get("next").asString)
+        return fetchBooksByTitleAndCategory(title, category, pageSize)
+            .flatMap {
+                // insert books into database and return a next token           
+                val books = it["books"].asJsonArray
+                val type = object : TypeToken<List<Book>>() {}.type
+                bookDao.insertBooks(Gson().fromJson(books, type))
+                    .andThen(
+                        Maybe.just(
+                            BookQueryToken(
+                                next = it.get("next").asString,
+                                previous = null
+                            )
+                        )
+                    )
             }
     }
 
     override fun fetch(token: BookQueryToken): Maybe<BookQueryToken> {
-        return queryByToken(token)
-            .map {
-                // val books = it["book"].asJsonArray
-                // insert books into database
-
-                // return tokens
-                BookQueryToken(
-                    next = it.get("next").asString,
-                    previous = it.get("previous").asString
-                )
+        return fetchBooksByToken(token)
+            .flatMap {
+                // insert books into database and return tokens           
+                val books = it["books"].asJsonArray
+                val type = object : TypeToken<List<Book>>() {}.type
+                bookDao.insertBooks(Gson().fromJson(books, type))
+                    .andThen(
+                        Maybe.just(
+                            BookQueryToken(
+                                next = it.get("next").asString,
+                                previous = it.get("previous").asString
+                            )
+                        )
+                    )
             }
     }
 

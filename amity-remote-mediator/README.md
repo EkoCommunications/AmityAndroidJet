@@ -198,8 +198,6 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
 }
 ``` 
 
-we are now ready to apply `PagingData` to `RecyclerView`
-
 ```code
         val pager = Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
@@ -207,8 +205,8 @@ we are now ready to apply `PagingData` to `RecyclerView`
             remoteMediator = BookRxRemoteMediator(
                 title = "rxjava",
                 category = "programing",
-                bookDao = bookDao!!,
-                tokenDao = bookQueryTokenDao!!
+                bookDao = bookDao,
+                tokenDao = bookQueryTokenDao
             )
         ) { bookDao.queryBooks(title = "rxjava", category = "programing") }
 
@@ -216,6 +214,8 @@ we are now ready to apply `PagingData` to `RecyclerView`
             .doOnNext { recyclerAdapter.submitData(this, it) }
             .subscribe()
 ```
+
+**Note:** This is a very **IMPORTANT RULE** TODO
 
 ## Positional Remote Mediator
 

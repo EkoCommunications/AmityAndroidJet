@@ -41,6 +41,19 @@ abstract class AmityPageKeyedRxRemoteMediator<TOKEN : AmityQueryToken, TOKEN_DAO
 }
 ```
 
+#### Sample
+
+In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows user to only see a list of books with a specific category and title. First create a book `Entity` which has three arguments bookId, title and category. 
+
+```code 
+@Entity(
+    tableName = "book",
+    primaryKeys = ["bookId"],
+    indices = [Index(value = ["title", "category"])]
+)
+class Book(var bookId: String)
+``` 
+
 ### AmityQueryToken
 
 `AmityQueryToken` is a `Room` entity designed to keep a next token and a previous token of each page which is later used for fetching more pages and refreshing existing pages. Create a new `Room` entity, make sure it extends `AmityQueryToken` and add more query parameters, if any. So we have the same set of query parameters on next queries.
@@ -56,7 +69,7 @@ What are query parameters? why do we need it? query parameters are a set of filt
     tableName = "book_query_token",
     primaryKeys = ["title", "category"] // query parameters as primary keys
 )
-class BookQueryToken(val title: String, val category: String, next: String?, previous: String?) : AmityQueryToken(next, previous)
+class BookQueryToken(var title: String, var category: String, next: String?, previous: String?) : AmityQueryToken(next, previous)
 ``` 
 
 ### AmityQueryTokenDao
@@ -116,11 +129,11 @@ set to `False` if the first page is on the top (top-down fetching) or `True` if 
 ```code 
 class BookPageKeyedRxRemoteMediator(val title: String, val category: String, tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
 
-    private fun fetchByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
+    private fun fetchBooksByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
         // trigger a book network request by title and category
     }
 
-    private fun fetchByToken(token: String): Maybe<JsonObject> {
+    private fun fetchBooksByToken(token: String): Maybe<JsonObject> {
         // trigger a book network request for a next page/previous page. 
     }
 

@@ -94,13 +94,6 @@ class BookQueryToken(next: String?, previous: String?) : AmityQueryToken(next, p
 interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken>
 ``` 
 
-##### BookQueryTokenDao
-
-```code 
-@Dao
-interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken>
-``` 
-
 ##### BookRxRemoteMediator
 
 ```code 

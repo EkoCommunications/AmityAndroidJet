@@ -197,6 +197,24 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
     }
 }
 ``` 
+```code
+        val pager = Pager(
+            config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+            initialKey = null,
+            remoteMediator = BookRxRemoteMediator(
+                title = "rxjava",
+                category = "programing",
+                bookDao = bookDao!!,
+                tokenDao = bookQueryTokenDao!!
+            )
+        ) { bookDao.queryBooks(title = "rxjava", category = "programing") }
+
+        pager.flowable
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext { recyclerAdapter.submitData(this, it) }
+            .subscribeOn(Schedulers.io())
+            .subscribe()
+```
 
 ## Positional Remote Mediator
 

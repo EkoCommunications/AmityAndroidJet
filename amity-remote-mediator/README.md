@@ -1,8 +1,8 @@
-# AmityRemoteMediator
+# AmityRxRemoteMediator
 
 We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items with given filters as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, tokens for fetching more pages later.
 
-Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from a server we end up showing outdated data and I'll tell what? you don't need to worry about it on `AmityRemoteMediator`.
+Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from a server we end up showing outdated data and I'll tell what? you don't need to worry about it on `AmityRxRemoteMediator`.
 
 ## First, pick the right mediator
 

@@ -198,8 +198,10 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
 }
 ``` 
 
+We now have everything in place, we can then create `PagingData` stream using `RemoteMediator` and submit data into `RecyclerView` through its `Adapter`.
+
 ```code
-        val pager = Pager(
+        val pagingData = Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
             initialKey = null,
             remoteMediator = BookRxRemoteMediator(
@@ -208,9 +210,9 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
                 bookDao = bookDao,
                 tokenDao = bookQueryTokenDao
             )
-        ) { bookDao.queryBooks(title = "rxjava", category = "programing") }
+        ) { bookDao.queryBooks(title = "rxjava", category = "programing") }.flowable
 
-        pager.flowable
+        pagingData
             .doOnNext { recyclerAdapter.submitData(this, it) }
             .subscribe()
 ```

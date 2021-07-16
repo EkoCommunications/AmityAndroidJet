@@ -43,7 +43,7 @@ abstract class AmityPageKeyedRxRemoteMediator<TOKEN : AmityQueryToken, TOKEN_DAO
 
 #### Sample
 
-In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows user to only see a list of books with a specific category and title. First create a book `Entity` which has three arguments bookId, title and category. 
+In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows user to only see a list of books with a specific title and category. First let's create a book `Entity` which has three arguments bookId, title and category and a book `Dao` with two basic functions query and insert.
 
 ```code 
 @Entity(
@@ -51,7 +51,19 @@ In this sample we assume we need to build a book store application with a simple
     primaryKeys = ["bookId"],
     indices = [Index(value = ["title", "category"])]
 )
-class Book(var bookId: String)
+class Book(var bookId: String, var title: String, var category: String)
+``` 
+
+```code 
+@Dao
+interface BookDao {
+
+    @Query("select * from book where title = :title and category = :category")
+    fun queryBooks(title: String, category: String): PagingSource<Int, Book>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertBooks(books: List<Book>): Completable
+}
 ``` 
 
 ### AmityQueryToken

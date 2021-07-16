@@ -54,7 +54,7 @@ What are query parameters? why do we need it? query parameters are a set of filt
 ```code 
 @Entity(
     tableName = "book_query_token",
-    primaryKeys = ["category", "title"]
+    primaryKeys = ["title", "category"] // query parameters as primary keys
 )
 class BookQueryToken(val title: String, val category: String, next: String?, previous: String?) : AmityQueryToken(next, previous)
 ``` 

@@ -61,7 +61,7 @@ What are query parameters? why do we need it? query parameters are a set of filt
 class BookQueryToken(next: String?, previous: String?) : AmityQueryToken(next, previous)
 ``` 
 
-### AmityPagingTokenDao
+### AmityQueryTokenDao
 
 In order for us to have access to tokens we need to get a hand on its Dao, create a new Dao make sure it extends AmityPagingTokenDao and pass it on via a class contructor, all required sql queries and transactions are on the Interface already.
 
@@ -81,7 +81,7 @@ A query token table name.
 
 ```code 
 @Dao
-interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken> {
+interface BookQueryTokenDao : AmityQueryTokenDao<BookQueryToken> {
 
     @RawQuery(observedEntities = [Book::class])
     override fun queryToken(query: SimpleSQLiteQuery): Maybe<BookQueryToken>
@@ -95,11 +95,11 @@ interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken> {
 }
 ``` 
 
-### AmityRxRemoteMediator
+### AmityPageKeyedRxRemoteMediator
 
 ##### fetchFirstPage
     
-Trigger a network request to fetch the first page to acquire the first next and previous tokens.
+Trigger a network request to fetch the first page to acquire the first next token (or the first previous token in case stackFromEnd is `True`).
     
 ##### fetch
     
@@ -116,7 +116,7 @@ set to `False` if the first page is on the top (top-down fetching) or `True` if 
 #### Sample
     
 ```code 
-class BookRxRemoteMediator(tokenDao: BookQueryTokenDao) : AmityRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
+class BookPageKeyedRxRemoteMediator(tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
 
     override fun fetchFirstPage(pageSize: Int): Maybe<BookQueryToken> {
         return Maybe.never<JsonObject>()
@@ -183,7 +183,7 @@ In order for us to have access to query parameters we need to get a hand on its 
 TODO
 ``` 
     
-### AmityRxRemoteMediator
+### AmityPositionalRxRemoteMediator
     
 ##### fetch
 

@@ -53,9 +53,18 @@ What are query parameters? why do we need it? query parameters are a set of filt
 
 **Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters (filters), so we need to keep these two separate on database and primary keys tell them apart.
 
+```code 
+class BookQueryToken(next: String?, previous: String?) : AmityQueryToken(next, previous)
+``` 
+
 ##### AmityPagingTokenDao
 
 In order for us to have access to tokens we need to get a hand on its Dao, create a new Dao make sure it extends AmityPagingTokenDao and pass it on via a class contructor, all required sql queries and transactions are on the Interface already.
+
+```code 
+@Dao
+interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken>
+``` 
 
 ### Functions overriding
 
@@ -79,22 +88,7 @@ A key/value `Map` of query parameters.
     
 set to `False` if the first page is on the top (top-down fetching) or `True` if the first page is on the bottom (bottom-up fetching)
     
-### Sample
-
-##### BookQueryToken
-
-```code 
-class BookQueryToken(next: String?, previous: String?) : AmityQueryToken(next, previous)
-``` 
-
-##### BookQueryTokenDao
-
-```code 
-@Dao
-interface BookQueryTokenDao : AmityPagingTokenDao<BookQueryToken>
-``` 
-
-##### BookRxRemoteMediator
+### RemoteMediator Implementation
 
 ```code 
 class BookRxRemoteMediator(tokenDao: BookQueryTokenDao) : AmityRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {

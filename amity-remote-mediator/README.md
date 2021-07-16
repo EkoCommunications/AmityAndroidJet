@@ -65,7 +65,7 @@ In order for us to have access to tokens we need to get hands on its `Dao`, crea
 
 ##### queryToken
     
-Execute a `BookQueryToken` query that was contrusted by `AmityQueryTokenDao`
+Execute a `BookQueryToken` query, a query string is contrusted by `Interface`
 
 ##### insertToken
     

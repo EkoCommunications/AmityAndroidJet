@@ -217,7 +217,7 @@ We now have everything in place, we can then proceed to create a `PagingData` st
             .subscribe()
 ```
 
-**Note:** This is a very **IMPORTANT RULE** TODO
+**Note:** It is a very **IMPORTANT** that a database query and a network query are identical TODO TODO TODO
 
 ## Positional Remote Mediator
 

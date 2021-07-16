@@ -29,14 +29,12 @@ TODO
 ## Page-keyed Remote Mediator
 
 ```code
-abstract class PageKeyedRemoteMediator<TOKEN : AmityQueryToken, TOKEN_DAO : AmityPagingTokenDao<TOKEN>> {
+abstract class AmityPageKeyedRxRemoteMediator<TOKEN : AmityQueryToken, TOKEN_DAO : AmityQueryTokenDao<TOKEN>> {
 
     abstract fun fetchFirstPage(): Maybe<TOKEN>
         
     abstract fun fetch(token: TOKEN): Maybe<TOKEN>
-    
-    abstract fun tableName(): String
-    
+        
     abstract fun primaryKeys(): Map<String, Any>
     
     abstract fun stackFromEnd(): Boolean

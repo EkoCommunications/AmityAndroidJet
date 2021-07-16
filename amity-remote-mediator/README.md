@@ -116,12 +116,12 @@ set to `False` if the first page is on the top (top-down fetching) or `True` if 
 ```code 
 class BookPageKeyedRxRemoteMediator(val title: String, val category: String, tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<BookQueryToken, BookQueryTokenDao>(tokenDao) {
 
-    private fun queryByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
-        // trigger a network request for books by title and category
+    private fun fetchByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
+        // trigger a book network request by title and category
     }
 
-    private fun queryByToken(token: String): Maybe<JsonObject> {
-        // trigger a network request for a next page/previous page. 
+    private fun fetchByToken(token: String): Maybe<JsonObject> {
+        // trigger a book network request for a next page/previous page. 
     }
 
     override fun fetchFirstPage(): Maybe<BookQueryToken> {
@@ -135,8 +135,8 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, tok
             }
     }
 
-    override fun fetchPage(token: BookQueryToken): Maybe<BookQueryToken> {
-        return queryByToken(title, category)
+    override fun fetch(token: BookQueryToken): Maybe<BookQueryToken> {
+        return queryByToken(token)
             .map {
                 // val books = it["book"].asJsonArray
                 // insert books into database
@@ -151,8 +151,8 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, tok
 
     override fun primaryKeys(): Map<String, Any> {
         return mapOf(
-            "" to "",
-            "" to ""
+            "title" to title,
+            "category" to category
         )
     }
 

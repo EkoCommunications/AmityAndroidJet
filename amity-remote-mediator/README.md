@@ -111,10 +111,7 @@ class BookRxRemoteMediator(tokenDao: BookQueryTokenDao) : AmityRxRemoteMediator<
     override fun fetchFirstPage(pageSize: Int): Maybe<BookQueryToken> {
         return Maybe.never<JsonObject>()
             .map {
-                BookQueryToken(
-                    next = it.get("next").asString,
-                    previous = it.get("previous").asString
-                )
+                BookQueryToken(next = it.get("next").asString)
             }
     }
 
@@ -136,7 +133,7 @@ class BookRxRemoteMediator(tokenDao: BookQueryTokenDao) : AmityRxRemoteMediator<
     }
 
     override fun stackFromEnd(): Boolean {
-        return true
+        return false
     }
 }
 ``` 

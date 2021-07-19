@@ -55,8 +55,4 @@ interface AmityQueryTokenDao<QUERY_TOKEN : AmityQueryToken> : AmityQueryDao {
     }
 
     fun queryToken(query: SimpleSQLiteQuery): Maybe<QUERY_TOKEN>
-
-    fun deleteTokensAfterPageNumber(queryParameters: Map<String, Any>, pageNumber: Int): Completable {
-        return Completable.never()
-    }
 }

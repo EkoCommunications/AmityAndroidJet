@@ -8,8 +8,4 @@ interface AmityQueryParamsDao<PARAMS : AmityQueryParams> : AmityQueryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertParams(parameter: PARAMS): Completable
-
-    fun deleteTokensAfterPageNumber(queryParameters: Map<String, Any>, pageNumber: Int): Completable {
-        return Completable.never()
-    }
 }

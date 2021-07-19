@@ -217,14 +217,14 @@ We now have everything in place, we can then proceed to create a `PagingData` st
             .subscribe()
 ```
 
-**Note:** It is a very **IMPORTANT** that a database query and a network query are identical TODO TODO TODO
+**Note:** It is a very **IMPORTANT** that a local database query and a network request are using the same set of parameters, using different sets of parameters on two datasources is very risky, `RemoteMediator` could repeatedly trigger a network request with one set of parameters while locally looking for data matched with another set of parameters which there is a posibility that there is no any or just some.
 
 ## Positional Remote Mediator
 
 ```code
 abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>> {
 
-    abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>    
+    abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>
 
     abstract fun tableName(): String
     

@@ -1,6 +1,5 @@
 package co.amity.rxremotemediator
 
-import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -13,7 +12,7 @@ import kotlin.math.max
 private const val DEFAULT_MAX_PAGE_NUMBER = 0
 
 @ExperimentalPagingApi
-abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>>(private val context: Context, private val paramsDao: PARAMS_DAO) :
+abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>>(private val paramsDao: PARAMS_DAO) :
     AmityRxRemoteMediator<ENTITY>() {
 
     private var maxPageNumber = DEFAULT_MAX_PAGE_NUMBER
@@ -59,7 +58,7 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams,
     }
 
     private fun deleteParamsAfterIndex(index: Int): Completable {
-        return paramsDao.deleteParamsAfterIndex(context, queryParameters = queryParameters(), index = index)
+        return paramsDao.deleteParamsAfterIndex(queryParameters = queryParameters(), index = index)
     }
 
     final override fun stackFromEnd(): Boolean {

@@ -1,6 +1,5 @@
 package co.amity.android.rxremotemediator
 
-import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import co.amity.rxremotemediator.PageKeyedRxRemoteMediator
 import com.google.gson.Gson
@@ -9,8 +8,8 @@ import com.google.gson.reflect.TypeToken
 import io.reactivex.Maybe
 
 @ExperimentalPagingApi
-class BookPageKeyedRxRemoteMediator(context: Context, val title: String, val category: String, val bookDao: BookDao, tokenDao: BookQueryTokenDao) :
-    PageKeyedRxRemoteMediator<Book, BookQueryToken, BookQueryTokenDao>(context, tokenDao) {
+class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val bookDao: BookDao, tokenDao: BookQueryTokenDao) :
+    PageKeyedRxRemoteMediator<Book, BookQueryToken, BookQueryTokenDao>(tokenDao) {
 
     private fun queryByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
         TODO("Not yet implemented")

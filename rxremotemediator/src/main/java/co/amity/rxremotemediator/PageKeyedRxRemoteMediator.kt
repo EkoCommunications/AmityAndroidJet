@@ -15,7 +15,7 @@ import kotlin.math.max
 const val INVALID_PAGE_NUMBER = -1
 
 @ExperimentalPagingApi
-abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryTokens, TOKEN_DAO : AmityQueryTokensDao<TOKEN>>(private val context: Context, private val tokenDao: TOKEN_DAO) :
+abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryTokens, TOKEN_DAO : AmityQueryTokensDao<TOKEN>>(private val tokenDao: TOKEN_DAO) :
     AmityRxRemoteMediator<ENTITY>() {
 
     final override fun loadSingle(loadType: LoadType, state: PagingState<Int, ENTITY>): Single<MediatorResult> {
@@ -80,7 +80,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryTokens,
             tokenDao.insertToken(token)
                 .andThen(
                     when (isLastPage) {
-                        true -> deleteTokensAfterPageNumber(context, pageNumber = token.pageNumber)
+                        true -> deleteTokensAfterPageNumber(pageNumber = token.pageNumber)
                         false -> Completable.complete()
                     }
                 )
@@ -88,8 +88,8 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryTokens,
         }
     }
 
-    private fun deleteTokensAfterPageNumber(context: Context, pageNumber: Int): Completable {
-        return tokenDao.deleteTokensAfterPageNumber(context, queryParameters = queryParameters(), pageNumber = pageNumber)
+    private fun deleteTokensAfterPageNumber(pageNumber: Int): Completable {
+        return tokenDao.deleteTokensAfterPageNumber(queryParameters = queryParameters(), pageNumber = pageNumber)
     }
 
     private val interceptErrorAndEmpty = MaybeTransformer<MediatorResult, MediatorResult> { upstream ->

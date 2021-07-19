@@ -1,6 +1,5 @@
 package co.amity.rxremotemediator
 
-import android.content.Context
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.sqlite.db.SimpleSQLiteQuery

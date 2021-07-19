@@ -11,7 +11,7 @@ interface AmityQueryTokensDao<QUERY_TOKENS : AmityQueryTokens> : AmityQueryObjec
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertToken(token: QUERY_TOKENS): Completable
 
-    fun getFirstQueryToken(primaryKeys: Map<String, Any>): Maybe<String> {
+    fun getFirstQueryToken(primaryKeys: Map<String, Any>): Maybe<QUERY_TOKENS> {
         return queryToken(
             SimpleSQLiteQuery(
                 String.format(
@@ -20,10 +20,9 @@ interface AmityQueryTokensDao<QUERY_TOKENS : AmityQueryTokens> : AmityQueryObjec
                 )
             )
         ).filter { it.previous != null }
-            .map<String> { it.previous }
     }
 
-    fun getLastQueryToken(primaryKeys: Map<String, Any>): Maybe<String> {
+    fun getLastQueryToken(primaryKeys: Map<String, Any>): Maybe<QUERY_TOKENS> {
         return queryToken(
             SimpleSQLiteQuery(
                 String.format(
@@ -32,7 +31,6 @@ interface AmityQueryTokensDao<QUERY_TOKENS : AmityQueryTokens> : AmityQueryObjec
                 )
             )
         ).filter { it.next != null }
-            .map<String> { it.next }
     }
 
     fun getTokenByPageNumber(pageNumber: Int, primaryKeys: Map<String, Any>): Maybe<String> {

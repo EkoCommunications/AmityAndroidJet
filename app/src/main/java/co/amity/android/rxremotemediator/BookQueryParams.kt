@@ -5,6 +5,6 @@ import co.amity.rxremotemediator.AmityQueryParams
 
 @Entity(
     tableName = "book_query_params",
-    primaryKeys = ["title", "category"]
+    primaryKeys = ["title", "category", "position"]
 )
-class BookQueryParams(var title: String, var category: String, position: Int, endOfPaginationReached: Boolean) : AmityQueryParams(position, endOfPaginationReached)
+class BookQueryParams(var title: String, var category: String, endOfPaginationReached: Boolean) : AmityQueryParams(endOfPaginationReached)

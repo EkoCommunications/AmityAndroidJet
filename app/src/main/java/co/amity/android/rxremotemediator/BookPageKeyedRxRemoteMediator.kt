@@ -25,18 +25,36 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
                 val books = it["book"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
-                    .andThen(Maybe.just(BookQueryToken(title = title, category = category, next = it.get("next").asString, previous = null)))
+                    .andThen(
+                        Maybe.just(
+                            BookQueryToken(
+                                title = title,
+                                category = category,
+                                next = it.get("next").asString,
+                                previous = null
+                            )
+                        )
+                    )
             }
     }
 
-    override fun fetch(token: String, pageSize: Int): Maybe<BookQueryToken> {
+    override fun fetch(token: String): Maybe<BookQueryToken> {
         return queryByToken(token)
             .flatMap {
                 // insert books into database and return tokens
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
-                    .andThen(Maybe.just(BookQueryToken(title = title, category = category, next = it.get("next").asString, previous = it.get("previous").asString)))
+                    .andThen(
+                        Maybe.just(
+                            BookQueryToken(
+                                title = title,
+                                category = category,
+                                next = it.get("next").asString,
+                                previous = it.get("previous").asString
+                            )
+                        )
+                    )
             }
     }
 

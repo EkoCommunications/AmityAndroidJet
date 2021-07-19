@@ -12,6 +12,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 const val INVALID_PAGE_NUMBER = -1
+const val INVALID_POSITION = -1
 
 @ExperimentalPagingApi
 abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryTokens, TOKEN_DAO : AmityQueryTokensDao<TOKEN>>(private val tokenDao: TOKEN_DAO) :
@@ -25,14 +26,14 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryTokens,
                     val pageNumber = ceil(max(1, anchorPosition).toDouble() / state.config.pageSize.toDouble()).toInt()
                     tokenDao.getTokenByPageNumber(pageNumber = pageNumber, primaryKeys = queryParameters())
                         .subscribeOn(Schedulers.io())
-                        .flatMap { fetch(token = it, pageSize = pageSize) }
-                        .flatMap { insertToken(applyQueryParametersToToken(it)) }
+                        .flatMap { fetch(token = it) }
+                        .flatMap { insertToken(applyQueryParametersToToken(it).apply { this.pageNumber = pageNumber }) }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
                 } ?: run {
                     fetchFirstPage(pageSize = pageSize)
                         .subscribeOn(Schedulers.io())
-                        .flatMap { insertToken(applyQueryParametersToToken(it)) }
+                        .flatMap { insertToken(applyQueryParametersToToken(it).apply { this.pageNumber = 1 }) }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
                 }
@@ -41,8 +42,10 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryTokens,
                 if (stackFromEnd()) {
                     tokenDao.getFirstQueryToken(primaryKeys = queryParameters())
                         .subscribeOn(Schedulers.io())
-                        .flatMap { fetch(token = it, pageSize = pageSize) }
-                        .flatMap { insertToken(applyQueryParametersToToken(it)) }
+                        .flatMap {
+                            fetch(token = it.previous!!)
+                                .flatMap { newTokens -> insertToken(applyQueryParametersToToken(newTokens).apply { this.pageNumber = it.pageNumber + 1 }) }
+                        }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
                 } else {
@@ -55,8 +58,10 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryTokens,
                 } else {
                     tokenDao.getLastQueryToken(primaryKeys = queryParameters())
                         .subscribeOn(Schedulers.io())
-                        .flatMap { fetch(token = it, pageSize = pageSize) }
-                        .flatMap { insertToken(applyQueryParametersToToken(it)) }
+                        .flatMap {
+                            fetch(token = it.next!!)
+                                .flatMap { newTokens -> insertToken(applyQueryParametersToToken(newTokens).apply { this.pageNumber = it.pageNumber + 1 }) }
+                        }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
                 }
@@ -66,25 +71,21 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryTokens,
 
     abstract fun fetchFirstPage(pageSize: Int): Maybe<TOKEN>
 
-    abstract fun fetch(token: String, pageSize: Int): Maybe<TOKEN>
+    abstract fun fetch(token: String): Maybe<TOKEN>
 
     private fun insertToken(token: TOKEN): Maybe<MediatorResult> {
-        return if (token.pageNumber == INVALID_PAGE_NUMBER) {
-            Maybe.error<MediatorResult>(Exception("Invalid page number! please make sure that you specify a correct page number for a token"))
-        } else {
-            val isLastPage = when (stackFromEnd()) {
-                true -> token.previous == null
-                false -> token.next == null
-            }
-            tokenDao.insertToken(token)
-                .andThen(
-                    when (isLastPage) {
-                        true -> deleteTokensAfterPageNumber(pageNumber = token.pageNumber)
-                        false -> Completable.complete()
-                    }
-                )
-                .andThen(Maybe.just<MediatorResult>(MediatorResult.Success(isLastPage)))
+        val isLastPage = when (stackFromEnd()) {
+            true -> token.previous == null
+            false -> token.next == null
         }
+        return tokenDao.insertToken(token)
+            .andThen(
+                when (isLastPage) {
+                    true -> deleteTokensAfterPageNumber(pageNumber = token.pageNumber)
+                    false -> Completable.complete()
+                }
+            )
+            .andThen(Maybe.just<MediatorResult>(MediatorResult.Success(isLastPage)))
     }
 
     private fun deleteTokensAfterPageNumber(pageNumber: Int): Completable {

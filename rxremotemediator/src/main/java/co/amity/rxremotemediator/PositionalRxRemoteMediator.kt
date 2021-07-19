@@ -45,7 +45,7 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams,
     private fun insertParams(skip: Int): Function<Array<PARAMS>, Single<MediatorResult>> {
         return Function {
             val endOfPaginationReached = it.lastOrNull()?.endOfPaginationReached ?: true
-            paramsDao.insertParams(it)
+            paramsDao.insertParams(it.mapIndexed { index, params -> params.apply { this.position = skip + index + 1 } })
                 .run {
                     when {
                         endOfPaginationReached && it.isEmpty() -> andThen(deleteParamsAfterIndex(skip))

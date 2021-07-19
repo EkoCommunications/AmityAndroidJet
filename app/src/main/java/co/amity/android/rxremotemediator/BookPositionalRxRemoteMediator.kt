@@ -26,7 +26,6 @@ class BookPositionalRxRemoteMediator(private val title: String, private val cate
                         BookQueryParams(
                             title = book.asJsonObject["title"].asString,
                             category = book.asJsonObject["category"].asString,
-                            position = skip + index + 1,
                             endOfPaginationReached = it.size() - 1 == index && it.size() < limit
                         )
                     }.toTypedArray()))

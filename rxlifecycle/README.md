@@ -192,7 +192,7 @@ The `Single` ends after the `ItemView` reaches `ON_DETACHED` state. it means the
 
 #### Non-main threads
 
-Any subscriptions subscribed on non-main threads will immedialy be terminated right after it is subscribed because the extensions will try to access to `View`'s states and its lifecycle, to prevent such cases we need to allow the extension do so before a subscription starts working and runs on other threads.
+Any subscriptions subscribed on non-main threads will immedialy be terminated right after it is subscribed because the extensions will try to access `View`'s states and its lifecycle, to prevent such cases we need to allow the extension to do so before a subscription starts working and runs on other threads.
 
 ```text
 loadImageFunctionSingle(userId)

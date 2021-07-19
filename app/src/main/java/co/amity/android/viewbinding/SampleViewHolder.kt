@@ -13,9 +13,9 @@ class SampleViewHolder(context: Context) : ViewBindingViewHolder<Any, ViewHolder
     }
 
     override fun onBind(item: Any) {
-        viewBinding.viewHolderTextView.text = "hello world!"
+        binding.viewHolderTextView.text = "hello world!"
 
-        viewBinding.viewHolderSampleButton.setOnClickListener {
+        binding.viewHolderSampleButton.setOnClickListener {
 
         }
     }

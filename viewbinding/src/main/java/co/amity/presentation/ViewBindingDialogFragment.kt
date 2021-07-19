@@ -12,7 +12,7 @@ abstract class ViewBindingDialogFragment<VB : ViewBinding> : RxDialogFragment() 
 
     private lateinit var vb: VB
 
-    var viewBinding: VB
+    var binding: VB
         get() = vb
         private set(value) {
             vb = value

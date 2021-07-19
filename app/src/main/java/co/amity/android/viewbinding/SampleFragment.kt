@@ -11,9 +11,9 @@ class SampleFragment : ViewBindingFragment<FragmentSampleBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewBinding.fragmentSampleTextView.text = "hello world!"
+        binding.fragmentSampleTextView.text = "hello world!"
 
-        viewBinding.fragmentSampleButton.setOnClickListener {
+        binding.fragmentSampleButton.setOnClickListener {
 
         }
     }

@@ -9,7 +9,7 @@ abstract class ViewBindingActivity<VB : ViewBinding> : RxAppCompatActivity() {
 
     private lateinit var vb: VB
 
-    var viewBinding: VB
+    var binding: VB
         get() = vb
         private set(value) {
             vb = value

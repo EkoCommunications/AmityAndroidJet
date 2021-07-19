@@ -9,9 +9,9 @@ class SampleActivity : ViewBindingActivity<ActivitySampleBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewBinding.activitySampleTextView.text = "hello world!"
+        binding.activitySampleTextView.text = "hello world!"
 
-        viewBinding.activitySampleButton.setOnClickListener {
+        binding.activitySampleButton.setOnClickListener {
 
         }
     }

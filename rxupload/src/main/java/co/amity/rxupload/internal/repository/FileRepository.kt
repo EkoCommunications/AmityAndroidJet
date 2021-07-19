@@ -9,6 +9,7 @@ import co.amity.rxupload.internal.datastore.FileRemoteDataStore
 import co.amity.rxupload.service.MultipartUploadService
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.reactivex.functions.Function3
 import java.util.*
 
 class FileRepository {

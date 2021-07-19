@@ -57,7 +57,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.7'
 
-    implementation project(':rxremotemediator')
+    implementation project(':rxlifecycle')
     implementation project(':rxremotemediator')
     implementation project(':rxupload')
     implementation project(':viewbinder')

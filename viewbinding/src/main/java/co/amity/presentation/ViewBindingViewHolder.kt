@@ -1,10 +1,13 @@
 package co.amity.presentation
 
+import android.content.Context
 import android.view.View
+import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 
-abstract class ViewBindingViewHolder<ENTITY : Any, BINDING : ViewBinding>(itemView: View) : RecyclerView.ViewHolder(itemView) {
+abstract class ViewBindingViewHolder<ENTITY : Any, BINDING : ViewBinding>(context: Context, @LayoutRes val resource: Int) :
+    RecyclerView.ViewHolder(View.inflate(context, resource, null)) {
 
     private var vb: BINDING
 

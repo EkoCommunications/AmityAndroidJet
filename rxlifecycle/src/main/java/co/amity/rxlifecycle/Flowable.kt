@@ -1,6 +1,7 @@
 package co.amity.rxlifecycle
 
 import android.view.View
+import androidx.annotation.UiThread
 import com.trello.rxlifecycle3.LifecycleProvider
 import com.trello.rxlifecycle3.android.ActivityEvent
 import com.trello.rxlifecycle3.android.FragmentEvent
@@ -35,6 +36,7 @@ inline fun <reified E, T> Flowable<T>.untilLifecycleEnd(lifecycleProvider: Lifec
     }
 }
 
+@UiThread
 fun <T> Flowable<T>.untilLifecycleEnd(view: View, uniqueId: String? = null): Flowable<T> {
     return bindToLifecycle(view)
         .doOnSubscribe {

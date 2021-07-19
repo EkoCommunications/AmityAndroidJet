@@ -1,6 +1,7 @@
 package co.amity.rxlifecycle
 
 import android.view.View
+import androidx.annotation.UiThread
 import com.trello.rxlifecycle3.LifecycleProvider
 import com.trello.rxlifecycle3.android.ActivityEvent
 import com.trello.rxlifecycle3.android.FragmentEvent
@@ -36,6 +37,7 @@ inline fun <reified E, T> Single<T>.untilLifecycleEnd(lifecycleProvider: Lifecyc
     }.allowEmpty()
 }
 
+@UiThread
 fun <T> Single<T>.untilLifecycleEnd(view: View, uniqueId: String? = null): Single<T> {
     return bindToLifecycle(view)
         .doOnSubscribe {

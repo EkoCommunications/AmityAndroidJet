@@ -1,6 +1,7 @@
 package co.amity.rxlifecycle
 
 import android.view.View
+import androidx.annotation.UiThread
 import com.trello.rxlifecycle3.LifecycleProvider
 import com.trello.rxlifecycle3.android.ActivityEvent
 import com.trello.rxlifecycle3.android.FragmentEvent
@@ -36,6 +37,7 @@ inline fun <reified E> Completable.untilLifecycleEnd(lifecycleProvider: Lifecycl
     }.allowInComplete()
 }
 
+@UiThread
 fun Completable.untilLifecycleEnd(view: View, uniqueId: String? = null): Completable {
     return bindToLifecycle(view)
         .doOnSubscribe {

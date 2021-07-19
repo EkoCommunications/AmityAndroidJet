@@ -1,4 +1,4 @@
-package co.amity.viewbinder
+package co.amity.presentation
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
@@ -19,4 +19,8 @@ abstract class ViewBindingViewHolder<E : Any, VB : ViewBinding>(itemView: View) 
     }
 
     abstract fun generateViewBinding(): VB
+
+    open fun onBind(item: E) {
+
+    }
 }

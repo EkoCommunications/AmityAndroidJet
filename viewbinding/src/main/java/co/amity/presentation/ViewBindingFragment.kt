@@ -1,4 +1,4 @@
-package co.amity.viewbinder
+package co.amity.presentation
 
 import android.os.Bundle
 import android.view.LayoutInflater

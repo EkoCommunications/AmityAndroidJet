@@ -1,4 +1,4 @@
-package co.amity.viewbinder
+package co.amity.presentation
 
 import org.junit.Test
 

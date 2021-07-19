@@ -1,6 +1,6 @@
 package co.amity.rxremotemediator
 
-interface AmityQueryObjectDao {
+interface AmityQueryDao {
 
     fun tableName(): String
 

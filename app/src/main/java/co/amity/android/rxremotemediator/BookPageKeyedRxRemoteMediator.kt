@@ -8,7 +8,7 @@ import com.google.gson.reflect.TypeToken
 import io.reactivex.Maybe
 
 @ExperimentalPagingApi
-class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val bookDao: BookDao, tokenDao: BookQueryTokenDao) :
+class BookPageKeyedRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, tokenDao: BookQueryTokenDao) :
     PageKeyedRxRemoteMediator<Book, BookQueryToken, BookQueryTokenDao>(tokenDao) {
 
     private fun queryByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
@@ -22,7 +22,8 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
     override fun fetchFirstPage(pageSize: Int): Maybe<BookQueryToken> {
         return queryByTitleAndCategory(title, category, pageSize)
             .flatMap {
-                val books = it["book"].asJsonArray
+                // insert books into database and return token
+                val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
                     .andThen(
@@ -30,6 +31,7 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
                             BookQueryToken(
                                 title = title,
                                 category = category,
+                                ids = books.map { book -> book.asJsonObject["id"].asString },
                                 next = it.get("next").asString,
                                 previous = null
                             )
@@ -41,7 +43,7 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
     override fun fetch(token: String): Maybe<BookQueryToken> {
         return queryByToken(token)
             .flatMap {
-                // insert books into database and return tokens
+                // insert books into database and return token
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
@@ -50,6 +52,7 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
                             BookQueryToken(
                                 title = title,
                                 category = category,
+                                ids = books.map { book -> book.asJsonObject["id"].asString },
                                 next = it.get("next").asString,
                                 previous = it.get("previous").asString
                             )

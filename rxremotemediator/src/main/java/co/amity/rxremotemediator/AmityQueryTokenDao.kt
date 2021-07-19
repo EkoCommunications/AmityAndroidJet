@@ -6,12 +6,12 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import io.reactivex.Completable
 import io.reactivex.Maybe
 
-interface AmityQueryTokensDao<QUERY_TOKENS : AmityQueryTokens> : AmityQueryObjectDao {
+interface AmityQueryTokenDao<QUERY_TOKEN : AmityQueryToken> : AmityQueryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertToken(token: QUERY_TOKENS): Completable
+    fun insertToken(token: QUERY_TOKEN): Completable
 
-    fun getFirstQueryToken(primaryKeys: Map<String, Any>): Maybe<QUERY_TOKENS> {
+    fun getFirstQueryToken(primaryKeys: Map<String, Any>): Maybe<QUERY_TOKEN> {
         return queryToken(
             SimpleSQLiteQuery(
                 String.format(
@@ -22,7 +22,7 @@ interface AmityQueryTokensDao<QUERY_TOKENS : AmityQueryTokens> : AmityQueryObjec
         ).filter { it.previous != null }
     }
 
-    fun getLastQueryToken(primaryKeys: Map<String, Any>): Maybe<QUERY_TOKENS> {
+    fun getLastQueryToken(primaryKeys: Map<String, Any>): Maybe<QUERY_TOKEN> {
         return queryToken(
             SimpleSQLiteQuery(
                 String.format(
@@ -54,7 +54,7 @@ interface AmityQueryTokensDao<QUERY_TOKENS : AmityQueryTokens> : AmityQueryObjec
                 .map<String> { it.previous })
     }
 
-    fun queryToken(query: SimpleSQLiteQuery): Maybe<QUERY_TOKENS>
+    fun queryToken(query: SimpleSQLiteQuery): Maybe<QUERY_TOKEN>
 
     fun deleteTokensAfterPageNumber(queryParameters: Map<String, Any>, pageNumber: Int): Completable {
         return Completable.never()

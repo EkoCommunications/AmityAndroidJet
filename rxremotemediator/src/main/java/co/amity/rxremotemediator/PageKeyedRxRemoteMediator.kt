@@ -12,10 +12,9 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 const val INVALID_PAGE_NUMBER = -1
-const val INVALID_POSITION = -1
 
 @ExperimentalPagingApi
-abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryTokens, TOKEN_DAO : AmityQueryTokensDao<TOKEN>>(private val tokenDao: TOKEN_DAO) :
+abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken, TOKEN_DAO : AmityQueryTokenDao<TOKEN>>(private val tokenDao: TOKEN_DAO) :
     AmityRxRemoteMediator<ENTITY>() {
 
     final override fun loadSingle(loadType: LoadType, state: PagingState<Int, ENTITY>): Single<MediatorResult> {

@@ -15,20 +15,21 @@ class BookPositionalRxRemoteMediator(private val title: String, private val cate
         TODO("Not yet implemented")
     }
 
-    override fun fetch(skip: Int, limit: Int): Single<Array<BookQueryParams>> {
+    override fun fetch(skip: Int, limit: Int): Single<BookQueryParams> {
         return queryBySkipAndLimit(skip, limit)
             .flatMap {
-                // insert books into database and return tokens
+                // insert books into database and return params
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
-                    .andThen(Single.just(books.mapIndexed { index, book ->
-                        BookQueryParams(
-                            title = book.asJsonObject["title"].asString,
-                            category = book.asJsonObject["category"].asString,
-                            endOfPaginationReached = it.size() - 1 == index && it.size() < limit
+                    .andThen(
+                        Single.just(
+                            BookQueryParams(
+                                title = title,
+                                category = category,
+                                ids = books.map { book -> book.asJsonObject["id"].asString })
                         )
-                    }.toTypedArray()))
+                    )
             }
     }
 

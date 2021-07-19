@@ -4,12 +4,12 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import io.reactivex.Completable
 
-interface AmityQueryParamsDao<PARAMS : AmityQueryParams> : AmityQueryObjectDao {
+interface AmityQueryParamsDao<PARAMS : AmityQueryParams> : AmityQueryDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertParams(parameters: List<PARAMS>): Completable
+    fun insertParams(parameter: PARAMS): Completable
 
-    fun deleteParamsAfterIndex(queryParameters: Map<String, Any>, index: Int): Completable {
+    fun deleteTokensAfterPageNumber(queryParameters: Map<String, Any>, pageNumber: Int): Completable {
         return Completable.never()
     }
 }

@@ -5,7 +5,6 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import io.reactivex.Completable
 import io.reactivex.Single
-import io.reactivex.functions.Function
 import kotlin.math.ceil
 import kotlin.math.max
 
@@ -25,40 +24,36 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams,
                     val pageNumber = ceil(max(1, anchorPosition).toDouble() / state.config.pageSize.toDouble()).toInt()
                     val skip = (pageNumber - 1) * pageSize
                     fetch(skip = skip, limit = pageSize)
-                        .flatMap(insertParams(skip))
+                        .flatMap { insertParams(it.apply { this.endOfPaginationReached = it.ids.size < pageSize }) }
                 } ?: run {
                     fetch(skip = 0, limit = pageSize)
-                        .flatMap(insertParams(0))
+                        .flatMap { insertParams(it.apply { this.endOfPaginationReached = it.ids.size < pageSize }) }
                 }
             }
             LoadType.PREPEND -> Single.just(MediatorResult.Success(true))
             LoadType.APPEND -> {
                 val skip = (++maxPageNumber - 1) * pageSize
                 fetch(skip = skip, limit = pageSize)
-                    .flatMap(insertParams(skip))
+                    .flatMap { insertParams(it.apply { this.endOfPaginationReached = it.ids.size < pageSize }) }
             }
         }
     }
 
-    abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>
+    abstract fun fetch(skip: Int, limit: Int): Single<PARAMS>
 
-    private fun insertParams(skip: Int): Function<Array<PARAMS>, Single<MediatorResult>> {
-        return Function {
-            val endOfPaginationReached = it.lastOrNull()?.endOfPaginationReached ?: true
-            paramsDao.insertParams(it.mapIndexed { index, params -> params.apply { this.position = skip + index + 1 } })
-                .run {
-                    when {
-                        endOfPaginationReached && it.isEmpty() -> andThen(deleteParamsAfterIndex(skip))
-                        endOfPaginationReached && it.isNotEmpty() -> andThen(deleteParamsAfterIndex(it.last().position))
-                        else -> this
-                    }
+    private fun insertParams(params: PARAMS): Single<MediatorResult> {
+        return paramsDao.insertParams(params)
+            .andThen(
+                when (params.endOfPaginationReached) {
+                    true -> deleteTokensAfterPageNumber(pageNumber = params.pageNumber)
+                    false -> Completable.complete()
                 }
-                .andThen(Single.just<MediatorResult>(MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)))
-        }
+            )
+            .andThen(Single.just<MediatorResult>(MediatorResult.Success(endOfPaginationReached = params.endOfPaginationReached)))
     }
 
-    private fun deleteParamsAfterIndex(index: Int): Completable {
-        return paramsDao.deleteParamsAfterIndex(queryParameters = queryParameters(), index = index)
+    private fun deleteTokensAfterPageNumber(pageNumber: Int): Completable {
+        return paramsDao.deleteTokensAfterPageNumber(queryParameters = queryParameters(), pageNumber = pageNumber)
     }
 
     final override fun stackFromEnd(): Boolean {

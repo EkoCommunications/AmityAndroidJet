@@ -1,7 +1,6 @@
-package co.amity.rxremotemediator
+package co.amity.rxremotemediator.provider
 
 import android.content.Context
-import co.amity.rxremotemediator.provider.BaseProvider
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.subjects.AsyncSubject

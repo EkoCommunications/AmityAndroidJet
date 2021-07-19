@@ -2,6 +2,7 @@ package co.amity.rxremotemediator
 
 import android.content.Context
 import androidx.room.RoomDatabase
+import co.amity.rxremotemediator.provider.ContextProvider
 import io.reactivex.Completable
 
 interface AmityQueryDao {

@@ -1,4 +1,4 @@
-package co.amity.rxremotemediator
+package co.amity.rxremotemediator.converter
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson

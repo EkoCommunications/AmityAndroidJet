@@ -5,11 +5,11 @@ import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
 import com.trello.rxlifecycle3.components.support.RxAppCompatActivity
 
-abstract class ViewBindingActivity<VB : ViewBinding> : RxAppCompatActivity() {
+abstract class ViewBindingActivity<BINDING : ViewBinding> : RxAppCompatActivity() {
 
-    private lateinit var vb: VB
+    private lateinit var vb: BINDING
 
-    var binding: VB
+    var binding: BINDING
         get() = vb
         private set(value) {
             vb = value
@@ -22,5 +22,5 @@ abstract class ViewBindingActivity<VB : ViewBinding> : RxAppCompatActivity() {
         setContentView(vb.root)
     }
 
-    abstract fun generateViewBinding(): VB
+    abstract fun generateViewBinding(): BINDING
 }

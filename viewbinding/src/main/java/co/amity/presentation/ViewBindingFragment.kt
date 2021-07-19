@@ -8,11 +8,11 @@ import androidx.annotation.CallSuper
 import androidx.viewbinding.ViewBinding
 import com.trello.rxlifecycle3.components.support.RxFragment
 
-abstract class ViewBindingFragment<VB : ViewBinding> : RxFragment() {
+abstract class ViewBindingFragment<BINDING : ViewBinding> : RxFragment() {
 
-    private lateinit var vb: VB
+    private lateinit var vb: BINDING
 
-    var binding: VB
+    var binding: BINDING
         get() = vb
         private set(value) {
             vb = value
@@ -24,5 +24,5 @@ abstract class ViewBindingFragment<VB : ViewBinding> : RxFragment() {
         return vb.root
     }
 
-    abstract fun generateViewBinding(inflater: LayoutInflater, container: ViewGroup?): VB
+    abstract fun generateViewBinding(inflater: LayoutInflater, container: ViewGroup?): BINDING
 }

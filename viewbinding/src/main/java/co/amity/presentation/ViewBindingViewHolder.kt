@@ -4,11 +4,11 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 
-abstract class ViewBindingViewHolder<E : Any, VB : ViewBinding>(itemView: View) : RecyclerView.ViewHolder(itemView) {
+abstract class ViewBindingViewHolder<ENTITY : Any, BINDING : ViewBinding>(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    private var vb: VB
+    private var vb: BINDING
 
-    var binding: VB
+    var binding: BINDING
         get() = vb
         private set(value) {
             vb = value
@@ -18,9 +18,9 @@ abstract class ViewBindingViewHolder<E : Any, VB : ViewBinding>(itemView: View) 
         vb = generateViewBinding()
     }
 
-    abstract fun generateViewBinding(): VB
+    abstract fun generateViewBinding(): BINDING
 
-    open fun onBind(item: E) {
+    open fun onBind(item: ENTITY) {
 
     }
 }

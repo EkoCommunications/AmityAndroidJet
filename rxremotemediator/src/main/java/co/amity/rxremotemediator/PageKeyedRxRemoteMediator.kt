@@ -1,6 +1,5 @@
 package co.amity.rxremotemediator
 
-import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState

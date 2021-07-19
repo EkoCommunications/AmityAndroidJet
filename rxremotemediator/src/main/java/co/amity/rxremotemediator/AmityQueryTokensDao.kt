@@ -1,10 +1,16 @@
 package co.amity.rxremotemediator
 
+import android.content.Context
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.sqlite.db.SimpleSQLiteQuery
 import io.reactivex.Completable
 import io.reactivex.Maybe
 
-interface AmityPagingTokenDao<QUERY_TOKEN : AmityQueryToken> {
+interface AmityQueryTokensDao<QUERY_TOKENS : AmityQueryTokens> : AmityQueryObjectDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertToken(token: QUERY_TOKENS): Completable
 
     fun getFirstQueryToken(primaryKeys: Map<String, Any>): Maybe<String> {
         return queryToken(
@@ -51,21 +57,9 @@ interface AmityPagingTokenDao<QUERY_TOKEN : AmityQueryToken> {
                 .map<String> { it.previous })
     }
 
-    fun queryToken(query: SimpleSQLiteQuery): Maybe<QUERY_TOKEN>
+    fun queryToken(query: SimpleSQLiteQuery): Maybe<QUERY_TOKENS>
 
-    fun insertToken(token: QUERY_TOKEN): Completable
-
-    fun tableName(): String
-
-    private fun condition(primaryKeys: Map<String, Any>): String {
-        return primaryKeys
-            .map {
-                when (val value = it.value) {
-                    is String -> String.format("%s = '%s'", it.key, value)
-                    is Boolean -> String.format("%s = '%s'", it.key, if (value) 1 else 0)
-                    else -> String.format("%s = %s", it.key, it.value)
-                }
-            }
-            .joinToString(separator = " and ")
+    fun deleteTokensAfterPageNumber(context: Context, queryParameters: Map<String, Any>, pageNumber: Int): Completable {
+        return Completable.never()
     }
 }

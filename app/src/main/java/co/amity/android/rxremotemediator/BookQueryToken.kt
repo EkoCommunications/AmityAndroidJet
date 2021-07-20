@@ -2,15 +2,10 @@ package co.amity.android.rxremotemediator
 
 import co.amity.rxremotemediator.AmityQueryToken
 
-class BookQueryToken(
-    var title: String,
-    var category: String,
-    next: String? = null,
-    previous: String? = null,
-    uniqueIds: List<String>
-) : AmityQueryToken(
-    queryParameters = mapOf("title" to title, "category" to category),
-    next = next,
-    previous = previous,
-    uniqueIds = uniqueIds
-)
+class BookQueryToken(var title: String, var category: String, next: String? = null, previous: String? = null, uniqueIds: List<String>) :
+    AmityQueryToken(
+        queryParameters = mapOf("title" to title, "category" to category),
+        next = next,
+        previous = previous,
+        uniqueIds = uniqueIds
+    )

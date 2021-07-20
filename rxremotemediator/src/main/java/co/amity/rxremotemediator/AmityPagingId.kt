@@ -5,11 +5,11 @@ import androidx.room.Ignore
 
 @Entity(
     tableName = "amity_paging_id",
-    primaryKeys = ["hash", "position"]
+    primaryKeys = ["hash", "nonce", "position"]
 )
-class AmityPagingId(@Ignore private var queryParameters: Map<String, Any>, var uniqueId: String) {
+class AmityPagingId(@Ignore var queryParameters: Map<String, Any>, var uniqueId: String) {
 
     var hash: Int = queryParameters.hashCode()
-    var nonce: Int? = null
+    var nonce: Int = DEFAULT_NONCE
     var position: Int = INVALID_POSITION
 }

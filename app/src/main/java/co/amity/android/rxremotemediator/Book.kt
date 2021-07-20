@@ -8,4 +8,9 @@ import androidx.room.Index
     primaryKeys = ["bookId"],
     indices = [Index(value = ["title", "category"])]
 )
-class Book(var bookId: String, var title: String, var category: String)
+class Book(var bookId: String, var title: String, var category: String) {
+
+    companion object {
+        const val NONCE: Int = 42
+    }
+}

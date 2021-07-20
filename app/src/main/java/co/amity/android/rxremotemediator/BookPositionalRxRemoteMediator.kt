@@ -11,7 +11,7 @@ import io.reactivex.Single
 @ExperimentalPagingApi
 class BookPositionalRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, paramsDao: AmityQueryParamsDao) :
     PositionalRemoteMediator<Book, BookQueryParams>(
-        nonce = "book".hashCode(),
+        nonce = Book.NONCE,
         queryParameters = mapOf("title" to title, "category" to category),
         paramsDao = paramsDao
     ) {

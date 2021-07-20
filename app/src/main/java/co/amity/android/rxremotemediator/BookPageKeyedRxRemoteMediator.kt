@@ -11,7 +11,7 @@ import io.reactivex.Maybe
 @ExperimentalPagingApi
 class BookPageKeyedRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, tokenDao: AmityQueryTokenDao) :
     PageKeyedRxRemoteMediator<Book, BookQueryToken>(
-        nonce = "book".hashCode(),
+        nonce = Book.NONCE,
         queryParameters = mapOf("title" to title, "category" to category),
         tokenDao = tokenDao
     ) {

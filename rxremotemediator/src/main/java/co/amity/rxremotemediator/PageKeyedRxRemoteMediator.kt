@@ -31,7 +31,6 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         .flatMap { fetch(token = it) }
                         .map {
                             it.apply {
-                                this.hash = this@PageKeyedRxRemoteMediator.queryParameters.hashCode()
                                 this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                 this.pageNumber = pageNumber
                             }
@@ -44,7 +43,6 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         .subscribeOn(Schedulers.io())
                         .map {
                             it.apply {
-                                this.hash = this@PageKeyedRxRemoteMediator.queryParameters.hashCode()
                                 this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                 this.pageNumber = 1
                             }
@@ -62,7 +60,6 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                             fetch(token = token.previous!!)
                                 .map {
                                     it.apply {
-                                        this.hash = this@PageKeyedRxRemoteMediator.queryParameters.hashCode()
                                         this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                         this.pageNumber = token.pageNumber + 1
                                     }

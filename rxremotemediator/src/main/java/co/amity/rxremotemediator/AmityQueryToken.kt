@@ -7,9 +7,9 @@ import androidx.room.Ignore
     tableName = "amity_query_token",
     primaryKeys = ["hash", "pageNumber"]
 )
-open class AmityQueryToken(@Ignore var queryParameters: Map<String, Any>, var next: String? = null, var previous: String? = null) {
+open class AmityQueryToken(@Ignore private var queryParameters: Map<String, Any>, var next: String? = null, var previous: String? = null) {
 
     var hash: Int = queryParameters.hashCode()
-    var nonce: Int = javaClass.simpleName.hashCode()
+    var nonce: Int? = null
     var pageNumber: Int = INVALID_PAGE_NUMBER
 }

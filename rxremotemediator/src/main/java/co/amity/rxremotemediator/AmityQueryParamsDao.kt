@@ -14,4 +14,8 @@ interface AmityQueryParamsDao {
 
     @Query("delete from amity_query_params where pageNumber > :pageNumber and hash = :hash and nonce = :nonce")
     fun deleteAfterPageNumber(pageNumber: Int, hash: Int, nonce: Int): Completable
+
+    fun deleteAfterPageNumber(pageNumber: Int, queryParameters: Map<String, Any>, nonce: Int): Completable {
+        return deleteAfterPageNumber(pageNumber, queryParameters.hashCode(), nonce)
+    }
 }

@@ -29,7 +29,6 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                     fetch(skip = skip, limit = pageSize)
                         .map {
                             it.apply {
-                                this.hash = this@PositionalRemoteMediator.queryParameters.hashCode()
                                 this.nonce = this@PositionalRemoteMediator.nonce
                                 this.pageNumber = pageNumber
                             }
@@ -39,7 +38,6 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                     fetch(skip = 0, limit = pageSize)
                         .map {
                             it.apply {
-                                this.hash = this@PositionalRemoteMediator.queryParameters.hashCode()
                                 this.nonce = this@PositionalRemoteMediator.nonce
                                 this.pageNumber = 1
                             }
@@ -53,7 +51,6 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                 fetch(skip = skip, limit = pageSize)
                     .map {
                         it.apply {
-                            this.hash = this@PositionalRemoteMediator.queryParameters.hashCode()
                             this.nonce = this@PositionalRemoteMediator.nonce
                             this.pageNumber = maxPageNumber
                         }
@@ -69,7 +66,7 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
         return paramsDao.insertParams(params)
             .andThen(
                 when (params.endOfPaginationReached) {
-                    true -> paramsDao.deleteAfterPageNumber(pageNumber = params.pageNumber, hash = params.hash, nonce = nonce)
+                    true -> paramsDao.deleteAfterPageNumber(pageNumber = params.pageNumber, queryParameters = queryParameters, nonce = nonce)
                     false -> Completable.complete()
                 }
             )

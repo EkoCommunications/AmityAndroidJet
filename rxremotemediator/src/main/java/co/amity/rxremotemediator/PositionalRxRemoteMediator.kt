@@ -33,7 +33,7 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                                 this.pageNumber = pageNumber
                             }
                         }
-                        .flatMap { insertParams(it) }
+                        .flatMap { insertParams(it, pageSize) }
                 } ?: run {
                     fetch(skip = 0, limit = pageSize)
                         .map {
@@ -42,7 +42,7 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                                 this.pageNumber = 1
                             }
                         }
-                        .flatMap { insertParams(it) }
+                        .flatMap { insertParams(it, pageSize) }
                 }
             }
             LoadType.PREPEND -> Single.just(MediatorResult.Success(true))
@@ -55,21 +55,32 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                             this.pageNumber = maxPageNumber
                         }
                     }
-                    .flatMap { insertParams(it) }
+                    .flatMap { insertParams(it, pageSize) }
             }
         }
     }
 
     abstract fun fetch(skip: Int, limit: Int): Single<PARAMS>
 
-    private fun insertParams(params: PARAMS): Single<MediatorResult> {
+    private fun insertParams(params: PARAMS, pageSize: Int): Single<MediatorResult> {
         return paramsDao.insertParams(params)
             .andThen(
                 when (params.endOfPaginationReached) {
-                    true -> paramsDao.deleteAfterPageNumber(pageNumber = params.pageNumber, queryParameters = queryParameters, nonce = nonce)
+                    true -> paramsDao.deleteAfterPageNumber(
+                        pageNumber = params.pageNumber,
+                        queryParameters = queryParameters,
+                        nonce = nonce
+                    )
                     false -> Completable.complete()
                 }
             )
+            .andThen(paramsDao.insertPagingIds(params.uniqueIds.mapIndexed { index, id ->
+                AmityPagingId(
+                    id = id,
+                    hash = params.hash,
+                    position = ((params.pageNumber - 1) * pageSize) + index + 1
+                )
+            }))
             .andThen(Single.just<MediatorResult>(MediatorResult.Success(endOfPaginationReached = params.endOfPaginationReached)))
     }
 

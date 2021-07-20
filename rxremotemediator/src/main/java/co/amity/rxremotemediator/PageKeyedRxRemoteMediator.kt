@@ -33,7 +33,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                 this.pageNumber = pageNumber
                             }
                         }
-                        .flatMap { insertToken(it) }
+                        .flatMap { insertToken(it, pageSize) }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
                 } ?: run {
@@ -45,7 +45,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                 this.pageNumber = 1
                             }
                         }
-                        .flatMap { insertToken(it) }
+                        .flatMap { insertToken(it, pageSize) }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
                 }
@@ -62,7 +62,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                         this.pageNumber = token.pageNumber + 1
                                     }
                                 }
-                                .flatMap { insertToken(it) }
+                                .flatMap { insertToken(it, pageSize) }
                         }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
@@ -84,7 +84,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                         this.pageNumber = token.pageNumber + 1
                                     }
                                 }
-                                .flatMap { insertToken(it) }
+                                .flatMap { insertToken(it, pageSize) }
                         }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
@@ -97,7 +97,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
 
     abstract fun fetch(token: String): Maybe<TOKEN>
 
-    private fun insertToken(token: TOKEN): Maybe<MediatorResult> {
+    private fun insertToken(token: TOKEN, pageSize: Int): Maybe<MediatorResult> {
         val isLastPage = when (stackFromEnd()) {
             true -> token.previous == null
             false -> token.next == null
@@ -105,10 +105,21 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
         return tokenDao.insertToken(token)
             .andThen(
                 when (isLastPage) {
-                    true -> tokenDao.deleteAfterPageNumber(pageNumber = token.pageNumber, queryParameters = queryParameters, nonce = nonce)
+                    true -> tokenDao.deleteAfterPageNumber(
+                        pageNumber = token.pageNumber,
+                        queryParameters = queryParameters,
+                        nonce = nonce
+                    )
                     false -> Completable.complete()
                 }
             )
+            .andThen(tokenDao.insertPagingIds(token.uniqueIds.mapIndexed { index, id ->
+                AmityPagingId(
+                    id = id,
+                    hash = token.hash,
+                    position = ((token.pageNumber - 1) * pageSize) + index + 1
+                )
+            }))
             .andThen(Maybe.just<MediatorResult>(MediatorResult.Success(isLastPage)))
     }
 

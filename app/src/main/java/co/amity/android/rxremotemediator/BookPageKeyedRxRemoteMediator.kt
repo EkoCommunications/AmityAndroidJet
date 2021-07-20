@@ -11,7 +11,7 @@ import io.reactivex.Maybe
 @ExperimentalPagingApi
 class BookPageKeyedRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, tokenDao: AmityQueryTokenDao) :
     PageKeyedRxRemoteMediator<Book, BookQueryToken>(
-        nonce = BookQueryToken::javaClass.hashCode(),
+        nonce = "book".hashCode(),
         queryParameters = mapOf("title" to title, "category" to category),
         tokenDao = tokenDao
     ) {
@@ -37,7 +37,8 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                                 title = title,
                                 category = category,
                                 next = it.get("next").asString,
-                                previous = null
+                                previous = null,
+                                uniqueIds = books.map { book -> book.asJsonObject["id"].asString }
                             )
                         )
                     )
@@ -57,7 +58,8 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                                 title = title,
                                 category = category,
                                 next = it.get("next").asString,
-                                previous = it.get("previous").asString
+                                previous = it.get("previous").asString,
+                                uniqueIds = books.map { book -> book.asJsonObject["id"].asString }
                             )
                         )
                     )

@@ -1,58 +1,48 @@
 package co.amity.rxremotemediator
 
+import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.room.Query
 import io.reactivex.Completable
 import io.reactivex.Maybe
 
-interface AmityQueryTokenDao<QUERY_TOKEN : AmityQueryToken> : AmityQueryDao {
+@Dao
+interface AmityQueryTokenDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertToken(token: QUERY_TOKEN): Completable
+    fun insertToken(token: AmityQueryToken): Completable
 
-    fun getFirstQueryToken(primaryKeys: Map<String, Any>): Maybe<QUERY_TOKEN> {
-        return queryToken(
-            SimpleSQLiteQuery(
-                String.format(
-                    "select * from %s where %s order by pageNumber asc limit 1",
-                    tableName(), condition(primaryKeys)
-                )
-            )
-        ).filter { it.previous != null }
+    @Query("delete from amity_query_token where pageNumber > :pageNumber and hash = :hash and nonce = :nonce")
+    fun deleteAfterPageNumber(pageNumber: Int, hash: Int, nonce: Int): Completable
+
+    fun deleteAfterPageNumber(pageNumber: Int, queryParameters: Map<String, Any>, nonce: Int): Completable {
+        return deleteAfterPageNumber(pageNumber, queryParameters.hashCode(), nonce)
     }
 
-    fun getLastQueryToken(primaryKeys: Map<String, Any>): Maybe<QUERY_TOKEN> {
-        return queryToken(
-            SimpleSQLiteQuery(
-                String.format(
-                    "select * from %s where %s order by pageNumber desc limit 1",
-                    tableName(), condition(primaryKeys)
-                )
-            )
-        ).filter { it.next != null }
+    @Query("select * from amity_query_token where hash = :hash and nonce = :nonce order by pageNumber asc limit 1")
+    fun getFirstQueryToken(hash: Int, nonce: Int): Maybe<AmityQueryToken>
+
+    fun getFirstQueryToken(queryParameters: Map<String, Any>, nonce: Int): Maybe<AmityQueryToken> {
+        return getFirstQueryToken(queryParameters.hashCode(), nonce).filter { it.previous != null }
     }
 
-    fun getTokenByPageNumber(pageNumber: Int, primaryKeys: Map<String, Any>): Maybe<String> {
-        return queryToken(
-            SimpleSQLiteQuery(
-                String.format(
-                    "select * from %s where %s and pageNumber = %s limit 1",
-                    tableName(), condition(primaryKeys), pageNumber - 1
-                )
-            )
-        ).filter { it.next != null }
+    @Query("select * from amity_query_token where hash = :hash and nonce = :nonce order by pageNumber desc limit 1")
+    fun getLastQueryToken(hash: Int, nonce: Int): Maybe<AmityQueryToken>
+
+    fun getLastQueryToken(queryParameters: Map<String, Any>, nonce: Int): Maybe<AmityQueryToken> {
+        return getLastQueryToken(queryParameters.hashCode(), nonce).filter { it.next != null }
+    }
+
+    @Query("select * from amity_query_token where pageNumber = :pageNumber and hash = :hash and nonce = :nonce limit 1")
+    fun getTokenByPageNumber(pageNumber: Int, hash: Int, nonce: Int): Maybe<AmityQueryToken>
+
+    fun getTokenByPageNumber(pageNumber: Int, queryParameters: Map<String, Any>, nonce: Int): Maybe<String> {
+        return getTokenByPageNumber(pageNumber - 1, queryParameters.hashCode(), nonce)
+            .filter { it.next != null }
             .map<String> { it.next }
-            .switchIfEmpty(queryToken(
-                SimpleSQLiteQuery(
-                    String.format(
-                        "select * from %s where %s and pageNumber = %s limit 1",
-                        tableName(), condition(primaryKeys), pageNumber + 1
-                    )
-                )
-            ).filter { it.previous != null }
+            .switchIfEmpty(getTokenByPageNumber(pageNumber + 1, queryParameters.hashCode(), nonce)
+                .filter { it.previous != null }
                 .map<String> { it.previous })
     }
-
-    fun queryToken(query: SimpleSQLiteQuery): Maybe<QUERY_TOKEN>
 }

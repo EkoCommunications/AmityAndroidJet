@@ -11,8 +11,11 @@ import kotlin.math.max
 private const val DEFAULT_MAX_PAGE_NUMBER = 0
 
 @ExperimentalPagingApi
-abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>>(private val paramsDao: PARAMS_DAO) :
-    AmityRxRemoteMediator<ENTITY>() {
+abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>(
+    private val nonce: Int,
+    val queryParameters: Map<String, Any> = mapOf(),
+    val paramsDao: AmityQueryParamsDao
+) : AmityRxRemoteMediator<ENTITY>() {
 
     private var maxPageNumber = DEFAULT_MAX_PAGE_NUMBER
 
@@ -24,17 +27,38 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams,
                     val pageNumber = ceil(max(1, anchorPosition).toDouble() / state.config.pageSize.toDouble()).toInt()
                     val skip = (pageNumber - 1) * pageSize
                     fetch(skip = skip, limit = pageSize)
-                        .flatMap { insertParams(it.apply { this.endOfPaginationReached = it.ids.size < pageSize }) }
+                        .map {
+                            it.apply {
+                                this.hash = this@PositionalRemoteMediator.queryParameters.hashCode()
+                                this.nonce = this@PositionalRemoteMediator.nonce
+                                this.pageNumber = pageNumber
+                            }
+                        }
+                        .flatMap { insertParams(it) }
                 } ?: run {
                     fetch(skip = 0, limit = pageSize)
-                        .flatMap { insertParams(it.apply { this.endOfPaginationReached = it.ids.size < pageSize }) }
+                        .map {
+                            it.apply {
+                                this.hash = this@PositionalRemoteMediator.queryParameters.hashCode()
+                                this.nonce = this@PositionalRemoteMediator.nonce
+                                this.pageNumber = 1
+                            }
+                        }
+                        .flatMap { insertParams(it) }
                 }
             }
             LoadType.PREPEND -> Single.just(MediatorResult.Success(true))
             LoadType.APPEND -> {
                 val skip = (++maxPageNumber - 1) * pageSize
                 fetch(skip = skip, limit = pageSize)
-                    .flatMap { insertParams(it.apply { this.endOfPaginationReached = it.ids.size < pageSize }) }
+                    .map {
+                        it.apply {
+                            this.hash = this@PositionalRemoteMediator.queryParameters.hashCode()
+                            this.nonce = this@PositionalRemoteMediator.nonce
+                            this.pageNumber = maxPageNumber
+                        }
+                    }
+                    .flatMap { insertParams(it) }
             }
         }
     }
@@ -45,15 +69,11 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams,
         return paramsDao.insertParams(params)
             .andThen(
                 when (params.endOfPaginationReached) {
-                    true -> deleteTokensAfterPageNumber(pageNumber = params.pageNumber)
+                    true -> paramsDao.deleteAfterPageNumber(pageNumber = params.pageNumber, hash = params.hash, nonce = nonce)
                     false -> Completable.complete()
                 }
             )
             .andThen(Single.just<MediatorResult>(MediatorResult.Success(endOfPaginationReached = params.endOfPaginationReached)))
-    }
-
-    private fun deleteTokensAfterPageNumber(pageNumber: Int): Completable {
-        return paramsDao.deleteTokensAfterPageNumber(queryParameters = queryParameters(), pageNumber = pageNumber)
     }
 
     final override fun stackFromEnd(): Boolean {

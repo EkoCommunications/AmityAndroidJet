@@ -1,6 +1,7 @@
 package co.amity.android.rxremotemediator
 
 import androidx.paging.ExperimentalPagingApi
+import co.amity.rxremotemediator.AmityQueryTokenDao
 import co.amity.rxremotemediator.PageKeyedRxRemoteMediator
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -8,8 +9,12 @@ import com.google.gson.reflect.TypeToken
 import io.reactivex.Maybe
 
 @ExperimentalPagingApi
-class BookPageKeyedRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, tokenDao: BookQueryTokenDao) :
-    PageKeyedRxRemoteMediator<Book, BookQueryToken, BookQueryTokenDao>(tokenDao) {
+class BookPageKeyedRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, tokenDao: AmityQueryTokenDao) :
+    PageKeyedRxRemoteMediator<Book, BookQueryToken>(
+        nonce = BookQueryToken::javaClass.hashCode(),
+        queryParameters = mapOf("title" to title, "category" to category),
+        tokenDao = tokenDao
+    ) {
 
     private fun queryByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
         TODO("Not yet implemented")
@@ -31,7 +36,6 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                             BookQueryToken(
                                 title = title,
                                 category = category,
-                                ids = books.map { book -> book.asJsonObject["id"].asString },
                                 next = it.get("next").asString,
                                 previous = null
                             )
@@ -52,27 +56,12 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                             BookQueryToken(
                                 title = title,
                                 category = category,
-                                ids = books.map { book -> book.asJsonObject["id"].asString },
                                 next = it.get("next").asString,
                                 previous = it.get("previous").asString
                             )
                         )
                     )
             }
-    }
-
-    override fun queryParameters(): Map<String, Any> {
-        return mapOf(
-            "title" to title,
-            "category" to category
-        )
-    }
-
-    override fun applyQueryParametersToToken(token: BookQueryToken): BookQueryToken {
-        return token.apply {
-            this.title = this@BookPageKeyedRxRemoteMediator.title
-            this.category = this@BookPageKeyedRxRemoteMediator.category
-        }
     }
 
     override fun stackFromEnd(): Boolean {

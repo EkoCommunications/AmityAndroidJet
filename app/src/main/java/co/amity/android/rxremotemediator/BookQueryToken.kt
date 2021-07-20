@@ -1,10 +1,6 @@
 package co.amity.android.rxremotemediator
 
-import androidx.room.Entity
 import co.amity.rxremotemediator.AmityQueryToken
 
-@Entity(
-    tableName = "book_query_token",
-    primaryKeys = ["title", "category", "pageNumber"]
-)
-class BookQueryToken(var title: String, var category: String, ids: List<String>, next: String?, previous: String?) : AmityQueryToken(ids, next, previous)
+class BookQueryToken(var title: String, var category: String, next: String? = null, previous: String? = null) :
+    AmityQueryToken(params = mapOf("title" to title, "category" to category), next = next, previous = previous)

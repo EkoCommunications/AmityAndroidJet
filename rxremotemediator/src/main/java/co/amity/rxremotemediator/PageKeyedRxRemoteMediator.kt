@@ -14,8 +14,11 @@ import kotlin.math.max
 const val INVALID_PAGE_NUMBER = -1
 
 @ExperimentalPagingApi
-abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken, TOKEN_DAO : AmityQueryTokenDao<TOKEN>>(private val tokenDao: TOKEN_DAO) :
-    AmityRxRemoteMediator<ENTITY>() {
+abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
+    private val nonce: Int,
+    val queryParameters: Map<String, Any> = mapOf(),
+    val tokenDao: AmityQueryTokenDao
+) : AmityRxRemoteMediator<ENTITY>() {
 
     final override fun loadSingle(loadType: LoadType, state: PagingState<Int, ENTITY>): Single<MediatorResult> {
         val pageSize = state.config.pageSize
@@ -23,27 +26,48 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken, 
             LoadType.REFRESH -> {
                 state.anchorPosition?.let { anchorPosition ->
                     val pageNumber = ceil(max(1, anchorPosition).toDouble() / state.config.pageSize.toDouble()).toInt()
-                    tokenDao.getTokenByPageNumber(pageNumber = pageNumber, primaryKeys = queryParameters())
+                    tokenDao.getTokenByPageNumber(pageNumber = pageNumber, queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
                         .flatMap { fetch(token = it) }
-                        .flatMap { insertToken(applyQueryParametersToToken(it).apply { this.pageNumber = pageNumber }) }
+                        .map {
+                            it.apply {
+                                this.hash = this@PageKeyedRxRemoteMediator.queryParameters.hashCode()
+                                this.nonce = this@PageKeyedRxRemoteMediator.nonce
+                                this.pageNumber = pageNumber
+                            }
+                        }
+                        .flatMap { insertToken(it) }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
                 } ?: run {
                     fetchFirstPage(pageSize = pageSize)
                         .subscribeOn(Schedulers.io())
-                        .flatMap { insertToken(applyQueryParametersToToken(it).apply { this.pageNumber = 1 }) }
+                        .map {
+                            it.apply {
+                                this.hash = this@PageKeyedRxRemoteMediator.queryParameters.hashCode()
+                                this.nonce = this@PageKeyedRxRemoteMediator.nonce
+                                this.pageNumber = 1
+                            }
+                        }
+                        .flatMap { insertToken(it) }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
                 }
             }
             LoadType.PREPEND -> {
                 if (stackFromEnd()) {
-                    tokenDao.getFirstQueryToken(primaryKeys = queryParameters())
+                    tokenDao.getFirstQueryToken(queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
-                        .flatMap {
-                            fetch(token = it.previous!!)
-                                .flatMap { newTokens -> insertToken(applyQueryParametersToToken(newTokens).apply { this.pageNumber = it.pageNumber + 1 }) }
+                        .flatMap { token ->
+                            fetch(token = token.previous!!)
+                                .map {
+                                    it.apply {
+                                        this.hash = this@PageKeyedRxRemoteMediator.queryParameters.hashCode()
+                                        this.nonce = this@PageKeyedRxRemoteMediator.nonce
+                                        this.pageNumber = token.pageNumber + 1
+                                    }
+                                }
+                                .flatMap { insertToken(it) }
                         }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
@@ -55,11 +79,18 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken, 
                 if (stackFromEnd()) {
                     Single.just<MediatorResult>(MediatorResult.Success(false))
                 } else {
-                    tokenDao.getLastQueryToken(primaryKeys = queryParameters())
+                    tokenDao.getLastQueryToken(queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
-                        .flatMap {
-                            fetch(token = it.next!!)
-                                .flatMap { newTokens -> insertToken(applyQueryParametersToToken(newTokens).apply { this.pageNumber = it.pageNumber + 1 }) }
+                        .flatMap { token ->
+                            fetch(token = token.next!!)
+                                .map {
+                                    it.apply {
+                                        this.hash = this@PageKeyedRxRemoteMediator.queryParameters.hashCode()
+                                        this.nonce = this@PageKeyedRxRemoteMediator.nonce
+                                        this.pageNumber = token.pageNumber + 1
+                                    }
+                                }
+                                .flatMap { insertToken(it) }
                         }
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
@@ -80,21 +111,15 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken, 
         return tokenDao.insertToken(token)
             .andThen(
                 when (isLastPage) {
-                    true -> deleteTokensAfterPageNumber(pageNumber = token.pageNumber)
+                    true -> tokenDao.deleteAfterPageNumber(pageNumber = token.pageNumber, queryParameters = queryParameters, nonce = nonce)
                     false -> Completable.complete()
                 }
             )
             .andThen(Maybe.just<MediatorResult>(MediatorResult.Success(isLastPage)))
     }
 
-    private fun deleteTokensAfterPageNumber(pageNumber: Int): Completable {
-        return tokenDao.deleteTokensAfterPageNumber(queryParameters = queryParameters(), pageNumber = pageNumber)
-    }
-
     private val interceptErrorAndEmpty = MaybeTransformer<MediatorResult, MediatorResult> { upstream ->
         upstream.onErrorReturn { MediatorResult.Error(it) }
             .switchIfEmpty(Maybe.just(MediatorResult.Success(true)))
     }
-
-    abstract fun applyQueryParametersToToken(token: TOKEN): TOKEN
 }

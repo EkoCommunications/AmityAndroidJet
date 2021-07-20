@@ -1,6 +1,7 @@
 package co.amity.android.rxremotemediator
 
 import androidx.paging.ExperimentalPagingApi
+import co.amity.rxremotemediator.AmityQueryParamsDao
 import co.amity.rxremotemediator.PositionalRemoteMediator
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -8,8 +9,12 @@ import com.google.gson.reflect.TypeToken
 import io.reactivex.Single
 
 @ExperimentalPagingApi
-class BookPositionalRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, paramsDao: BookQueryParamsDao) :
-    PositionalRemoteMediator<Book, BookQueryParams, BookQueryParamsDao>(paramsDao) {
+class BookPositionalRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, paramsDao: AmityQueryParamsDao) :
+    PositionalRemoteMediator<Book, BookQueryParams>(
+        nonce = BookQueryParams::javaClass.hashCode(),
+        queryParameters = mapOf("title" to title, "category" to category),
+        paramsDao = paramsDao
+    ) {
 
     private fun queryBySkipAndLimit(skip: Int, limit: Int): Single<JsonObject> {
         TODO("Not yet implemented")
@@ -27,16 +32,10 @@ class BookPositionalRxRemoteMediator(private val title: String, private val cate
                             BookQueryParams(
                                 title = title,
                                 category = category,
-                                ids = books.map { book -> book.asJsonObject["id"].asString })
+                                endOfPaginationReached = books.size() < limit
+                            )
                         )
                     )
             }
-    }
-
-    override fun queryParameters(): Map<String, Any> {
-        return mapOf(
-            "title" to title,
-            "category" to category
-        )
     }
 }

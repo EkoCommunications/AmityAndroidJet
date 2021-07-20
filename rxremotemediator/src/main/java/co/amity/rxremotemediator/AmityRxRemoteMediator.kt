@@ -6,7 +6,5 @@ import androidx.paging.rxjava2.RxRemoteMediator
 @ExperimentalPagingApi
 abstract class AmityRxRemoteMediator<ENTITY : Any> : RxRemoteMediator<Int, ENTITY>() {
 
-    abstract fun queryParameters(): Map<String, Any>
-
     abstract fun stackFromEnd(): Boolean
 }

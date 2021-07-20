@@ -11,8 +11,6 @@ import io.reactivex.schedulers.Schedulers
 import kotlin.math.ceil
 import kotlin.math.max
 
-const val INVALID_PAGE_NUMBER = -1
-
 @ExperimentalPagingApi
 abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
     private val nonce: Int,
@@ -82,7 +80,6 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                             fetch(token = token.next!!)
                                 .map {
                                     it.apply {
-                                        this.hash = this@PageKeyedRxRemoteMediator.queryParameters.hashCode()
                                         this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                         this.pageNumber = token.pageNumber + 1
                                     }

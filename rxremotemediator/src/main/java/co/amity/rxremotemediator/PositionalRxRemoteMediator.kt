@@ -75,11 +75,11 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                 }
             )
             .andThen(paramsDao.insertPagingIds(params.uniqueIds.mapIndexed { index, id ->
-                AmityPagingId(
-                    id = id,
-                    hash = params.hash,
-                    position = ((params.pageNumber - 1) * pageSize) + index + 1
-                )
+                AmityPagingId(uniqueId = id, queryParameters = queryParameters)
+                    .apply {
+                        this.nonce = this@PositionalRemoteMediator.nonce
+                        this.position = ((params.pageNumber - 1) * pageSize) + index + 1
+                    }
             }))
             .andThen(Single.just<MediatorResult>(MediatorResult.Success(endOfPaginationReached = params.endOfPaginationReached)))
     }

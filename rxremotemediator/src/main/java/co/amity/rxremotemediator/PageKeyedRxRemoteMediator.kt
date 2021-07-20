@@ -114,11 +114,11 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                 }
             )
             .andThen(tokenDao.insertPagingIds(token.uniqueIds.mapIndexed { index, id ->
-                AmityPagingId(
-                    id = id,
-                    hash = token.hash,
-                    position = ((token.pageNumber - 1) * pageSize) + index + 1
-                )
+                AmityPagingId(uniqueId = id, queryParameters = queryParameters)
+                    .apply {
+                        this.nonce = this@PageKeyedRxRemoteMediator.nonce
+                        this.position = ((token.pageNumber - 1) * pageSize) + index + 1
+                    }
             }))
             .andThen(Maybe.just<MediatorResult>(MediatorResult.Success(isLastPage)))
     }

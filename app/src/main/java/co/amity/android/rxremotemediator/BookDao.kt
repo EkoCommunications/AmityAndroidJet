@@ -21,8 +21,8 @@ interface BookDao : AmityPagingDao<Book> {
             generateSqlQuery(
                 tableName = "book",
                 uniqueIdKey = "id",
-                queryParameters = mapOf("title" to title, "category" to category),
-                nonce = Book.NONCE
+                nonce = Book.NONCE,
+                queryParameters = mapOf("title" to title, "category" to category)
             )
         )
     }

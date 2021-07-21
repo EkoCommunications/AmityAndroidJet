@@ -37,11 +37,11 @@ TODO
 
 ##### QueryParameters
 
-A set of filters in the `Map`, if any. (Key/Value pairs)
+A set of filters specified in the `Map`, if any. (Key/Value pairs)
 
 ##### AmityQueryToken and AmityQueryTokenDao
 
-`AmityQueryToken` is the expected object returned by the abstract functions, it is designed to keep a set of query parameters in the `Map` (Key/Value pairs), next/previous tokens of each page which is later used for fetching more pages or refreshing existing pages and a set of unique ids of items of each page which is later used for identifying invalid items.
+`AmityQueryToken` is the expected object returned by the abstract functions, it is designed to keep a set of query parameters specified in the `Map` (Key/Value pairs), next/previous tokens of each page which is later used for fetching more pages or refreshing existing pages and a set of unique ids of items of each page which is later used for identifying invalid items.
 
 In order for us to have access to `AmityQueryToken` we need to get hands on `AmityPagingTokenDao`, make sure we define both on the `RoomDatabase` class and pass `AmityPagingTokenDao` to the class construtor.
 
@@ -214,11 +214,11 @@ TODO
 
 ##### QueryParameters
 
-A set of filters in the `Map`, if any. (Key/Value pairs)
+A set of filters specified in the `Map`, if any. (Key/Value pairs)
 
 ##### AmityQueryParams and AmityQueryParamsDao
 
-`AmityQueryParams` is the expected object returned by the abstract function, it is designed to keep a set of query parameters in the `Map` (Key/Value pairs), a last page boolean flag and a set of unique ids of items of each page which is later used for identifying invalid items.
+`AmityQueryParams` is the expected object returned by the abstract function, it is designed to keep a set of query parameters specified in the `Map` (Key/Value pairs), a last page boolean flag and a set of unique ids of items of each page which is later used for identifying invalid items.
 
 In order for us to have access to `AmityQueryParams` we need to get hands on `AmityQueryParamsDao`, make sure we define both on the `RoomDatabase` class and pass `AmityQueryParamsDao` to the class construtor.
 
@@ -344,7 +344,7 @@ recyclerview.addOnScrollListener(AmityPagingDataRefresher())
 
 To make sure that outdated items get updated, invalid items won't be display and items stay sorted (if books are sorted by thiers titles it should be okay but what happens if they are sorted by some kind of specific algorithms likes user preferences?).
 
-Our simple `Dao` is no longer fit for a job, we need to adjust it by implementing `AmityPagingDao` and override a raw query function, generate a query string for the raw query function by calling `queryPagingData()` and pass these following parameters: a table name, a unique id, a nonce and query parameters in the `Map` (Key/Value pairs).
+Our simple `Dao` is no longer fit for a job, we need to adjust it by implementing `AmityPagingDao` and override a raw query function, generate a query string for the raw query function by calling `queryPagingData()` and pass these following parameters: a table name, a unique id, a nonce and query parameters specified in the `Map` (Key/Value pairs).
 
 ```code 
 @Dao

@@ -11,11 +11,8 @@ import kotlin.math.max
 private const val DEFAULT_MAX_PAGE_NUMBER = 0
 
 @ExperimentalPagingApi
-abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>(
-    private val nonce: Int,
-    val queryParameters: Map<String, Any> = mapOf(),
-    val paramsDao: AmityQueryParamsDao
-) : AmityRxRemoteMediator<ENTITY>() {
+abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val paramsDao: AmityQueryParamsDao) :
+    AmityRxRemoteMediator<ENTITY>() {
 
     private var maxPageNumber = DEFAULT_MAX_PAGE_NUMBER
 
@@ -68,8 +65,8 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                 when (params.endOfPaginationReached) {
                     true -> paramsDao.deleteAfterPageNumber(
                         pageNumber = params.pageNumber,
-                        queryParameters = queryParameters,
-                        nonce = nonce
+                        nonce = nonce,
+                        queryParameters = queryParameters
                     )
                     false -> Completable.complete()
                 }

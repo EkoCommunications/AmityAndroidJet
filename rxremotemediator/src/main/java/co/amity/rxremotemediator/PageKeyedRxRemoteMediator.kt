@@ -12,11 +12,8 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 @ExperimentalPagingApi
-abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
-    private val nonce: Int,
-    val queryParameters: Map<String, Any> = mapOf(),
-    val tokenDao: AmityQueryTokenDao
-) : AmityRxRemoteMediator<ENTITY>() {
+abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val tokenDao: AmityQueryTokenDao) :
+    AmityRxRemoteMediator<ENTITY>() {
 
     final override fun loadSingle(loadType: LoadType, state: PagingState<Int, ENTITY>): Single<MediatorResult> {
         val pageSize = state.config.pageSize
@@ -67,12 +64,12 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         .compose(interceptErrorAndEmpty)
                         .toSingle()
                 } else {
-                    Single.just<MediatorResult>(MediatorResult.Success(false))
+                    Single.just<MediatorResult>(MediatorResult.Success(true))
                 }
             }
             LoadType.APPEND -> {
                 if (stackFromEnd()) {
-                    Single.just<MediatorResult>(MediatorResult.Success(false))
+                    Single.just<MediatorResult>(MediatorResult.Success(true))
                 } else {
                     tokenDao.getLastQueryToken(queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
@@ -107,8 +104,8 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                 when (isLastPage) {
                     true -> tokenDao.deleteAfterPageNumber(
                         pageNumber = token.pageNumber,
-                        queryParameters = queryParameters,
-                        nonce = nonce
+                        nonce = nonce,
+                        queryParameters = queryParameters
                     )
                     false -> Completable.complete()
                 }

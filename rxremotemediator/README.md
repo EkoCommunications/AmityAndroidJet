@@ -350,7 +350,7 @@ As we mentioned in the beginning of this article, once items are inserted into d
 recyclerview.addOnScrollListener(AmityPagingDataRefresher())
 ``` 
 
-To make sure that outdated items get updated, deleted items won't be display, invalid items won't be displayed (the items that were once but no longer are matched with a given set of filters) and they stay sorted (if the books are sorted by its titles it should be okay but what happens if they are sorted by some kind of specific algorithms likes your preferences?).
+To make sure that outdated items get updated, invalid items won't be display and items stay sorted (if the books are sorted by thiers titles it should be okay but what happens if they are sorted by some kind of specific algorithms likes your preferences?).
 
 Our simple `Dao` is no longer fit for a job, we need to adjust it by implementing `AmityPagingDao` and override a raw query function, generate a query string for the raw query function by calling `queryPagingData()` and pass these following parameters: a table name, a unique id, a nonce and query parameters in the `Map` (Key/Value pairs).
 

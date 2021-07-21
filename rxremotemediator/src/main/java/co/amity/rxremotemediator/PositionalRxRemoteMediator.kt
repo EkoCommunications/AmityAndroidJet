@@ -11,7 +11,7 @@ import kotlin.math.max
 private const val DEFAULT_MAX_PAGE_NUMBER = 0
 
 @ExperimentalPagingApi
-abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val paramsDao: AmityQueryParamsDao) :
+abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val paramsDao: AmityQueryParamsDao) :
     AmityRxRemoteMediator<ENTITY>() {
 
     private var maxPageNumber = DEFAULT_MAX_PAGE_NUMBER
@@ -26,7 +26,7 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                     fetch(skip = skip, limit = pageSize)
                         .map {
                             it.apply {
-                                this.nonce = this@PositionalRemoteMediator.nonce
+                                this.nonce = this@PositionalRxRemoteMediator.nonce
                                 this.pageNumber = pageNumber
                             }
                         }
@@ -35,7 +35,7 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                     fetch(skip = 0, limit = pageSize)
                         .map {
                             it.apply {
-                                this.nonce = this@PositionalRemoteMediator.nonce
+                                this.nonce = this@PositionalRxRemoteMediator.nonce
                                 this.pageNumber = 1
                             }
                         }
@@ -48,7 +48,7 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
                 fetch(skip = skip, limit = pageSize)
                     .map {
                         it.apply {
-                            this.nonce = this@PositionalRemoteMediator.nonce
+                            this.nonce = this@PositionalRxRemoteMediator.nonce
                             this.pageNumber = maxPageNumber
                         }
                     }
@@ -74,7 +74,7 @@ abstract class PositionalRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>
             .andThen(paramsDao.insertPagingIds(params.uniqueIds.mapIndexed { index, id ->
                 AmityPagingId(uniqueId = id, queryParameters = queryParameters)
                     .apply {
-                        this.nonce = this@PositionalRemoteMediator.nonce
+                        this.nonce = this@PositionalRxRemoteMediator.nonce
                         this.position = ((params.pageNumber - 1) * pageSize) + index + 1
                     }
             }))

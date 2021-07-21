@@ -2,7 +2,7 @@ package co.amity.android.rxremotemediator
 
 import androidx.paging.ExperimentalPagingApi
 import co.amity.rxremotemediator.AmityQueryParamsDao
-import co.amity.rxremotemediator.PositionalRemoteMediator
+import co.amity.rxremotemediator.PositionalRxRemoteMediator
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
@@ -10,7 +10,7 @@ import io.reactivex.Single
 
 @ExperimentalPagingApi
 class BookPositionalRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, paramsDao: AmityQueryParamsDao) :
-    PositionalRemoteMediator<Book, BookQueryParams>(
+    PositionalRxRemoteMediator<Book, BookQueryParams>(
         nonce = Book.NONCE,
         queryParameters = mapOf("title" to title, "category" to category),
         paramsDao = paramsDao

@@ -34,6 +34,8 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
     abstract fun fetchFirstPage(pageSize: Int): Maybe<TOKEN>
         
     abstract fun fetch(token: TOKEN): Maybe<TOKEN>
+    
+    abstract fun stackFromEnd(): Boolean
 }
 ```
 
@@ -47,9 +49,9 @@ TODO
 
 A set of filters in the `Map`, if any. (Key/Value pairs)
 
-##### AmityQueryToken and AmityQueryTokenDao
+##### `AmityQueryToken` and `AmityQueryTokenDao`
 
-`AmityQueryToken` is an expected object returned by the abstract functions, designed to keep next and previous tokens of each page which is later used for fetching more pages and refreshing existing pages, a set of unique ids of items of each page which is later used for identifying invalid items on database and a set of query parameters in the `Map`. (Key/Value pairs)
+`AmityQueryToken` is an expected object returned by the abstract functions, it is designed to keep a set of query parameters in the `Map` (Key/Value pairs), next/previous tokens of each page which is later used for fetching more pages or refreshing existing pages and a set of unique ids of items of each page which is later used for identifying invalid items on database.
 
 In order for us to have access to `AmityQueryToken` we need to get hands on `AmityPagingTokenDao`, make sure we define both on a `RoomDatabase` class and pass `AmityPagingTokenDao` to a class construtor.
 
@@ -206,53 +208,35 @@ We now have everything in place, we can then proceed to create a `PagingData` st
 ## Positional Remote Mediator
 
 ```code
-abstract class PositionalRemoteMediator<PARAMS : AmityQueryParams, PARAMS_DAO : AmityQueryParamsDao<PARAMS>> {
+abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val paramsDao: AmityQueryParamsDao) : AmityRxRemoteMediator<ENTITY>() {
 
-    abstract fun fetch(skip: Int, limit: Int): Single<Array<PARAMS>>
-
-    abstract fun tableName(): String
-    
-    abstract fun primaryKeys(): Map<String, Any>
+    abstract fun fetch(skip: Int, limit: Int): Single<PARAMS>    
 }
 ```
 
-### AmityQueryParams
+### Constructor arguments
 
-`AmityQueryParams` is a `Room` entity designed to keep query parameters (filters). Create a new `Room` entity, make sure it extends `AmityQueryParams` and add more query parameters, if any. So we have the same set of query parameters on next queries.
+##### Nonce
 
-**Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters (filters), so we need to keep these two separate on database and primary keys tell them apart.
-
-#### Sample
-
-```code 
 TODO
-``` 
 
-### AmityQueryParamsDao
-    
-In order for us to have access to query parameters we need to get a hand on its `Dao`, create a new `Dao` make sure it extends `AmityQueryParamsDao` and pass it on via a class contructor, all required sql queries and transactions are on the `Interface` already.
+##### QueryParameters
 
-#### Sample
+A set of filters in the `Map`, if any. (Key/Value pairs)
 
-```code 
-TODO
-``` 
-    
-### AmityPositionalRxRemoteMediator
+##### `AmityQueryParams` and `AmityQueryTokenDao`
+
+`AmityQueryParams` is an expected object returned by the abstract function, it is designed to keep a set of query parameters in the `Map` (Key/Value pairs), a last page boolean flag and a set of unique ids of items of each page which is later used for identifying invalid items on database.
+
+In order for us to have access to `AmityQueryParams` we need to get hands on `AmityQueryTokenDao`, make sure we define both on a `RoomDatabase` class and pass `AmityQueryTokenDao` to a class construtor.
+
+### Abstract functions
     
 ##### fetch
 
 Trigger a network request with a specific length control by `skip` and `limit`.
 
-##### tableName
-    
-A query parameter table name.
-    
-##### primaryKeys
-    
-A key/value `Map` of query parameters.
-
-#### Sample
+### Sample
 
 ```code 
 TODO

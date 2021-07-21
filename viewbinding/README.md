@@ -1,6 +1,6 @@
 # Amity View Binding
 
-### Easily create a binding class for your Activity, Fragment and ViewHolder 
+### Easily create a binding class for Activity, Fragment and ViewHolder 
 
 ```code 
 class SampleActivity : ViewBindingActivity<ActivitySampleBinding>() {

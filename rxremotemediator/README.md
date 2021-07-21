@@ -37,7 +37,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
 }
 ```
 
-### Constructor Arguments
+### Constructor arguments
 
 ##### Nonce
 
@@ -49,11 +49,11 @@ A set of filters in the `Map`, if any. (Key/Value pairs)
 
 ##### AmityQueryToken and AmityQueryTokenDao
 
-`AmityQueryToken` is an expected object returned by the functions, designed to keep a next token and a previous token of each page which is later used for fetching more pages and refreshing existing pages, a set of unique ids of items of each page which is later used for identifying invalid items on database and a set of query parameters in the `Map`. (Key/Value pairs)
+`AmityQueryToken` is an expected object returned by the abstract functions, designed to keep next and previous tokens of each page which is later used for fetching more pages and refreshing existing pages, a set of unique ids of items of each page which is later used for identifying invalid items on database and a set of query parameters in the `Map`. (Key/Value pairs)
 
-In order for us to have access to `AmityQueryToken` we need to get hands on `AmityPagingTokenDao`, define both on a `RoomDatabase` class and pass it to a contructor.
+In order for us to have access to `AmityQueryToken` we need to get hands on `AmityPagingTokenDao`, make sure we define both on a `RoomDatabase` class and pass `AmityPagingTokenDao` to a class construtor.
 
-### Abstract Functions
+### Abstract functions
 
 ##### fetchFirstPage
     
@@ -67,7 +67,7 @@ Trigger a network request with a specific token.
     
 set to `False` if the first page is on the top (top-down fetching) or `True` if the first page is on the bottom (bottom-up fetching)
 
-#### Sample
+### Sample
 
 In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows user to only see a list of books with a specific title and category. First, let's create a book `Entity` which has three variables: bookId, title and category as well as a book `Dao` with two basic functions: query and insert.
 

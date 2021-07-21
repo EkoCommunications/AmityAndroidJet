@@ -334,7 +334,7 @@ We now have everything in place, we can then proceed to create a `PagingData` st
 
 **Note:** It is very **IMPORTANT** that a local database query and a network request are using the same set of parameters, using a different set of parameters on two datasources is very risky, `RemoteMediator` could repeatedly trigger a network request with one set of parameters while locally looking for data matched with another set of parameters which there is a posibility that there is no any or just some.
 
-## Stay up-to-date and sorted
+### Stay up-to-date and sorted
     
 As we mentioned in the beginning of this article, when items are inserted into database, without a data comparison or a reliable real-time event from a server the items will eventually be outdated. To prevent that we need to inject `AmityPagingDataRefresher` into `RecyclerView`. `AmityPagingDataRefresher` forces `RemoteMediator` to re-fetching the items again when a user scrolls pass through pages to update outdated items, get rid of invalid items and move items to new positions.
     

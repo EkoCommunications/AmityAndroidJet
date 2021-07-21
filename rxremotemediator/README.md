@@ -1,124 +1,59 @@
 # Amity RxRemoteMediator
 
-We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items with given filters as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, tokens for fetching more pages later.
+We are the `RxRemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, tokens for fetching more pages.
 
-Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from a server we end up showing outdated data and I'll tell what? we don't need to worry about it on `AmityRxRemoteMediator`.
+Another common difficulty of using `RxRemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from a server we end up showing invalid or outdated data. TODO
 
 ## First, pick the right mediator
 
 We support 3 types of mediator, it depends on how do we fetch data from a pagined source.
 
-#### Item-keyed Remote Mediator
+#### ItemKeyedRxRemoteMediator
 
 using information from the items themselves to fetch more data.
 
-#### Page-keyed Remote Mediator
+#### PageKeyedRxRemoteMediator
 
 using tokens to load pages (each response has next and previous tokens).
 
-#### Positional Remote Mediator
+#### PositionalRxRemoteMediator
 
 using `skip` and `limit` to specify where to begin returning results and the maximum number of results to be returned.
 
-## Item-keyed Remote Mediator
+## ItemKeyedRxRemoteMediator
 
 ```code
 TODO
 ```
 
-## Page-keyed Remote Mediator
+## PageKeyedRxRemoteMediator
 
 ```code
-abstract class AmityPageKeyedRxRemoteMediator<ENTITY:Any, TOKEN : AmityQueryToken, TOKEN_DAO : AmityQueryTokenDao<TOKEN>> {
+abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val tokenDao: AmityQueryTokenDao) : AmityRxRemoteMediator<ENTITY>() {
 
-    abstract fun fetchFirstPage(): Maybe<TOKEN>
+    abstract fun fetchFirstPage(pageSize: Int): Maybe<TOKEN>
         
     abstract fun fetch(token: TOKEN): Maybe<TOKEN>
-        
-    abstract fun primaryKeys(): Map<String, Any>
-    
-    abstract fun stackFromEnd(): Boolean
 }
 ```
 
-#### Sample
+### Arguments
 
-In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows user to only see a list of books with a specific title and category. First let's create a book `Entity` which has three arguments bookId, title and category and a book `Dao` with two basic functions, query and insert.
+##### Nonce
 
-```code 
-@Entity(
-    tableName = "book",
-    primaryKeys = ["bookId"],
-    indices = [Index(value = ["title", "category"])]
-)
-class Book(var bookId: String, var title: String, var category: String)
-``` 
+TODO
 
-```code 
-@Dao
-interface BookDao {
+##### QueryParameters
 
-    @Query("select * from book where title = :title and category = :category")
-    fun queryBooks(title: String, category: String): PagingSource<Int, Book>
+A set of filters in the `Map`, if any. (Key/Value pairs)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertBooks(books: List<Book>): Completable
-}
-``` 
+##### AmityQueryToken and AmityQueryTokenDao
 
-### AmityQueryToken
+`AmityQueryToken` is an expected object returned by the functions, designed to keep a next token and a previous token of each page which is later used for fetching more pages and refreshing existing pages, a set of unique ids of items of each page which is later used for identifying invalid items on database and a set of query parameters in the `Map`. (Key/Value pairs)
 
-`AmityQueryToken` is a `Room` entity designed to keep a next token and a previous token of each page which is later used for fetching more pages and refreshing existing pages. Create a new `Room` entity, make sure it extends `AmityQueryToken` and add more query parameters, if any. So we have the same set of query parameters on next queries.
+In order for us to have access to `AmityQueryToken` we need to get hands on `AmityPagingTokenDao`, define both on a `RoomDatabase` class and pass it to a contructor.
 
-What are query parameters? why do we need it? query parameters are a set of filters, in different usecases, sets of filters are most likely different, so are query results, so are tokens, this is why we need to keep a bond between query parameters and tokens because each set of query parameters has specific tokens.
-
-**Note:** This is a very **IMPORTANT RULE**, we need to make sure that all query parameters are member of primary keys, espescially when we have a wide variety of query parameters (filters) like, for example, we have two `ListFragment`s and each has its own a seperate set of query parameters (filters), so we need to keep these two separate on database and primary keys tell them apart.
-
-#### Sample
-
-```code 
-@Entity(
-    tableName = "book_query_token",
-    primaryKeys = ["title", "category"] // query parameters as primary keys
-)
-class BookQueryToken(var title: String, var category: String, next: String?, previous: String?) : AmityQueryToken(next, previous)
-``` 
-
-### AmityQueryTokenDao
-
-In order for us to have access to tokens we need to get hands on its `Dao`, create a new `Dao` make sure it extends `AmityPagingTokenDao` and pass it on via a class contructor, implement all these following functions, any other additional sql queries and transactions are on the `Interface` already.
-
-##### queryToken
-    
-Execute a `BookQueryToken` query, a query string is built for us by the `Interface` all we need to do is to annotate a function with `@RawQuery`.
-
-##### insertToken
-    
-Insert a `BookQueryToken` object into database for later usages, using `OnConflictStrategy.REPLACE` as a conflict strategy is recommended as tokens may change over time and outdate tokens should be replaced.
-
-##### tableName
-    
-A query token table name.
-
-#### Sample
-
-```code 
-@Dao
-interface BookQueryTokenDao : AmityQueryTokenDao<BookQueryToken> {
-
-    @RawQuery(observedEntities = [BookQueryToken::class])
-    override fun queryToken(query: SimpleSQLiteQuery): Maybe<BookQueryToken>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override fun insertToken(token: BookQueryToken): Completable
-
-    override fun tableName(): String {
-        return "book_query_token"
-    }
-}
-``` 
-
-### AmityPageKeyedRxRemoteMediator
+### Functions
 
 ##### fetchFirstPage
     
@@ -127,16 +62,48 @@ Trigger a network request to fetch the first page to acquire the first next toke
 ##### fetch
     
 Trigger a network request with a specific token.
-    
-##### primaryKeys
-
-A key/value `Map` of query parameters.
-    
+        
 ##### stackFromEnd
     
 set to `False` if the first page is on the top (top-down fetching) or `True` if the first page is on the bottom (bottom-up fetching)
 
 #### Sample
+
+In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows user to only see a list of books with a specific title and category. First, let's create a book `Entity` which has three variables: bookId, title and category as well as a book `Dao` with two basic functions: query and insert.
+
+```code 
+@Entity(
+    tableName = "book",
+    primaryKeys = ["bookId"],
+    indices = [Index(value = ["title", "category"])]
+)
+class Book(var bookId: String, var title: String, var category: String)
+
+@Dao
+interface BookDao {
+
+    @Query("select * from book where title = :title and category = :category order by title")
+    fun queryBooks(title: String, category: String): PagingSource<Int, Book>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertBooks(books: List<Book>): Completable
+}
+
+@Database(entities = arrayOf(AmityQueryToken::class), version = 1)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun tokenDao(): AmityQueryTokenDao
+}
+``` 
+
+```code 
+class BookQueryToken(var title: String, var category: String, next: String? = null, previous: String? = null, uniqueIds: List<String>) :
+    AmityQueryToken(
+        queryParameters = mapOf("title" to title, "category" to category),
+        next = next,
+        previous = previous,
+        uniqueIds = uniqueIds
+    )
+``` 
     
 ```code 
 class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val bookDao: BookDao, tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<Book, BookQueryToken, BookQueryTokenDao>(tokenDao) {
@@ -183,17 +150,6 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
                         )
                     )
             }
-    }
-
-    override fun primaryKeys(): Map<String, Any> {
-        return mapOf(
-            "title" to title,
-            "category" to category
-        )
-    }
-
-    override fun stackFromEnd(): Boolean {
-        return false
     }
 }
 ``` 

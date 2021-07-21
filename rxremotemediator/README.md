@@ -2,7 +2,7 @@
 
 We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, tokens for fetching more pages.
 
-Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from a server we end up showing invalid or outdated data. TODO
+Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from a server we end up showing invalid or outdated data. Another common difficulty is when items cannot be sorted by any of theirs variables but can only be sorted by some specific algorithms likes user preferences, best seller and etc., and those algorithms or sort keys are not passed on to us then we need to locally generate and store sort keys of each algorithms by ourself. On TODO
 
 ## First, pick the right mediator
 
@@ -39,7 +39,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
 }
 ```
 
-### Constructor arguments
+### Constructor parameters
 
 ##### Nonce
 
@@ -214,7 +214,7 @@ abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParam
 }
 ```
 
-### Constructor arguments
+### Constructor parameters
 
 ##### Nonce
 

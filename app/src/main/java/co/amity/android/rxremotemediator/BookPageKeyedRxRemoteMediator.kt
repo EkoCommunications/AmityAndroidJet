@@ -6,7 +6,7 @@ import co.amity.rxremotemediator.PageKeyedRxRemoteMediator
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import io.reactivex.Maybe
+import io.reactivex.Single
 
 @ExperimentalPagingApi
 class BookPageKeyedRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, tokenDao: AmityQueryTokenDao) :
@@ -16,23 +16,23 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
         tokenDao = tokenDao
     ) {
 
-    private fun queryByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
+    private fun fetchBooksByTitleAndCategory(title: String, category: String, pageSize: Int): Single<JsonObject> {
         TODO("Not yet implemented")
     }
 
-    private fun queryByToken(token: String): Maybe<JsonObject> {
+    private fun fetchBooksByToken(token: String): Single<JsonObject> {
         TODO("Not yet implemented")
     }
 
-    override fun fetchFirstPage(pageSize: Int): Maybe<BookQueryToken> {
-        return queryByTitleAndCategory(title, category, pageSize)
+    override fun fetchFirstPage(pageSize: Int): Single<BookQueryToken> {
+        return fetchBooksByTitleAndCategory(title, category, pageSize)
             .flatMap {
                 // insert books into database and return token
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
                     .andThen(
-                        Maybe.just(
+                        Single.just(
                             BookQueryToken(
                                 title = title,
                                 category = category,
@@ -45,15 +45,15 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
             }
     }
 
-    override fun fetch(token: String): Maybe<BookQueryToken> {
-        return queryByToken(token)
+    override fun fetch(token: String): Single<BookQueryToken> {
+        return fetchBooksByToken(token)
             .flatMap {
                 // insert books into database and return token
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
                     .andThen(
-                        Maybe.just(
+                        Single.just(
                             BookQueryToken(
                                 title = title,
                                 category = category,
@@ -67,6 +67,6 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
     }
 
     override fun stackFromEnd(): Boolean {
-        return true
+        return false
     }
 }

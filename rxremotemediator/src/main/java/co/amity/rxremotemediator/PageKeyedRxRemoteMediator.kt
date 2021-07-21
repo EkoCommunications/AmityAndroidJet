@@ -3,10 +3,7 @@ package co.amity.rxremotemediator
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
-import io.reactivex.Completable
-import io.reactivex.Maybe
-import io.reactivex.MaybeTransformer
-import io.reactivex.Single
+import io.reactivex.*
 import io.reactivex.schedulers.Schedulers
 import kotlin.math.ceil
 import kotlin.math.max
@@ -23,7 +20,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                     val pageNumber = ceil(max(1, anchorPosition).toDouble() / state.config.pageSize.toDouble()).toInt()
                     tokenDao.getTokenByPageNumber(pageNumber = pageNumber, queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
-                        .flatMap { fetch(token = it) }
+                        .flatMapSingle { fetch(token = it) }
                         .map {
                             it.apply {
                                 this.nonce = this@PageKeyedRxRemoteMediator.nonce
@@ -32,7 +29,6 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         }
                         .flatMap { insertToken(it, pageSize) }
                         .compose(interceptErrorAndEmpty)
-                        .toSingle()
                 } ?: run {
                     fetchFirstPage(pageSize = pageSize)
                         .subscribeOn(Schedulers.io())
@@ -44,14 +40,13 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         }
                         .flatMap { insertToken(it, pageSize) }
                         .compose(interceptErrorAndEmpty)
-                        .toSingle()
                 }
             }
             LoadType.PREPEND -> {
                 if (stackFromEnd()) {
                     tokenDao.getFirstQueryToken(queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
-                        .flatMap { token ->
+                        .flatMapSingle { token ->
                             fetch(token = token.previous!!)
                                 .map {
                                     it.apply {
@@ -62,7 +57,6 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                 .flatMap { insertToken(it, pageSize) }
                         }
                         .compose(interceptErrorAndEmpty)
-                        .toSingle()
                 } else {
                     Single.just<MediatorResult>(MediatorResult.Success(true))
                 }
@@ -73,7 +67,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                 } else {
                     tokenDao.getLastQueryToken(queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
-                        .flatMap { token ->
+                        .flatMapSingle { token ->
                             fetch(token = token.next!!)
                                 .map {
                                     it.apply {
@@ -84,17 +78,16 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                 .flatMap { insertToken(it, pageSize) }
                         }
                         .compose(interceptErrorAndEmpty)
-                        .toSingle()
                 }
             }
         }
     }
 
-    abstract fun fetchFirstPage(pageSize: Int): Maybe<TOKEN>
+    abstract fun fetchFirstPage(pageSize: Int): Single<TOKEN>
 
-    abstract fun fetch(token: String): Maybe<TOKEN>
+    abstract fun fetch(token: String): Single<TOKEN>
 
-    private fun insertToken(token: TOKEN, pageSize: Int): Maybe<MediatorResult> {
+    private fun insertToken(token: TOKEN, pageSize: Int): Single<MediatorResult> {
         val isLastPage = when (stackFromEnd()) {
             true -> token.previous == null
             false -> token.next == null
@@ -117,11 +110,15 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         this.position = ((token.pageNumber - 1) * pageSize) + index + 1
                     }
             }))
-            .andThen(Maybe.just<MediatorResult>(MediatorResult.Success(isLastPage)))
+            .andThen(Single.just<MediatorResult>(MediatorResult.Success(isLastPage)))
     }
 
-    private val interceptErrorAndEmpty = MaybeTransformer<MediatorResult, MediatorResult> { upstream ->
-        upstream.onErrorReturn { MediatorResult.Error(it) }
-            .switchIfEmpty(Maybe.just(MediatorResult.Success(true)))
+    private val interceptErrorAndEmpty = SingleTransformer<MediatorResult, MediatorResult> { upstream ->
+        upstream.onErrorReturn {
+            when (it) {
+                is NoSuchElementException -> MediatorResult.Success(true)
+                else -> MediatorResult.Error(it)
+            }
+        }
     }
 }

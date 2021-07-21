@@ -126,15 +126,15 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
         tokenDao = tokenDao
     ) {
 
-    private fun fetchBooksByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
+    private fun fetchBooksByTitleAndCategory(title: String, category: String, pageSize: Int): Single<JsonObject> {
         // trigger a book network request by title and category
     }
 
-    private fun fetchBooksByToken(token: String): Maybe<JsonObject> {
+    private fun fetchBooksByToken(token: String): Single<JsonObject> {
         // trigger a book network request for a next page/previous page. 
     }
 
-    override fun fetchFirstPage(pageSize: Int): Maybe<BookQueryToken> {
+    override fun fetchFirstPage(pageSize: Int): Single<BookQueryToken> {
         return fetchBooksByTitleAndCategory(title, category, pageSize)
             .flatMap {
                 // insert books into database and return token
@@ -142,7 +142,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
                     .andThen(
-                        Maybe.just(
+                        Single.just(
                             BookQueryToken(
                                 title = title,
                                 category = category,
@@ -155,7 +155,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
             }
     }
 
-    override fun fetch(token: String): Maybe<BookQueryToken> {
+    override fun fetch(token: String): Single<BookQueryToken> {
         return fetchBooksByToken(token)
             .flatMap {
                 // insert books into database and return token
@@ -163,7 +163,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
                     .andThen(
-                        Maybe.just(
+                        Single.just(
                             BookQueryToken(
                                 title = title,
                                 category = category,

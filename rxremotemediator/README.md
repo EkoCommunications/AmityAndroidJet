@@ -224,11 +224,11 @@ TODO
 
 A set of filters in the `Map`, if any. (Key/Value pairs)
 
-##### `AmityQueryParams` and `AmityQueryTokenDao`
+##### `AmityQueryParams` and `AmityQueryParamsDao`
 
 `AmityQueryParams` is an expected object returned by the abstract function, it is designed to keep a set of query parameters in the `Map` (Key/Value pairs), a last page boolean flag and a set of unique ids of items of each page which is later used for identifying invalid items on database.
 
-In order for us to have access to `AmityQueryParams` we need to get hands on `AmityQueryTokenDao`, make sure we define both on a `RoomDatabase` class and pass `AmityQueryTokenDao` to a class construtor.
+In order for us to have access to `AmityQueryParams` we need to get hands on `AmityQueryParamsDao`, make sure we define both on a `RoomDatabase` class and pass `AmityQueryParamsDao` to a class construtor.
 
 ### Abstract functions
     
@@ -238,9 +238,80 @@ Trigger a network request with a specific length control by `skip` and `limit`.
 
 ### Sample
 
+Let's re-use a book `Entity` and a book `Dao` we created [here](https://github.com/EkoCommunications/AmityAndroidJet/blob/develop/rxremotemediator/README.md#sample) and define more items on a database class
+
 ```code 
-TODO
+@Database(entities = arrayOf(BookDao::class, AmityQueryToken::class, AmityQueryParams::class), version = 1)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun bookDao(): BookDao
+    abstract fun tokenDao(): AmityQueryTokenDao
+    abstract fun paramsDao(): AmityQueryParamsDao
+}
 ``` 
+
+Implement a new `PageKeyedRxRemoteMediator`. 
+
+```code 
+class BookQueryParams(var title: String, var category: String, endOfPaginationReached: Boolean, uniqueIds: List<String>) :
+    AmityQueryParams(
+        queryParameters = mapOf("title" to title, "category" to category),
+        endOfPaginationReached = endOfPaginationReached,
+        uniqueIds = uniqueIds
+    )
+``` 
+
+```code 
+class BookPositionalRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, paramsDao: AmityQueryParamsDao) :
+    PositionalRxRemoteMediator<Book, BookQueryParams>(
+        nonce = Book.NONCE,
+        queryParameters = mapOf("title" to title, "category" to category),
+        paramsDao = paramsDao
+    ) {
+
+    private fun queryBySkipAndLimit(skip: Int, limit: Int): Single<JsonObject> {
+        // trigger a book network request by skip and limit
+    }
+
+    override fun fetch(skip: Int, limit: Int): Single<BookQueryParams> {
+        return queryBySkipAndLimit(skip, limit)
+            .flatMap {
+                // insert books into database and return params
+                val books = it["books"].asJsonArray
+                val type = object : TypeToken<List<Book>>() {}.type
+                bookDao.insertBooks(Gson().fromJson(books, type))
+                    .andThen(
+                        Single.just(
+                            BookQueryParams(
+                                title = title,
+                                category = category,
+                                endOfPaginationReached = books.size() < limit,
+                                uniqueIds = books.map { book -> book.asJsonObject["id"].asString }
+                            )
+                        )
+                    )
+            }
+    }
+``` 
+
+We now have everything in place, we can then proceed to create a `PagingData` stream using `RemoteMediator` and submit data into `RecyclerView` through its `Adapter`.
+
+
+```code
+        val pagingData = Pager(
+            config = PagingConfig(pageSize = 20, enablePlaceholders = false),
+            initialKey = null,
+            remoteMediator = BookPositionalRxRemoteMediator(
+                title = "rxjava",
+                category = "programing",
+                bookDao = bookDao,
+                paramsDao = paramsDao
+            )
+        ) { bookDao.queryBooks(title = "rxjava", category = "programing") }.flowable
+
+        pagingData
+            .doOnNext { recyclerAdapter.submitData(this, it) }
+            .subscribe()
+```
     
 ## AmityPagingDataRefresher
     

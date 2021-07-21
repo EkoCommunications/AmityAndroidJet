@@ -69,7 +69,7 @@ set to `False` if the first page is on the top (top-down fetching) or `True` if 
 
 ### Sample
 
-In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows user to only see a list of books with a specific title and category. First, let's create a book `Entity` which has three variables: bookId, title and category as well as a book `Dao` with two basic functions: query and insert.
+In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows a user to only see a list of books with a specific title and category. First, let's create a book `Entity` which has 3 variables: bookId, title and category as well as a book `Dao` with 2 basic functions: query and insert.
 
 ```code 
 @Entity(
@@ -77,8 +77,15 @@ In this sample we assume we need to build a book store application with a simple
     primaryKeys = ["bookId"],
     indices = [Index(value = ["title", "category"])]
 )
-class Book(var bookId: String, var title: String, var category: String)
+class Book(var bookId: String, var title: String, var category: String) {
 
+    companion object {
+        const val NONCE: Int = 42
+    }
+}
+``` 
+
+```code 
 @Dao
 interface BookDao {
 
@@ -88,12 +95,19 @@ interface BookDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBooks(books: List<Book>): Completable
 }
+``` 
 
-@Database(entities = arrayOf(AmityQueryToken::class), version = 1)
+Then define them on a database class along with `AmityQueryToken` and `AmityQueryTokenDao`.
+
+```code 
+@Database(entities = arrayOf(BookDao::class, AmityQueryToken::class), version = 1)
 abstract class AppDatabase : RoomDatabase() {
+    abstract fun bookDao(): BookDao
     abstract fun tokenDao(): AmityQueryTokenDao
 }
 ``` 
+
+Implement a new `PageKeyedRxRemoteMediator`. 
 
 ```code 
 class BookQueryToken(var title: String, var category: String, next: String? = null, previous: String? = null, uniqueIds: List<String>) :
@@ -106,7 +120,11 @@ class BookQueryToken(var title: String, var category: String, next: String? = nu
 ``` 
     
 ```code 
-class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val bookDao: BookDao, tokenDao: BookQueryTokenDao) : AmityPageKeyedRxRemoteMediator<Book, BookQueryToken, BookQueryTokenDao>(tokenDao) {
+class BookPageKeyedRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, tokenDao: AmityQueryTokenDao) : PageKeyedRxRemoteMediator<Book, BookQueryToken>(
+        nonce = Book.NONCE,
+        queryParameters = mapOf("title" to title, "category" to category),
+        tokenDao = tokenDao
+    ) {
 
     private fun fetchBooksByTitleAndCategory(title: String, category: String, pageSize: Int): Maybe<JsonObject> {
         // trigger a book network request by title and category
@@ -116,40 +134,50 @@ class BookPageKeyedRxRemoteMediator(val title: String, val category: String, val
         // trigger a book network request for a next page/previous page. 
     }
 
-    override fun fetchFirstPage(): Maybe<BookQueryToken> {
+    override fun fetchFirstPage(pageSize: Int): Maybe<BookQueryToken> {
         return fetchBooksByTitleAndCategory(title, category, pageSize)
             .flatMap {
-                // insert books into database and return a next token           
+                // insert books into database and return token
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
                     .andThen(
                         Maybe.just(
                             BookQueryToken(
+                                title = title,
+                                category = category,
                                 next = it.get("next").asString,
-                                previous = null
+                                previous = null,
+                                uniqueIds = books.map { book -> book.asJsonObject["id"].asString }
                             )
                         )
                     )
             }
     }
 
-    override fun fetch(token: BookQueryToken): Maybe<BookQueryToken> {
+    override fun fetch(token: String): Maybe<BookQueryToken> {
         return fetchBooksByToken(token)
             .flatMap {
-                // insert books into database and return tokens           
+                // insert books into database and return token
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
                     .andThen(
                         Maybe.just(
                             BookQueryToken(
+                                title = title,
+                                category = category,
                                 next = it.get("next").asString,
-                                previous = it.get("previous").asString
+                                previous = it.get("previous").asString,
+                                uniqueIds = books.map { book -> book.asJsonObject["id"].asString }
                             )
                         )
                     )
             }
+    }
+    
+    override fun stackFromEnd(): Boolean {
+        return false
     }
 }
 ``` 
@@ -160,11 +188,11 @@ We now have everything in place, we can then proceed to create a `PagingData` st
         val pagingData = Pager(
             config = PagingConfig(pageSize = 20, enablePlaceholders = false),
             initialKey = null,
-            remoteMediator = BookRxRemoteMediator(
+            remoteMediator = BookPageKeyedRxRemoteMediator(
                 title = "rxjava",
                 category = "programing",
                 bookDao = bookDao,
-                tokenDao = bookQueryTokenDao
+                tokenDao = tokenDao
             )
         ) { bookDao.queryBooks(title = "rxjava", category = "programing") }.flowable
 

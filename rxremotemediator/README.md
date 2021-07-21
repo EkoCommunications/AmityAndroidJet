@@ -57,15 +57,15 @@ In order for us to have access to `AmityQueryToken` we need to get hands on `Ami
 
 ### Abstract functions
 
-##### fetchFirstPage
+##### fetchFirstPage(pageSize: Int)
     
 Trigger a network request to fetch the first page to acquire the first next token (or the first previous token in case stackFromEnd is `True`).
     
-##### fetch
+##### fetch(token: TOKEN)
     
 Trigger a network request with a specific token.
         
-##### stackFromEnd
+##### stackFromEnd()
     
 set to `False` if the first page is on the top (top-down fetching) or `True` if the first page is on the bottom (bottom-up fetching)
 
@@ -232,19 +232,46 @@ In order for us to have access to `AmityQueryParams` we need to get hands on `Am
 
 ### Abstract functions
     
-##### fetch
+##### fetch(skip: Int, limit: Int)
 
 Trigger a network request with a specific length control by `skip` and `limit`.
 
 ### Sample
 
-Let's re-use a book `Entity` and a book `Dao` we created [here](https://github.com/EkoCommunications/AmityAndroidJet/blob/develop/rxremotemediator/README.md#sample) and define more items on a database class
+In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows a user to only see a list of books with a specific title and category. First, let's create a book `Entity` which has 3 variables: bookId, title and category as well as a book `Dao` with 2 basic functions: query and insert.
 
 ```code 
-@Database(entities = arrayOf(BookDao::class, AmityQueryToken::class, AmityQueryParams::class), version = 1)
+@Entity(
+    tableName = "book",
+    primaryKeys = ["bookId"],
+    indices = [Index(value = ["title", "category"])]
+)
+class Book(var bookId: String, var title: String, var category: String) {
+
+    companion object {
+        const val NONCE: Int = 42
+    }
+}
+``` 
+
+```code 
+@Dao
+interface BookDao {
+
+    @Query("select * from book where title = :title and category = :category order by title")
+    fun queryBooks(title: String, category: String): PagingSource<Int, Book>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertBooks(books: List<Book>): Completable
+}
+``` 
+
+Then define them on a database class along with `AmityQueryParams` and `AmityQueryParamsDao`.
+
+```code 
+@Database(entities = arrayOf(BookDao::class, AmityQueryToken::class), version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
-    abstract fun tokenDao(): AmityQueryTokenDao
     abstract fun paramsDao(): AmityQueryParamsDao
 }
 ``` 

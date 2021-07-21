@@ -37,7 +37,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
 }
 ```
 
-### Arguments
+### Constructor Arguments
 
 ##### Nonce
 
@@ -53,7 +53,7 @@ A set of filters in the `Map`, if any. (Key/Value pairs)
 
 In order for us to have access to `AmityQueryToken` we need to get hands on `AmityPagingTokenDao`, define both on a `RoomDatabase` class and pass it to a contructor.
 
-### Functions
+### Abstract Functions
 
 ##### fetchFirstPage
     

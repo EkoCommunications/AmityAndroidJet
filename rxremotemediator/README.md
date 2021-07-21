@@ -339,7 +339,9 @@ We now have everything in place, we can then proceed to create a `PagingData` st
             .doOnNext { recyclerAdapter.submitData(this, it) }
             .subscribe()
 ```
-    
+
+**Note:** It is a very **IMPORTANT** that a local database query and a network request are using the same set of parameters, using different sets of parameters on two datasources is very risky, `RemoteMediator` could repeatedly trigger a network request with one set of parameters while locally looking for data matched with another set of parameters which there is a posibility that there is no any or just some.
+
 ## AmityPagingDataRefresher
     
 As we mentioned in the beginning of this article, once items are inserted into database, `RemoteMediator` stops fetching any more items, without a full data comparison or a reliable real-time event from a server the items will eventually be outdated. To prevent that we need to inject `AmityPagingDataRefresher` into a `RecyclerView`. `AmityPagingDataRefresher` forces `RemoteMediator` to re-fetching items again when a user scrolls pass through pages. Update outdated items, get rid of deleted items or move items to new positions along with the process.

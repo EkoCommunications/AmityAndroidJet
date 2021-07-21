@@ -8,25 +8,17 @@ Common challenges of using `RemoteMediator` is when items are inserted into data
 
 We support 3 types of `RemoteMediator`, it depends on how do we fetch data from pagined sources.
 
-#### ItemKeyedRxRemoteMediator
+### ItemKeyedRxRemoteMediator
 
 using information from the items themselves to fetch more data.
-
-#### PageKeyedRxRemoteMediator
-
-using tokens to load pages (each response has next and previous tokens).
-
-#### PositionalRxRemoteMediator
-
-using `skip` and `limit` to specify where to begin returning results and the maximum number of results to be returned.
-
-## ItemKeyedRxRemoteMediator
 
 ```code
 TODO
 ```
 
-## PageKeyedRxRemoteMediator
+### PageKeyedRxRemoteMediator
+
+using tokens to load pages (each response has next and previous tokens).
 
 ```code
 abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val tokenDao: AmityQueryTokenDao) : AmityRxRemoteMediator<ENTITY>() {
@@ -39,7 +31,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
 }
 ```
 
-### Constructor Parameters
+#### Constructor Parameters
 
 ##### Nonce
 
@@ -55,7 +47,7 @@ A set of filters in the `Map`, if any. (Key/Value pairs)
 
 In order for us to have access to `AmityQueryToken` we need to get hands on `AmityPagingTokenDao`, make sure we define both on the `RoomDatabase` class and pass `AmityPagingTokenDao` to the class construtor.
 
-### Abstract Functions
+#### Abstract Functions
 
 ##### fetchFirstPage(pageSize: Int)
     
@@ -69,7 +61,7 @@ Trigger a network request with a specific token.
     
 set to `False` if the first page is on the top (top-down fetching) or `True` if the first page is on the bottom (bottom-up fetching)
 
-### Sample
+#### Sample
 
 In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows a user to only see a list of books with a specific title and category. First, let's create a book `Entity` which has 3 variables: bookId, title and category as well as a book `Dao` with 2 basic functions: query and insert.
 
@@ -205,7 +197,9 @@ We now have everything in place, we can then proceed to create a `PagingData` st
 
 **Note:** It is very **IMPORTANT** that a local database query and a network request are using the same set of parameters, using a different set of parameters on two datasources is very risky, `RemoteMediator` could repeatedly trigger a network request with one set of parameters while locally looking for data matched with another set of parameters which there is a posibility that there is no any or just some.
 
-## Positional Remote Mediator
+### PositionalRxRemoteMediator
+
+using `skip` and `limit` to specify where to begin returning results and the maximum number of results to be returned.
 
 ```code
 abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val paramsDao: AmityQueryParamsDao) : AmityRxRemoteMediator<ENTITY>() {
@@ -214,7 +208,7 @@ abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParam
 }
 ```
 
-### Constructor Parameters
+#### Constructor Parameters
 
 ##### Nonce
 
@@ -230,13 +224,13 @@ A set of filters in the `Map`, if any. (Key/Value pairs)
 
 In order for us to have access to `AmityQueryParams` we need to get hands on `AmityQueryParamsDao`, make sure we define both on the `RoomDatabase` class and pass `AmityQueryParamsDao` to the class construtor.
 
-### Abstract Functions
+#### Abstract Functions
     
 ##### fetch(skip: Int, limit: Int)
 
 Trigger a network request with a specific length control by `skip` and `limit`.
 
-### Sample
+#### Sample
 
 In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows a user to only see a list of books with a specific title and category. First, let's create a book `Entity` which has 3 variables: bookId, title and category as well as a book `Dao` with 2 basic functions: query and insert.
 

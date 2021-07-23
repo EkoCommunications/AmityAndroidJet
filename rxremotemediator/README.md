@@ -1,32 +1,22 @@
 # Amity RxRemoteMediator
 
-We are the `RemoteMediator` for a DB + Network based `PagingData` stream which traiggers network requests to fetch more items as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, tokens for fetching more pages.
+We are the `RemoteMediator` for a DB + Network based `PagingData` stream which triggers network requests to fetch more items as user scrolls, and automatically `insert` / `query` necessary information into / from the database, for example, tokens for fetching more pages.
 
-Another common difficulty of using `RemoteMediator` is once items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a full data comparison or a reliable real-time event from a server we end up showing invalid or outdated data. TODO
+Common challenges of using `RemoteMediator` is when items are inserted into the database, there is no easy way to tell which item has been deleted, updated or moved, so without a data comparison or a reliable real-time event from a server we end up showing invalid or outdated data and when items cannot be sorted by any of theirs variables but can only be sorted by some specific algorithms likes user preferences, best sellers and etc. and those algorithms or sort keys are not passed on to us then we need to locally generate and store sort keys of each algorithms by ourself. On `AmityRxRemoteMediator` we offer solutions for both issues.
 
-## First, pick the right mediator
+First, pick the right `RemoteMediator`, We support 3 types of `RemoteMediator`, it depends on how do we fetch data from pagined sources.
 
-We support 3 types of mediator, it depends on how do we fetch data from a pagined source.
-
-#### ItemKeyedRxRemoteMediator
+### ItemKeyedRxRemoteMediator
 
 using information from the items themselves to fetch more data.
-
-#### PageKeyedRxRemoteMediator
-
-using tokens to load pages (each response has next and previous tokens).
-
-#### PositionalRxRemoteMediator
-
-using `skip` and `limit` to specify where to begin returning results and the maximum number of results to be returned.
-
-## ItemKeyedRxRemoteMediator
 
 ```code
 TODO
 ```
 
-## PageKeyedRxRemoteMediator
+### PageKeyedRxRemoteMediator
+
+using tokens to load pages (each response has next and previous tokens).
 
 ```code
 abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val tokenDao: AmityQueryTokenDao) : AmityRxRemoteMediator<ENTITY>() {
@@ -39,7 +29,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
 }
 ```
 
-### Constructor arguments
+#### Constructor Parameters
 
 ##### Nonce
 
@@ -47,15 +37,15 @@ TODO
 
 ##### QueryParameters
 
-A set of filters in the `Map`, if any. (Key/Value pairs)
+A set of filters specified in the `Map`, if any. (Key/Value pairs)
 
-##### `AmityQueryToken` and `AmityQueryTokenDao`
+##### AmityQueryToken and AmityQueryTokenDao
 
-`AmityQueryToken` is an expected object returned by the abstract functions, it is designed to keep a set of query parameters in the `Map` (Key/Value pairs), next/previous tokens of each page which is later used for fetching more pages or refreshing existing pages and a set of unique ids of items of each page which is later used for identifying invalid items on database.
+`AmityQueryToken` is the expected object returned by the abstract functions, it is designed to keep a set of query parameters specified in the `Map` (Key/Value pairs), next/previous tokens of each page which is later used for fetching more pages or refreshing existing pages and a set of unique ids of items of each page which is later used for identifying invalid items.
 
-In order for us to have access to `AmityQueryToken` we need to get hands on `AmityPagingTokenDao`, make sure we define both on a `RoomDatabase` class and pass `AmityPagingTokenDao` to a class construtor.
+In order for us to have access to `AmityQueryToken` we need to get hands on `AmityPagingTokenDao`, make sure we define both on the `RoomDatabase` class and pass `AmityPagingTokenDao` to the class construtor.
 
-### Abstract functions
+#### Abstract Functions
 
 ##### fetchFirstPage(pageSize: Int)
     
@@ -69,7 +59,7 @@ Trigger a network request with a specific token.
     
 set to `False` if the first page is on the top (top-down fetching) or `True` if the first page is on the bottom (bottom-up fetching)
 
-### Sample
+#### Sample
 
 In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows a user to only see a list of books with a specific title and category. First, let's create a book `Entity` which has 3 variables: bookId, title and category as well as a book `Dao` with 2 basic functions: query and insert.
 
@@ -99,7 +89,7 @@ interface BookDao {
 }
 ``` 
 
-Then define them on a database class along with `AmityQueryToken` and `AmityQueryTokenDao`.
+Then define Book and BookDao on the database class along with `AmityQueryToken` and `AmityQueryTokenDao`.
 
 ```code 
 @Database(entities = arrayOf(BookDao::class, AmityQueryToken::class), version = 1)
@@ -139,7 +129,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
     override fun fetchFirstPage(pageSize: Int): Single<BookQueryToken> {
         return fetchBooksByTitleAndCategory(title, category, pageSize)
             .flatMap {
-                // insert books into database and return token
+                // insert books into the database and return token
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
@@ -160,7 +150,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
     override fun fetch(token: String): Single<BookQueryToken> {
         return fetchBooksByToken(token)
             .flatMap {
-                // insert books into database and return token
+                // insert books into the database and return token
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
@@ -203,9 +193,11 @@ We now have everything in place, we can then proceed to create a `PagingData` st
             .subscribe()
 ```
 
-**Note:** It is a very **IMPORTANT** that a local database query and a network request are using the same set of parameters, using different sets of parameters on two datasources is very risky, `RemoteMediator` could repeatedly trigger a network request with one set of parameters while locally looking for data matched with another set of parameters which there is a posibility that there is no any or just some.
+**Note:** It is very **IMPORTANT** that a local database query and a network request are using the same set of parameters, using a different set of parameters on two datasources is very risky, `RemoteMediator` could repeatedly trigger a network request with one set of parameters while locally looking for data matched with another set of parameters which there is a posibility that there is no any or just some.
 
-## Positional Remote Mediator
+### PositionalRxRemoteMediator
+
+using `skip` and `limit` to specify where to begin returning results and the maximum number of results to be returned.
 
 ```code
 abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParams>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val paramsDao: AmityQueryParamsDao) : AmityRxRemoteMediator<ENTITY>() {
@@ -214,7 +206,7 @@ abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParam
 }
 ```
 
-### Constructor arguments
+#### Constructor Parameters
 
 ##### Nonce
 
@@ -222,21 +214,21 @@ TODO
 
 ##### QueryParameters
 
-A set of filters in the `Map`, if any. (Key/Value pairs)
+A set of filters specified in the `Map`, if any. (Key/Value pairs)
 
-##### `AmityQueryParams` and `AmityQueryParamsDao`
+##### AmityQueryParams and AmityQueryParamsDao
 
-`AmityQueryParams` is an expected object returned by the abstract function, it is designed to keep a set of query parameters in the `Map` (Key/Value pairs), a last page boolean flag and a set of unique ids of items of each page which is later used for identifying invalid items on database.
+`AmityQueryParams` is the expected object returned by the abstract function, it is designed to keep a set of query parameters specified in the `Map` (Key/Value pairs), a last page boolean flag and a set of unique ids of items of each page which is later used for identifying invalid items.
 
-In order for us to have access to `AmityQueryParams` we need to get hands on `AmityQueryParamsDao`, make sure we define both on a `RoomDatabase` class and pass `AmityQueryParamsDao` to a class construtor.
+In order for us to have access to `AmityQueryParams` we need to get hands on `AmityQueryParamsDao`, make sure we define both on the `RoomDatabase` class and pass `AmityQueryParamsDao` to the class construtor.
 
-### Abstract functions
+#### Abstract Functions
     
 ##### fetch(skip: Int, limit: Int)
 
 Trigger a network request with a specific length control by `skip` and `limit`.
 
-### Sample
+#### Sample
 
 In this sample we assume we need to build a book store application with a simple paginated list of books with a filter function that allows a user to only see a list of books with a specific title and category. First, let's create a book `Entity` which has 3 variables: bookId, title and category as well as a book `Dao` with 2 basic functions: query and insert.
 
@@ -266,7 +258,7 @@ interface BookDao {
 }
 ``` 
 
-Then define them on a database class along with `AmityQueryParams` and `AmityQueryParamsDao`.
+Then define Book and BookDao on the database class along with `AmityQueryParams` and `AmityQueryParamsDao`.
 
 ```code 
 @Database(entities = arrayOf(BookDao::class, AmityQueryToken::class), version = 1)
@@ -302,7 +294,7 @@ class BookPositionalRxRemoteMediator(private val title: String, private val cate
     override fun fetch(skip: Int, limit: Int): Single<BookQueryParams> {
         return queryBySkipAndLimit(skip, limit)
             .flatMap {
-                // insert books into database and return params
+                // insert books into the database and return params
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
@@ -340,19 +332,19 @@ We now have everything in place, we can then proceed to create a `PagingData` st
             .subscribe()
 ```
 
-**Note:** It is a very **IMPORTANT** that a local database query and a network request are using the same set of parameters, using different sets of parameters on two datasources is very risky, `RemoteMediator` could repeatedly trigger a network request with one set of parameters while locally looking for data matched with another set of parameters which there is a posibility that there is no any or just some.
+**Note:** It is very **IMPORTANT** that a local database query and a network request are using the same set of parameters, using a different set of parameters on two datasources is very risky, `RemoteMediator` could repeatedly trigger a network request with one set of parameters while locally looking for data matched with another set of parameters which there is a posibility that there is no any or just some.
 
-## Stay up-to-date and sorted
+### Stay up-to-date and sorted
     
-As we mentioned in the beginning of this article, once items are inserted into database, `RemoteMediator` stops fetching any more items, without a full data comparison or a reliable real-time event from a server the items will eventually be outdated. To prevent that we need to inject `AmityPagingDataRefresher` into a `RecyclerView`. `AmityPagingDataRefresher` forces `RemoteMediator` to re-fetching items again when a user scrolls pass through pages. Update outdated items, get rid of deleted items or move items to new positions along with the process.
+As we mentioned in the beginning of this article, when items are inserted into the database, without a data comparison or a reliable real-time event from a server the items will eventually be outdated. To prevent that we need to inject `AmityPagingDataRefresher` into `RecyclerView`. `AmityPagingDataRefresher` forces `RemoteMediator` to re-fetching the items again when a user scrolls pass through pages to update outdated items, get rid of invalid items and move items to new positions.
     
 ```code   
 recyclerview.addOnScrollListener(AmityPagingDataRefresher())
 ``` 
 
-To make sure that outdated items get updated, deleted items won't be display, invalid items won't be displayed (the items that were once but no longer are matched with a given set of filters) and they stay sorted (if the books are sorted by its titles it should be okay but what happens if they are sorted by some kind of specific algorithms likes your preferences?).
+To make sure that outdated items get updated, invalid items won't be display and items stay sorted (if books are sorted by thiers titles it should be okay but what happens if they are sorted by some kind of specific algorithms likes user preferences?).
 
-Our simple `Dao` is no longer fit for a job, we need to adjust it by implementing `AmityPagingDao` and override a raw query function, generate a query string for the raw query function by calling `queryPagingData()` and pass these following parameters: a table name, a unique id, a nonce and query parameters in the `Map` (Key/Value pairs).
+Our simple `Dao` is no longer fit for a job, we need to adjust it by implementing `AmityPagingDao` and override a raw query function, generate a query string for the raw query function by calling `queryPagingData()` and pass these following parameters: a table name, a unique id, a nonce and query parameters specified in the `Map` (Key/Value pairs).
 
 ```code 
 @Dao

@@ -1,8 +1,8 @@
 # Amity RxRemoteMediator
 
-We are the `RemoteMediator` for a DB + Network based `PagingData` stream which triggers network requests to fetch more items as user scrolls, and automatically `insert` / `query` necessarily information into / from database, for example, tokens for fetching more pages.
+We are the `RemoteMediator` for a DB + Network based `PagingData` stream which triggers network requests to fetch more items as user scrolls, and automatically `insert` / `query` necessary information into / from the database, for example, tokens for fetching more pages.
 
-Common challenges of using `RemoteMediator` is when items are inserted into database, there is no easy way to tell which item has been deleted, updated or moved, so without a data comparison or a reliable real-time event from a server we end up showing invalid or outdated data and when items cannot be sorted by any of theirs variables but can only be sorted by some specific algorithms likes user preferences, best sellers and etc. and those algorithms or sort keys are not passed on to us then we need to locally generate and store sort keys of each algorithms by ourself. On `AmityRxRemoteMediator` we offer solutions for both issues.
+Common challenges of using `RemoteMediator` is when items are inserted into the database, there is no easy way to tell which item has been deleted, updated or moved, so without a data comparison or a reliable real-time event from a server we end up showing invalid or outdated data and when items cannot be sorted by any of theirs variables but can only be sorted by some specific algorithms likes user preferences, best sellers and etc. and those algorithms or sort keys are not passed on to us then we need to locally generate and store sort keys of each algorithms by ourself. On `AmityRxRemoteMediator` we offer solutions for both issues.
 
 First, pick the right `RemoteMediator`, We support 3 types of `RemoteMediator`, it depends on how do we fetch data from pagined sources.
 
@@ -129,7 +129,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
     override fun fetchFirstPage(pageSize: Int): Single<BookQueryToken> {
         return fetchBooksByTitleAndCategory(title, category, pageSize)
             .flatMap {
-                // insert books into database and return token
+                // insert books into the database and return token
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
@@ -150,7 +150,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
     override fun fetch(token: String): Single<BookQueryToken> {
         return fetchBooksByToken(token)
             .flatMap {
-                // insert books into database and return token
+                // insert books into the database and return token
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
@@ -294,7 +294,7 @@ class BookPositionalRxRemoteMediator(private val title: String, private val cate
     override fun fetch(skip: Int, limit: Int): Single<BookQueryParams> {
         return queryBySkipAndLimit(skip, limit)
             .flatMap {
-                // insert books into database and return params
+                // insert books into the database and return params
                 val books = it["books"].asJsonArray
                 val type = object : TypeToken<List<Book>>() {}.type
                 bookDao.insertBooks(Gson().fromJson(books, type))
@@ -336,7 +336,7 @@ We now have everything in place, we can then proceed to create a `PagingData` st
 
 ### Stay up-to-date and sorted
     
-As we mentioned in the beginning of this article, when items are inserted into database, without a data comparison or a reliable real-time event from a server the items will eventually be outdated. To prevent that we need to inject `AmityPagingDataRefresher` into `RecyclerView`. `AmityPagingDataRefresher` forces `RemoteMediator` to re-fetching the items again when a user scrolls pass through pages to update outdated items, get rid of invalid items and move items to new positions.
+As we mentioned in the beginning of this article, when items are inserted into the database, without a data comparison or a reliable real-time event from a server the items will eventually be outdated. To prevent that we need to inject `AmityPagingDataRefresher` into `RecyclerView`. `AmityPagingDataRefresher` forces `RemoteMediator` to re-fetching the items again when a user scrolls pass through pages to update outdated items, get rid of invalid items and move items to new positions.
     
 ```code   
 recyclerview.addOnScrollListener(AmityPagingDataRefresher())

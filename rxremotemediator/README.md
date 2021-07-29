@@ -72,6 +72,7 @@ In this sample we assume we need to build a book store application with a simple
 class Book(var bookId: String, var title: String, var category: String) {
 
     companion object {
+        // a completaly random integer but it must not share this with other entities.
         const val NONCE: Int = 42
     }
 }
@@ -241,6 +242,7 @@ In this sample we assume we need to build a book store application with a simple
 class Book(var bookId: String, var title: String, var category: String) {
 
     companion object {
+        // a completaly random integer but it must not share this with other entities.
         const val NONCE: Int = 42
     }
 }
@@ -261,7 +263,7 @@ interface BookDao {
 Then define Book and BookDao on the database class along with `AmityQueryParams` and `AmityQueryParamsDao`.
 
 ```code 
-@Database(entities = arrayOf(BookDao::class, AmityQueryToken::class), version = 1)
+@Database(entities = arrayOf(BookDao::class, AmityQueryParams::class), version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
     abstract fun paramsDao(): AmityQueryParamsDao

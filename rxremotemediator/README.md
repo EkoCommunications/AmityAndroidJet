@@ -33,7 +33,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
 
 ##### Nonce
 
-TODO
+A specific arbitrary number for a Room `Entity`, it allows us to access to the right query parameters.
 
 ##### QueryParameters
 
@@ -210,7 +210,7 @@ abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParam
 
 ##### Nonce
 
-TODO
+A specific arbitrary number for a Room `Entity`, it allows us to access to the right query parameters.
 
 ##### QueryParameters
 

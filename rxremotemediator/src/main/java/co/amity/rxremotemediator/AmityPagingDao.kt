@@ -7,6 +7,7 @@ interface AmityPagingDao<ENTITY : Any> {
 
     fun queryPagingData(sqlQuery: SimpleSQLiteQuery): PagingSource<Int, ENTITY>
 
+    fun generateSqlQuery(tableName: String, idKey: String, nonce: Int, queryParameters: Map<String, Any>, order: Order = Order.ASC): SimpleSQLiteQuery {
         return SimpleSQLiteQuery(
             String.format(
                 "select %s.*, amity_paging_id.* from %s, amity_paging_id where amity_paging_id.id = '%s.%s' and amity_paging_id.hash = %s and amity_paging_id.nonce = %s order by amity_paging_id.position %s",

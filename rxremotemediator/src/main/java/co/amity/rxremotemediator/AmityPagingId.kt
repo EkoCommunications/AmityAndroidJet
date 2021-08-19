@@ -7,7 +7,10 @@ import androidx.room.Ignore
     tableName = "amity_paging_id",
     primaryKeys = ["hash", "nonce", "position"]
 )
-class AmityPagingId(@Ignore var queryParameters: Map<String, Any>, var uniqueId: String) {
+class AmityPagingId(
+    @Ignore var queryParameters: Map<String, Any> = emptyMap(),
+    var uniqueId: String
+) {
 
     var hash: Int = queryParameters.hashCode()
     var nonce: Int = DEFAULT_NONCE

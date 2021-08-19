@@ -71,8 +71,8 @@ abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParam
                     false -> Completable.complete()
                 }
             )
-            .andThen(paramsDao.insertPagingIds(params.uniqueIds.mapIndexed { index, id ->
-                AmityPagingId(uniqueId = id, queryParameters = queryParameters)
+            .andThen(paramsDao.insertPagingIds(params.ids.mapIndexed { index, id ->
+                AmityPagingId(queryParameters = queryParameters, id = id)
                     .apply {
                         this.nonce = this@PositionalRxRemoteMediator.nonce
                         this.position = ((params.pageNumber - 1) * pageSize) + index + 1

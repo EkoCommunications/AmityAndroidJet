@@ -103,12 +103,12 @@ abstract class AppDatabase : RoomDatabase() {
 Implement a new `PageKeyedRxRemoteMediator`. 
 
 ```code 
-class BookQueryToken(var title: String, var category: String, next: String? = null, previous: String? = null, uniqueIds: List<String>) :
+class BookQueryToken(var title: String, var category: String, next: String? = null, previous: String? = null, ids: List<String>) :
     AmityQueryToken(
         queryParameters = mapOf("title" to title, "category" to category),
         next = next,
         previous = previous,
-        uniqueIds = uniqueIds
+        ids = ids
     )
 ``` 
     
@@ -141,7 +141,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                                 category = category,
                                 next = it.get("next").asString,
                                 previous = null,
-                                uniqueIds = books.map { book -> book.asJsonObject["id"].asString }
+                                ids = books.map { book -> book.asJsonObject["id"].asString }
                             )
                         )
                     )
@@ -162,7 +162,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                                 category = category,
                                 next = it.get("next").asString,
                                 previous = it.get("previous").asString,
-                                uniqueIds = books.map { book -> book.asJsonObject["id"].asString }
+                                ids = books.map { book -> book.asJsonObject["id"].asString }
                             )
                         )
                     )
@@ -273,11 +273,11 @@ abstract class AppDatabase : RoomDatabase() {
 Implement a new `PageKeyedRxRemoteMediator`. 
 
 ```code 
-class BookQueryParams(var title: String, var category: String, endOfPaginationReached: Boolean, uniqueIds: List<String>) :
+class BookQueryParams(var title: String, var category: String, endOfPaginationReached: Boolean, ids: List<String>) :
     AmityQueryParams(
         queryParameters = mapOf("title" to title, "category" to category),
         endOfPaginationReached = endOfPaginationReached,
-        uniqueIds = uniqueIds
+        ids = ids
     )
 ``` 
 
@@ -306,7 +306,7 @@ class BookPositionalRxRemoteMediator(private val title: String, private val cate
                                 title = title,
                                 category = category,
                                 endOfPaginationReached = books.size() < limit,
-                                uniqueIds = books.map { book -> book.asJsonObject["id"].asString }
+                                ids = books.map { book -> book.asJsonObject["id"].asString }
                             )
                         )
                     )
@@ -359,7 +359,7 @@ interface BookDao : AmityPagingDao<Book> {
         return queryPagingData(
             generateSqlQuery(
                 tableName = "book",
-                uniqueIdKey = "bookId",
+                idKey = "bookId",
                 nonce = Book.NONCE,
                 queryParameters = mapOf("title" to title, "category" to category)
             )

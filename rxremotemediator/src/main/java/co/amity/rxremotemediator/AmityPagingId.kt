@@ -9,7 +9,7 @@ import androidx.room.Ignore
 )
 class AmityPagingId(
     @Ignore var queryParameters: Map<String, Any> = emptyMap(),
-    var uniqueId: String
+    var id: String? = null
 ) {
 
     var hash: Int = queryParameters.hashCode()

@@ -33,7 +33,7 @@ class BookPositionalRxRemoteMediator(private val title: String, private val cate
                                 title = title,
                                 category = category,
                                 endOfPaginationReached = books.size() < limit,
-                                uniqueIds = books.map { book -> book.asJsonObject["id"].asString }
+                                ids = books.map { book -> book.asJsonObject["id"].asString }
                             )
                         )
                     )

@@ -15,8 +15,8 @@ interface AmityPagingDao<ENTITY : Any> {
                 tableName,
                 tableName,
                 idKey,
-                nonce,
                 queryParameters.hashCode(),
+                nonce,
                 order.value
             )
         )

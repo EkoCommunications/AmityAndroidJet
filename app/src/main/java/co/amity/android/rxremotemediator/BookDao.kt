@@ -20,9 +20,10 @@ interface BookDao : AmityPagingDao<Book> {
         return queryPagingData(
             generateSqlQuery(
                 tableName = "book",
-                idKey = "bookId",
-                nonce = Book.NONCE,
-                queryParameters = mapOf("title" to title, "category" to category)
+                primaryKeyColumnName = "bookId",
+                additionalPrimaryKeys = emptyMap(),
+                queryParameters = mapOf("title" to title, "category" to category),
+                nonce = Book.NONCE
             )
         )
     }

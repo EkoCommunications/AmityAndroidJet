@@ -1,4 +1,6 @@
 # Amity RxLifecycle Kotlin Extensions
+[![](https://jitpack.io/v/EkoCommunications/AmityAndroidJet.svg)](https://jitpack.io/#EkoCommunications/AmityAndroidJet/rxlifecycle)
+
 
 We are the kotlin extensions under `Flowable`, `Single`, `Maybe` and `Completable` that allow a user to easily one-lined bind any subscriptions to any lifecycles.
 

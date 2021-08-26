@@ -1,4 +1,5 @@
 # Amity View Binding
+[![](https://jitpack.io/v/EkoCommunications/AmityAndroidJet.svg)](https://jitpack.io/#EkoCommunications/AmityAndroidJet/viewbinding)
 
 ### Easily create a binding class for Activity, Fragment and ViewHolder 
 

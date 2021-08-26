@@ -103,7 +103,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                     false -> Completable.complete()
                 }
             )
-            .andThen(tokenDao.insertPagingIds(token.ids.mapIndexed { index, id ->
+            .andThen(tokenDao.insertPagingIds(token.primaryKeys.mapIndexed { index, id ->
                 AmityPagingId(queryParameters = queryParameters, id = id)
                     .apply {
                         this.nonce = this@PageKeyedRxRemoteMediator.nonce

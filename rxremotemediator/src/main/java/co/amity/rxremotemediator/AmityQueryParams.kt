@@ -9,7 +9,7 @@ import androidx.room.Ignore
 )
 open class AmityQueryParams(
     @Ignore var queryParameters: Map<String, Any> = emptyMap(),
-    @Ignore var ids: List<String> = emptyList(),
+    @Ignore var primaryKeys: List<String> = emptyList(),
     var endOfPaginationReached: Boolean
 ) {
 

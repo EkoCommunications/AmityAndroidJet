@@ -38,7 +38,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                                 category = category,
                                 next = it.get("next").asString,
                                 previous = null,
-                                ids = books.map { book -> book.asJsonObject["id"].asString }
+                                primaryKeys = books.map { book -> book.asJsonObject["id"].asString }
                             )
                         )
                     )
@@ -59,7 +59,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                                 category = category,
                                 next = it.get("next").asString,
                                 previous = it.get("previous").asString,
-                                ids = books.map { book -> book.asJsonObject["id"].asString }
+                                primaryKeys = books.map { book -> book.asJsonObject["id"].asString }
                             )
                         )
                     )

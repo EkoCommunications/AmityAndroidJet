@@ -1,5 +1,5 @@
 # Amity RxRemoteMediator
-[![](https://jitpack.io/v/EkoCommunications/AmityAndroidJet.svg)](https://jitpack.io/#EkoCommunications/AmityAndroidJet)
+[![](https://jitpack.io/v/EkoCommunications/AmityAndroidJet.svg)](https://jitpack.io/#EkoCommunications/AmityAndroidJet/RxRemoteMediator)
 
 We are the `RemoteMediator` for a DB + Network based `PagingData` stream which triggers network requests to fetch more items as user scrolls, and automatically `insert` / `query` necessary information into / from the database, for example, tokens for fetching more pages.
 

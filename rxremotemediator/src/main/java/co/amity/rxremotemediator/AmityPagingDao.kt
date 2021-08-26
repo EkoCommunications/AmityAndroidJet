@@ -24,9 +24,9 @@ interface AmityPagingDao<ENTITY : Any> {
                 primaryKeyColumnName,
                 additionalPrimaryKeys.takeIf { it.isNotEmpty() }?.map {
                     when (val value = it.value) {
-                        is String -> String.format("%s = '%s'", it.key, value)
-                        is Boolean -> String.format("%s = '%s'", it.key, if (value) 1 else 0)
-                        else -> String.format("%s = %s", it.key, it.value)
+                        is String -> String.format("%s.%s = '%s'", tableName, it.key, value)
+                        is Boolean -> String.format("%s.%s = '%s'", tableName, it.key, if (value) 1 else 0)
+                        else -> String.format("%s.%s = %s", tableName, it.key, it.value)
                     }
                 }?.joinToString(separator = ", ", prefix = "and ") ?: "",
                 queryParameters.hashCode(),

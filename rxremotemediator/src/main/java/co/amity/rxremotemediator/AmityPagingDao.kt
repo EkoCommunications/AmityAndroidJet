@@ -28,7 +28,7 @@ interface AmityPagingDao<ENTITY : Any> {
                         is Boolean -> String.format("%s.%s = '%s'", tableName, it.key, if (value) 1 else 0)
                         else -> String.format("%s.%s = %s", tableName, it.key, it.value)
                     }
-                }?.joinToString(separator = ", ", prefix = "and ") ?: "",
+                }?.joinToString(separator = " and ", prefix = "and ") ?: "",
                 queryParameters.hashCode(),
                 nonce,
                 order.value

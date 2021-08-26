@@ -1,4 +1,5 @@
 # Amity RxUpload Kotlin Extension
+[![](https://jitpack.io/v/EkoCommunications/AmityAndroidJet.svg)](https://jitpack.io/#EkoCommunications/AmityAndroidJet/rxupload)
 
 we are the kotlin extension under `Uri` class that allows a user to upload a single object as a set of parts (Multipart upload) and be able to easily track the progress directly from a rx stream of progress.
 

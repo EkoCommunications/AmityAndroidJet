@@ -5,11 +5,11 @@ import androidx.room.Ignore
 
 @Entity(
     tableName = "amity_paging_id",
-    primaryKeys = ["hash", "nonce", "position"]
+    primaryKeys = ["hash", "nonce", "id"]
 )
 class AmityPagingId(
     @Ignore var queryParameters: Map<String, Any> = emptyMap(),
-    var id: String? = null
+    var id: String = ""
 ) {
 
     var hash: Int = queryParameters.hashCode()

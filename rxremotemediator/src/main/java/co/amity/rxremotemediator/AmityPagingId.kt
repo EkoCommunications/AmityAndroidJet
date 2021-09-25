@@ -2,12 +2,10 @@ package co.amity.rxremotemediator
 
 import androidx.room.Entity
 import androidx.room.Ignore
-import androidx.room.Index
 
 @Entity(
     tableName = "amity_paging_id",
-    primaryKeys = ["hash", "nonce", "position"],
-    indices = [Index(value = ["id"], unique = true)]
+    primaryKeys = ["hash", "nonce", "position"]
 )
 class AmityPagingId(
     @Ignore var queryParameters: Map<String, Any> = emptyMap(),

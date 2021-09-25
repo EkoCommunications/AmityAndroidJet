@@ -47,7 +47,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                 this.pageNumber = pageNumber
                             }
                         }
-                        .flatMap { insertToken(it, pageSize) }
+                        .flatMap { insertToken(loadType, it, pageSize) }
                         .compose(interceptErrorAndEmpty)
                 } ?: run {
                     fetchFirstPage(pageSize = pageSize)
@@ -58,7 +58,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                 this.pageNumber = 1
                             }
                         }
-                        .flatMap { insertToken(it, pageSize) }
+                        .flatMap { insertToken(loadType, it, pageSize) }
                         .compose(interceptErrorAndEmpty)
                 })
 
@@ -75,7 +75,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                         this.pageNumber = token.pageNumber + 1
                                     }
                                 }
-                                .flatMap { insertToken(it, pageSize) }
+                                .flatMap { insertToken(loadType, it, pageSize) }
                         }
                         .compose(interceptErrorAndEmpty)
                 } else {
@@ -96,7 +96,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                         this.pageNumber = token.pageNumber + 1
                                     }
                                 }
-                                .flatMap { insertToken(it, pageSize) }
+                                .flatMap { insertToken(loadType, it, pageSize) }
                         }
                         .compose(interceptErrorAndEmpty)
                 }
@@ -108,7 +108,14 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
 
     abstract fun fetch(token: String): Single<TOKEN>
 
-    private fun insertToken(token: TOKEN, pageSize: Int): Single<MediatorResult> {
+    private fun insertToken(loadType: LoadType, token: TOKEN, pageSize: Int): Single<MediatorResult> {
+        if (loadType == LoadType.REFRESH) {
+            tokenDao.deleteAfterPageNumber(
+                pageNumber = token.pageNumber,
+                nonce = nonce,
+                queryParameters = queryParameters
+            )
+        }
         val isLastPage = when (stackFromEnd()) {
             true -> token.previous == null
             false -> token.next == null

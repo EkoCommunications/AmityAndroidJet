@@ -92,11 +92,10 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
             true -> token.previous == null
             false -> token.next == null
         }
-        return if (loadType == LoadType.REFRESH) {
-            tokenDao.deletePagingIds(queryParameters, nonce)
-        } else {
-            Completable.complete()
-        }.andThen(tokenDao.insertToken(token)
+        if (loadType == LoadType.REFRESH) {
+            tokenDao.deletePagingIds(queryParameters = queryParameters, nonce = nonce)
+        }
+        return tokenDao.insertToken(token)
             .andThen(
                 when (isLastPage) {
                     true -> tokenDao.deleteAfterPageNumber(
@@ -114,7 +113,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         this.position = ((token.pageNumber - 1) * pageSize) + index + 1
                     }
             }))
-            .andThen(Single.just<MediatorResult>(MediatorResult.Success(isLastPage))))
+            .andThen(Single.just<MediatorResult>(MediatorResult.Success(isLastPage)))
     }
 
     private val interceptErrorAndEmpty = SingleTransformer<MediatorResult, MediatorResult> { upstream ->

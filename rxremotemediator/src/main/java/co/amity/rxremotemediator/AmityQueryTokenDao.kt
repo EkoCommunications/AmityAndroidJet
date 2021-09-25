@@ -23,11 +23,11 @@ interface AmityQueryTokenDao {
         return deleteAfterPageNumber(pageNumber, queryParameters.hashCode(), nonce)
     }
 
-    @Query("delete from amity_paging_id where hash = :hash and nonce = :nonce")
-    fun deletePagingIds(hash: Int, nonce: Int): Completable
+    @Query("delete from amity_paging_id where nonce = :nonce and hash = :hash")
+    fun deletePagingIds(nonce: Int, hash: Int): Completable
 
     fun deletePagingIds(queryParameters: Map<String, Any>, nonce: Int): Completable {
-        return deletePagingIds(queryParameters.hashCode(), nonce)
+        return deletePagingIds(nonce, queryParameters.hashCode())
     }
 
     @Query("select * from amity_query_token where hash = :hash and nonce = :nonce order by pageNumber asc limit 1")

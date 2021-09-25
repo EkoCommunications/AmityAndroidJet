@@ -88,15 +88,12 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
     abstract fun fetch(token: String): Single<TOKEN>
 
     private fun insertToken(loadType: LoadType, token: TOKEN, pageSize: Int): Single<MediatorResult> {
-        if (loadType == LoadType.REFRESH) {
-            tokenDao.deletePagingIds(
-                nonce = nonce,
-                queryParameters = queryParameters
-            )
-        }
         val isLastPage = when (stackFromEnd()) {
             true -> token.previous == null
             false -> token.next == null
+        }
+        if (loadType == LoadType.REFRESH) {
+            tokenDao.deletePagingIds(queryParameters, nonce)
         }
         return tokenDao.insertToken(token)
             .andThen(

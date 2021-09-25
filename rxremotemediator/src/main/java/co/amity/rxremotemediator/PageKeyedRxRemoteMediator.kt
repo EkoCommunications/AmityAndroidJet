@@ -9,36 +9,16 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 @ExperimentalPagingApi
-abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
-    val nonce: Int,
-    val queryParameters: Map<String, Any> = mapOf(),
-    val tokenDao: AmityQueryTokenDao
-) :
+abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val tokenDao: AmityQueryTokenDao) :
     AmityRxRemoteMediator<ENTITY>() {
 
-    final override fun loadSingle(
-        loadType: LoadType,
-        state: PagingState<Int, ENTITY>
-    ): Single<MediatorResult> {
+    final override fun loadSingle(loadType: LoadType, state: PagingState<Int, ENTITY>): Single<MediatorResult> {
         val pageSize = state.config.pageSize
         return when (loadType) {
             LoadType.REFRESH -> {
-                tokenDao.deleteAfterPageNumber(
-                    pageNumber = 1,
-                    nonce = nonce,
-                    queryParameters = queryParameters
-                ).andThen(state.anchorPosition?.let { anchorPosition ->
-                    val pageNumber = ceil(
-                        max(
-                            1,
-                            anchorPosition
-                        ).toDouble() / state.config.pageSize.toDouble()
-                    ).toInt()
-                    tokenDao.getTokenByPageNumber(
-                        pageNumber = pageNumber,
-                        queryParameters = queryParameters,
-                        nonce = nonce
-                    )
+                state.anchorPosition?.let { anchorPosition ->
+                    val pageNumber = ceil(max(1, anchorPosition).toDouble() / state.config.pageSize.toDouble()).toInt()
+                    tokenDao.getTokenByPageNumber(pageNumber = pageNumber, queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
                         .flatMapSingle { fetch(token = it) }
                         .map {
@@ -60,8 +40,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         }
                         .flatMap { insertToken(loadType, it, pageSize) }
                         .compose(interceptErrorAndEmpty)
-                })
-
+                }
             }
             LoadType.PREPEND -> {
                 if (stackFromEnd()) {
@@ -141,13 +120,12 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
             .andThen(Single.just<MediatorResult>(MediatorResult.Success(isLastPage)))
     }
 
-    private val interceptErrorAndEmpty =
-        SingleTransformer<MediatorResult, MediatorResult> { upstream ->
-            upstream.onErrorReturn {
-                when (it) {
-                    is NoSuchElementException -> MediatorResult.Success(true)
-                    else -> MediatorResult.Error(it)
-                }
+    private val interceptErrorAndEmpty = SingleTransformer<MediatorResult, MediatorResult> { upstream ->
+        upstream.onErrorReturn {
+            when (it) {
+                is NoSuchElementException -> MediatorResult.Success(true)
+                else -> MediatorResult.Error(it)
             }
         }
+    }
 }

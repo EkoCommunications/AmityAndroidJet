@@ -93,7 +93,9 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
             false -> token.next == null
         }
         if (loadType == LoadType.REFRESH) {
-            tokenDao.deletePagingIds(queryParameters, nonce).subscribe()
+            tokenDao.clearPagingIds(queryParameters, nonce)
+                .andThen(tokenDao.clearQueryToken(queryParameters, nonce))
+                .subscribe()
         }
         return tokenDao.insertToken(token)
             .andThen(

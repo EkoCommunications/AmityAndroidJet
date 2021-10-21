@@ -32,6 +32,13 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                 } ?: run {
                     fetchFirstPage(pageSize = pageSize)
                         .subscribeOn(Schedulers.io())
+                        .flatMap {
+                            if (stackFromEnd() && it.pageNumber == INVALID_PAGE_NUMBER) {
+                                Single.error(Exception("Page number must be defined by a subclass, because we have no idea how to calculate it!"))
+                            } else {
+                                Single.just(it)
+                            }
+                        }
                         .map {
                             it.apply {
                                 this.nonce = this@PageKeyedRxRemoteMediator.nonce

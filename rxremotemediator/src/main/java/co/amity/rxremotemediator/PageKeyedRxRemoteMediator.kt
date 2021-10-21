@@ -67,8 +67,10 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                     tokenDao.getFirstQueryToken(queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
                         .flatMapSingle { token ->
+                            Log.e("testtest", "thread:" + Thread.currentThread().name)
                             fetch(token = token.previous!!)
                                 .map {
+                                    Log.e("testtest", "thread:" + Thread.currentThread().name)
                                     it.apply {
                                         this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                         this.pageNumber = token.pageNumber - 1
@@ -103,7 +105,10 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         .compose(interceptErrorAndEmpty)
                 }
             }
-        }
+        }.doOnTerminate { Log.e("testtest", "doOnTerminate") }
+            .doOnDispose { Log.e("testtest", "doOnDispose") }
+            .doOnSuccess { Log.e("testtest", "doOnSuccess") }
+            .doOnError { Log.e("testtest", "doOnError:" + it.message) }
     }
 
     abstract fun fetchFirstPage(pageSize: Int): Single<TOKEN>

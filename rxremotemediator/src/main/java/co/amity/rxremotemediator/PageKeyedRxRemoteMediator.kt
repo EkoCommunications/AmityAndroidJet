@@ -35,7 +35,11 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         .map {
                             it.apply {
                                 this.nonce = this@PageKeyedRxRemoteMediator.nonce
-                                this.pageNumber = 1
+                                if (stackFromEnd()) {
+                                    // have to be defined by a subclass!
+                                } else {
+                                    this.pageNumber = 1
+                                }
                             }
                         }
                         .flatMap { insertToken(it, pageSize) }
@@ -51,7 +55,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                 .map {
                                     it.apply {
                                         this.nonce = this@PageKeyedRxRemoteMediator.nonce
-                                        this.pageNumber = token.pageNumber + 1
+                                        this.pageNumber = token.pageNumber - 1
                                     }
                                 }
                                 .flatMap { insertToken(it, pageSize) }

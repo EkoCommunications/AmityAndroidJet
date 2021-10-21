@@ -79,13 +79,13 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         }
                         .compose(interceptErrorAndEmpty)
                 } else {
-                    Single.just<MediatorResult>(MediatorResult.Success(true))
+                    Single.just<MediatorResult>(MediatorResult.Success(false))
                 }
             }
             LoadType.APPEND -> {
                 Log.e("testtest", "APPEND")
                 if (stackFromEnd()) {
-                    Single.just<MediatorResult>(MediatorResult.Success(true))
+                    Single.just<MediatorResult>(MediatorResult.Success(false))
                 } else {
                     tokenDao.getLastQueryToken(queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
@@ -134,6 +134,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                     }
             }))
             .andThen(Single.just<MediatorResult>(MediatorResult.Success(isLastPage)))
+            .doOnSuccess { Log.e("testtest", "isLastPage:$isLastPage") }
     }
 
     private val interceptErrorAndEmpty = SingleTransformer<MediatorResult, MediatorResult> { upstream ->

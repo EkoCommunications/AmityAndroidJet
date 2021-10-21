@@ -79,13 +79,13 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         }
                         .compose(interceptErrorAndEmpty)
                 } else {
-                    Single.just<MediatorResult>(MediatorResult.Success(false))
+                    Single.just<MediatorResult>(MediatorResult.Success(true))
                 }
             }
             LoadType.APPEND -> {
                 Log.e("testtest", "APPEND")
                 if (stackFromEnd()) {
-                    Single.just<MediatorResult>(MediatorResult.Success(false))
+                    Single.just<MediatorResult>(MediatorResult.Success(true))
                 } else {
                     tokenDao.getLastQueryToken(queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
@@ -103,7 +103,10 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         .compose(interceptErrorAndEmpty)
                 }
             }
-        }
+        }.doOnTerminate { Log.e("testtest", "doOnTerminate") }
+            .doOnDispose { Log.e("testtest", "doOnDispose") }
+            .doOnSuccess { Log.e("testtest", "doOnSuccess") }
+            .doOnError { Log.e("testtest", "doOnError:" + it.message) }
     }
 
     abstract fun fetchFirstPage(pageSize: Int): Single<TOKEN>

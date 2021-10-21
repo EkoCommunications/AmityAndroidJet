@@ -1,5 +1,6 @@
 package co.amity.rxremotemediator
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -16,15 +17,20 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
         val pageSize = state.config.pageSize
         return when (loadType) {
             LoadType.REFRESH -> {
+                Log.e("testtest", "REFRESH")
                 state.anchorPosition?.let { anchorPosition ->
                     val pageNumber = ceil(max(1, anchorPosition).toDouble() / state.config.pageSize.toDouble()).toInt()
                     tokenDao.getTokenByPageNumber(pageNumber = pageNumber, queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
-                        .flatMapSingle { fetch(token = it) }
+                        .flatMapSingle {
+                            Log.e("testtest", String.format("token:%s pageNumber:%s", it, pageNumber))
+                            fetch(token = it)
+                        }
                         .map {
                             it.apply {
                                 this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                 this.pageNumber = pageNumber
+                                Log.e("testtest", String.format("previous:%s next:%s", this.previous, this.next))
                             }
                         }
                         .flatMap { insertToken(it, pageSize) }
@@ -47,6 +53,8 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                 } else {
                                     this.pageNumber = 1
                                 }
+                                Log.e("testtest", String.format("firstPage:%s", this.pageNumber))
+                                Log.e("testtest", String.format("previous:%s next:%s", this.previous, this.next))
                             }
                         }
                         .flatMap { insertToken(it, pageSize) }
@@ -54,6 +62,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                 }
             }
             LoadType.PREPEND -> {
+                Log.e("testtest", "PREPEND")
                 if (stackFromEnd()) {
                     tokenDao.getFirstQueryToken(queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
@@ -63,6 +72,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                     it.apply {
                                         this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                         this.pageNumber = token.pageNumber - 1
+                                        Log.e("testtest", String.format("token:%s previous:%s next:%s pageNumber:%s", token.previous, this.previous, this.next, this.pageNumber))
                                     }
                                 }
                                 .flatMap { insertToken(it, pageSize) }
@@ -73,6 +83,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                 }
             }
             LoadType.APPEND -> {
+                Log.e("testtest", "APPEND")
                 if (stackFromEnd()) {
                     Single.just<MediatorResult>(MediatorResult.Success(true))
                 } else {
@@ -84,6 +95,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                     it.apply {
                                         this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                         this.pageNumber = token.pageNumber + 1
+                                        Log.e("testtest", String.format("token:%s previous:%s next:%s pageNumber:%s", token.next, this.previous, this.next, this.pageNumber))
                                     }
                                 }
                                 .flatMap { insertToken(it, pageSize) }

@@ -1,6 +1,9 @@
-package co.amity.android.rxremotemediator
+package co.amity.android.data.repository.datastore
 
 import androidx.paging.ExperimentalPagingApi
+import co.amity.android.data.model.Book
+import co.amity.android.data.model.BookQueryParams
+import co.amity.android.data.repository.datastore.local.api.BookDao
 import co.amity.rxremotemediator.AmityQueryParamsDao
 import co.amity.rxremotemediator.PositionalRxRemoteMediator
 import com.google.gson.Gson
@@ -16,12 +19,12 @@ class BookPositionalRxRemoteMediator(private val title: String, private val cate
         paramsDao = paramsDao
     ) {
 
-    private fun queryBySkipAndLimit(skip: Int, limit: Int): Single<JsonObject> {
+    private fun fetchBySkipAndLimit(skip: Int, limit: Int): Single<JsonObject> {
         TODO("Not yet implemented")
     }
 
     override fun fetch(skip: Int, limit: Int): Single<BookQueryParams> {
-        return queryBySkipAndLimit(skip, limit)
+        return fetchBySkipAndLimit(skip, limit)
             .flatMap {
                 // insert books into database and return params
                 val books = it["books"].asJsonArray

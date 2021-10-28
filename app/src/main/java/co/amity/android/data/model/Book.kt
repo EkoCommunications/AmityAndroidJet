@@ -1,12 +1,10 @@
-package co.amity.android.rxremotemediator
+package co.amity.android.data.model
 
 import androidx.room.Entity
-import androidx.room.Index
 
 @Entity(
     tableName = "book",
-    primaryKeys = ["bookId"],
-    indices = [Index(value = ["title", "category"])]
+    primaryKeys = ["bookId"]
 )
 class Book(var bookId: String, var title: String, var category: String) {
 

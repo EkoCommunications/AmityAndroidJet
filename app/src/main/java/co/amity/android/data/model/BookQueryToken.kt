@@ -1,4 +1,4 @@
-package co.amity.android.rxremotemediator
+package co.amity.android.data.model
 
 import co.amity.rxremotemediator.AmityQueryToken
 

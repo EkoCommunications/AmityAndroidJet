@@ -1,6 +1,10 @@
-package co.amity.android.rxremotemediator
+package co.amity.android.data.repository.datastore
 
 import androidx.paging.ExperimentalPagingApi
+import co.amity.android.data.model.Book
+import co.amity.android.data.model.BookQueryToken
+import co.amity.android.data.repository.datastore.local.api.BookDao
+import co.amity.android.data.repository.datastore.remote.BookRemoteDataStore
 import co.amity.rxremotemediator.AmityQueryTokenDao
 import co.amity.rxremotemediator.PageKeyedRxRemoteMediator
 import com.google.gson.Gson
@@ -8,24 +12,28 @@ import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import io.reactivex.Single
 
-@ExperimentalPagingApi
-class BookPageKeyedRxRemoteMediator(private val title: String, private val category: String, private val bookDao: BookDao, tokenDao: AmityQueryTokenDao) :
-    PageKeyedRxRemoteMediator<Book, BookQueryToken>(
-        nonce = Book.NONCE,
-        queryParameters = mapOf("title" to title, "category" to category),
-        tokenDao = tokenDao
-    ) {
+@OptIn(ExperimentalPagingApi::class)
+class BookPageKeyedRxRemoteMediator(
+    private val title: String,
+    private val category: String,
+    private val bookDao: BookDao,
+    tokenDao: AmityQueryTokenDao
+) : PageKeyedRxRemoteMediator<Book, BookQueryToken>(
+    nonce = Book.NONCE,
+    queryParameters = mapOf("title" to title, "category" to category),
+    tokenDao = tokenDao
+) {
 
-    private fun fetchBooksByTitleAndCategory(title: String, category: String, pageSize: Int): Single<JsonObject> {
-        TODO("Not yet implemented")
+    private fun fetchFirstPage(title: String, category: String, pageSize: Int): Single<JsonObject> {
+        return BookRemoteDataStore().fetchFirstPage(title = title, category = category, pageSize = pageSize)
     }
 
-    private fun fetchBooksByToken(token: String): Single<JsonObject> {
-        TODO("Not yet implemented")
+    private fun fetchNextPage(token: String): Single<JsonObject> {
+        return BookRemoteDataStore().fetchNextPage(token = token)
     }
 
     override fun fetchFirstPage(pageSize: Int): Single<BookQueryToken> {
-        return fetchBooksByTitleAndCategory(title, category, pageSize)
+        return fetchFirstPage(title, category, pageSize)
             .flatMap {
                 // insert books into database and return token
                 val books = it["books"].asJsonArray
@@ -38,7 +46,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                                 category = category,
                                 next = it.get("next").asString,
                                 previous = null,
-                                primaryKeys = books.map { book -> book.asJsonObject["id"].asString }
+                                primaryKeys = books.map { book -> book.asJsonObject["bookId"].asString }
                             )
                         )
                     )
@@ -46,7 +54,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
     }
 
     override fun fetch(token: String): Single<BookQueryToken> {
-        return fetchBooksByToken(token)
+        return fetchNextPage(token)
             .flatMap {
                 // insert books into database and return token
                 val books = it["books"].asJsonArray
@@ -59,7 +67,7 @@ class BookPageKeyedRxRemoteMediator(private val title: String, private val categ
                                 category = category,
                                 next = it.get("next").asString,
                                 previous = it.get("previous").asString,
-                                primaryKeys = books.map { book -> book.asJsonObject["id"].asString }
+                                primaryKeys = books.map { book -> book.asJsonObject["bookId"].asString }
                             )
                         )
                     )

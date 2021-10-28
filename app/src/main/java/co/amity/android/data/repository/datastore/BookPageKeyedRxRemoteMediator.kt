@@ -44,7 +44,7 @@ class BookPageKeyedRxRemoteMediator(
                             BookQueryToken(
                                 title = title,
                                 category = category,
-                                next = it.get("next").asString,
+                                next = it.get("next")?.asString,
                                 previous = null,
                                 primaryKeys = books.map { book -> book.asJsonObject["bookId"].asString }
                             )
@@ -65,8 +65,8 @@ class BookPageKeyedRxRemoteMediator(
                             BookQueryToken(
                                 title = title,
                                 category = category,
-                                next = it.get("next").asString,
-                                previous = it.get("previous").asString,
+                                next = it.get("next")?.asString,
+                                previous = it.get("previous")?.asString,
                                 primaryKeys = books.map { book -> book.asJsonObject["bookId"].asString }
                             )
                         )

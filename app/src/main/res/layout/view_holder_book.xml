@@ -10,6 +10,12 @@
         android:padding="9dp">
 
         <TextView
+            android:id="@+id/view_holder_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="6dp" />
+
+        <TextView
             android:id="@+id/view_holder_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -16,6 +16,7 @@ class BookViewHolder(context: Context) : ViewBindingViewHolder<Book, ViewHolderB
     }
 
     override fun onBind(item: Book) {
+        binding.viewHolderId.text = layoutPosition.toString()
         binding.viewHolderTitle.text = item.title
         binding.viewHolderCategory.text = item.category
     }

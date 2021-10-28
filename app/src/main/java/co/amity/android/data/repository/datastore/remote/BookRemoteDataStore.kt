@@ -1,9 +1,12 @@
 package co.amity.android.data.repository.datastore.remote
 
+import co.amity.android.data.repository.DEFAULT_PAGE_SIZE
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import io.reactivex.Single
 import java.util.*
+
+private const val MAX_PAGE_SIZE = 10
 
 class BookRemoteDataStore {
 
@@ -12,9 +15,9 @@ class BookRemoteDataStore {
             addProperty("next", "2")
             add("books", JsonArray()
                 .apply {
-                    for (index in 0..10) {
+                    for (index in 1..MAX_PAGE_SIZE) {
                         add(JsonObject().apply {
-                            addProperty("bookId", UUID.randomUUID().toString())
+                            addProperty("bookId", index.toString())
                             addProperty("title", UUID.randomUUID().toString())
                             addProperty("category", UUID.randomUUID().toString())
                         })
@@ -25,22 +28,24 @@ class BookRemoteDataStore {
 
     fun fetchNextPage(token: String): Single<JsonObject> {
         return Single.just(JsonObject().apply {
-            if (token.toInt() < 10) {
+            if (token.toInt() < MAX_PAGE_SIZE) {
                 addProperty("next", (token.toInt() + 1).toString())
             }
             if (token.toInt() > 1) {
                 addProperty("previous", (token.toInt() - 1).toString())
             }
-            add("books", JsonArray()
-                .apply {
-                    for (index in 0..10) {
-                        add(JsonObject().apply {
-                            addProperty("bookId", UUID.randomUUID().toString())
-                            addProperty("title", UUID.randomUUID().toString())
-                            addProperty("category", UUID.randomUUID().toString())
-                        })
-                    }
-                })
+            if (token.toInt() <= MAX_PAGE_SIZE) {
+                add("books", JsonArray()
+                    .apply {
+                        for (index in 1..MAX_PAGE_SIZE) {
+                            add(JsonObject().apply {
+                                addProperty("bookId", (((token.toInt() - 1) * DEFAULT_PAGE_SIZE) + index).toString())
+                                addProperty("title", UUID.randomUUID().toString())
+                                addProperty("category", UUID.randomUUID().toString())
+                            })
+                        }
+                    })
+            }
         })
     }
 }

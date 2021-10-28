@@ -1,6 +1,5 @@
 package co.amity.rxremotemediator
 
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -17,20 +16,15 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
         val pageSize = state.config.pageSize
         return when (loadType) {
             LoadType.REFRESH -> {
-                Log.e("testtest", "REFRESH")
                 state.anchorPosition?.let { anchorPosition ->
                     val pageNumber = ceil(max(1, anchorPosition).toDouble() / state.config.pageSize.toDouble()).toInt()
                     tokenDao.getTokenByPageNumber(pageNumber = pageNumber, queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
-                        .flatMapSingle {
-                            Log.e("testtest", String.format("token:%s pageNumber:%s", it, pageNumber))
-                            fetch(token = it)
-                        }
+                        .flatMapSingle { fetch(token = it) }
                         .map {
                             it.apply {
                                 this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                 this.pageNumber = pageNumber
-                                Log.e("testtest", String.format("previous:%s next:%s", this.previous, this.next))
                             }
                         }
                         .flatMap { insertToken(it, pageSize) }
@@ -53,8 +47,6 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                 } else {
                                     this.pageNumber = 1
                                 }
-                                Log.e("testtest", String.format("firstPage:%s", this.pageNumber))
-                                Log.e("testtest", String.format("previous:%s next:%s", this.previous, this.next))
                             }
                         }
                         .flatMap { insertToken(it, pageSize) }
@@ -62,7 +54,6 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                 }
             }
             LoadType.PREPEND -> {
-                Log.e("testtest", "PREPEND")
                 if (stackFromEnd()) {
                     tokenDao.getFirstQueryToken(queryParameters = queryParameters, nonce = nonce)
                         .subscribeOn(Schedulers.io())
@@ -72,18 +63,15 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                     it.apply {
                                         this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                         this.pageNumber = token.pageNumber - 1
-                                        Log.e("testtest", String.format("token:%s previous:%s next:%s pageNumber:%s", token.previous, this.previous, this.next, this.pageNumber))
                                     }
                                 }
                                 .flatMap { insertToken(it, pageSize) }
-                        }
-                        .compose(interceptErrorAndEmpty)
+                        }.compose(interceptErrorAndEmpty)
                 } else {
                     Single.just<MediatorResult>(MediatorResult.Success(true))
                 }
             }
             LoadType.APPEND -> {
-                Log.e("testtest", "APPEND")
                 if (stackFromEnd()) {
                     Single.just<MediatorResult>(MediatorResult.Success(true))
                 } else {
@@ -95,18 +83,13 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                                     it.apply {
                                         this.nonce = this@PageKeyedRxRemoteMediator.nonce
                                         this.pageNumber = token.pageNumber + 1
-                                        Log.e("testtest", String.format("token:%s previous:%s next:%s pageNumber:%s", token.next, this.previous, this.next, this.pageNumber))
                                     }
                                 }
                                 .flatMap { insertToken(it, pageSize) }
-                        }
-                        .compose(interceptErrorAndEmpty)
+                        }.compose(interceptErrorAndEmpty)
                 }
             }
-        }.doOnTerminate { Log.e("testtest", "doOnTerminate") }
-            .doOnDispose { Log.e("testtest", "doOnDispose") }
-            .doOnSuccess { Log.e("testtest", "doOnSuccess") }
-            .doOnError { Log.e("testtest", "doOnError:" + it.message) }
+        }
     }
 
     abstract fun fetchFirstPage(pageSize: Int): Single<TOKEN>
@@ -125,6 +108,12 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         pageNumber = token.pageNumber,
                         nonce = nonce,
                         queryParameters = queryParameters
+                    ).andThen(
+                        tokenDao.deleteAfterPosition(
+                            position = ((token.pageNumber - 1) * pageSize) + token.primaryKeys.size,
+                            nonce = nonce,
+                            queryParameters = queryParameters
+                        )
                     )
                     false -> Completable.complete()
                 }
@@ -137,7 +126,6 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                     }
             }))
             .andThen(Single.just<MediatorResult>(MediatorResult.Success(isLastPage)))
-            .doOnSuccess { Log.e("testtest", "isLastPage:$isLastPage") }
     }
 
     private val interceptErrorAndEmpty = SingleTransformer<MediatorResult, MediatorResult> { upstream ->

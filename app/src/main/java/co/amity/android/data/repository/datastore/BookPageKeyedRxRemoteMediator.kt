@@ -26,11 +26,16 @@ class BookPageKeyedRxRemoteMediator(
 ) {
 
     private fun fetchFirstPage(title: String, category: String, pageSize: Int): Single<JsonObject> {
-        return BookRemoteDataStore().fetchFirstPage(title = title, category = category, pageSize = pageSize)
+        return BookRemoteDataStore().fetchFirstPage(
+            title = title,
+            category = category,
+            pageSize = pageSize,
+            stackFromEnd = stackFromEnd
+        )
     }
 
     private fun fetchNextPage(token: String): Single<JsonObject> {
-        return BookRemoteDataStore().fetchNextPage(token = token)
+        return BookRemoteDataStore().fetchNextPage(token = token, stackFromEnd = stackFromEnd)
     }
 
     override fun fetchFirstPage(pageSize: Int): Single<BookQueryToken> {

@@ -32,7 +32,7 @@ class BookActivity : ViewBindingActivity<ActivityMainBinding>() {
             }
         })
 
-        val stackFromEnd = true
+        val stackFromEnd = false
 
         val layoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd = stackFromEnd

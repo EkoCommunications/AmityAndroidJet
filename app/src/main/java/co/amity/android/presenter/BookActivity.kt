@@ -1,9 +1,11 @@
 package co.amity.android.presenter
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import co.amity.android.data.model.Book
 import co.amity.android.data.repository.DEFAULT_PAGE_SIZE
 import co.amity.android.databinding.ActivityMainBinding
@@ -30,9 +32,15 @@ class BookActivity : ViewBindingActivity<ActivityMainBinding>() {
             }
         })
 
-        binding.bookRecyclerView.layoutManager = LinearLayoutManager(this)
+        val layoutManager = LinearLayoutManager(this)
+        binding.bookRecyclerView.layoutManager = layoutManager
         binding.bookRecyclerView.adapter = adapter
         binding.bookRecyclerView.addOnScrollListener(AmityPagingDataRefresher(stackFromEnd = false, pageSize = DEFAULT_PAGE_SIZE))
+        binding.bookRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                Log.e("testtest", layoutManager.findFirstCompletelyVisibleItemPosition().toString())
+            }
+        })
 
         viewModel.getAllBooks(context = this, title = "", category = "")
             .observeOn(AndroidSchedulers.mainThread())

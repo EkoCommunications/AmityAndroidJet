@@ -17,16 +17,24 @@ internal const val DEFAULT_PAGE_SIZE = 10
 @OptIn(ExperimentalPagingApi::class)
 class BookRepository {
 
-    fun getAllBooks(context: Context, title: String, category: String): Flowable<PagingData<Book>> {
+    fun getAllBooks(context: Context, title: String, category: String, stackFromEnd: Boolean): Flowable<PagingData<Book>> {
         return Pager(
             config = PagingConfig(pageSize = DEFAULT_PAGE_SIZE),
             initialKey = null,
             remoteMediator = BookPageKeyedRxRemoteMediator(
                 title = title,
                 category = category,
+                stackFromEnd = stackFromEnd,
                 bookDao = BookDatabase.invoke(context = context).bookDao(),
                 tokenDao = BookDatabase.invoke(context = context).tokenDao()
             )
-        ) { BookLocalDataStore().getAllBooks(context = context, title = title, category = category) }.flowable
+        ) {
+            BookLocalDataStore().getAllBooks(
+                context = context,
+                title = title,
+                category = category,
+                stackFromEnd = stackFromEnd
+            )
+        }.flowable
     }
 }

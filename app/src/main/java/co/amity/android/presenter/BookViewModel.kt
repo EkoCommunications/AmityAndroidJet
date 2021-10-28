@@ -9,7 +9,7 @@ import io.reactivex.Flowable
 
 class BookViewModel : ViewModel() {
 
-    fun getAllBooks(context: Context, title: String, category: String): Flowable<PagingData<Book>> {
-        return GetAllBookUseCase().getAllBooks(context = context, title = title, category = category)
+    fun getAllBooks(context: Context, title: String, category: String, stackFromEnd: Boolean): Flowable<PagingData<Book>> {
+        return GetAllBookUseCase().getAllBooks(context = context, title = title, category = category, stackFromEnd = stackFromEnd)
     }
 }

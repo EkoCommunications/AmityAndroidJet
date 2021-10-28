@@ -32,17 +32,21 @@ class BookActivity : ViewBindingActivity<ActivityMainBinding>() {
             }
         })
 
+        val stackFromEnd = true
+
         val layoutManager = LinearLayoutManager(this)
+        layoutManager.stackFromEnd = stackFromEnd
+
         binding.bookRecyclerView.layoutManager = layoutManager
         binding.bookRecyclerView.adapter = adapter
-        binding.bookRecyclerView.addOnScrollListener(AmityPagingDataRefresher(stackFromEnd = false, pageSize = DEFAULT_PAGE_SIZE))
+        binding.bookRecyclerView.addOnScrollListener(AmityPagingDataRefresher(stackFromEnd = true, pageSize = DEFAULT_PAGE_SIZE))
         binding.bookRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 Log.e("testtest", layoutManager.findFirstCompletelyVisibleItemPosition().toString())
             }
         })
 
-        viewModel.getAllBooks(context = this, title = "", category = "")
+        viewModel.getAllBooks(context = this, title = "", category = "", stackFromEnd = stackFromEnd)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { adapter.submitData(lifecycle, it) }
             .untilLifecycleEnd(this)

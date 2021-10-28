@@ -17,14 +17,18 @@ interface BookDao : AmityPagingDao<Book> {
     @RawQuery(observedEntities = [Book::class, AmityPagingId::class])
     override fun queryPagingData(sqlQuery: SimpleSQLiteQuery): PagingSource<Int, Book>
 
-    fun getAllBooks(title: String, category: String): PagingSource<Int, Book> {
+    fun getAllBooks(title: String, category: String, stackFromEnd: Boolean): PagingSource<Int, Book> {
         return queryPagingData(
             generateSqlQuery(
                 tableName = "book",
                 primaryKeyColumnName = "bookId",
                 additionalPrimaryKeys = emptyMap(),
                 queryParameters = mapOf("title" to title, "category" to category),
-                nonce = Book.NONCE
+                nonce = Book.NONCE,
+                order = when (stackFromEnd) {
+                    true -> AmityPagingDao.Order.DESC
+                    false -> AmityPagingDao.Order.ASC
+                }
             )
         )
     }

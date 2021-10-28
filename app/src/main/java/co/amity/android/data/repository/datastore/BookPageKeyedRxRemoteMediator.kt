@@ -16,6 +16,7 @@ import io.reactivex.Single
 class BookPageKeyedRxRemoteMediator(
     private val title: String,
     private val category: String,
+    private val stackFromEnd: Boolean,
     private val bookDao: BookDao,
     tokenDao: AmityQueryTokenDao
 ) : PageKeyedRxRemoteMediator<Book, BookQueryToken>(
@@ -75,6 +76,6 @@ class BookPageKeyedRxRemoteMediator(
     }
 
     override fun stackFromEnd(): Boolean {
-        return false
+        return stackFromEnd
     }
 }

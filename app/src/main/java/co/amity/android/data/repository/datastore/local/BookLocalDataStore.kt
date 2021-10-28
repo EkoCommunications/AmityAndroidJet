@@ -6,9 +6,9 @@ import co.amity.android.data.model.Book
 
 class BookLocalDataStore {
 
-    fun getAllBooks(context: Context, title: String, category: String): PagingSource<Int, Book> {
+    fun getAllBooks(context: Context, title: String, category: String, stackFromEnd: Boolean): PagingSource<Int, Book> {
         return BookDatabase.invoke(context = context)
             .bookDao()
-            .getAllBooks(title = title, category = category)
+            .getAllBooks(title = title, category = category, stackFromEnd = stackFromEnd)
     }
 }

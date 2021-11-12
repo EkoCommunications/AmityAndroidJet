@@ -11,13 +11,10 @@ import co.amity.presentation.ViewBindingActivity
 import co.amity.rxlifecycle.untilLifecycleEnd
 import co.amity.rxremotemediator.AmityPagingDataRefresher
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class BookActivity : ViewBindingActivity<ActivityMainBinding>() {
-
-    private var disposable: Disposable? = null
 
     private val viewModel: BookViewModel by viewModels()
 
@@ -38,7 +35,7 @@ class BookActivity : ViewBindingActivity<ActivityMainBinding>() {
         binding.bookRecyclerView.adapter = adapter
         binding.bookRecyclerView.addOnScrollListener(AmityPagingDataRefresher(pageSize = DEFAULT_PAGE_SIZE))
 
-        disposable = viewModel.getAllBooks(context = this, title = "", category = "")
+        viewModel.getAllBooks(context = this, title = "", category = "")
             .throttleLast(100, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { adapter.submitData(lifecycle, it) }

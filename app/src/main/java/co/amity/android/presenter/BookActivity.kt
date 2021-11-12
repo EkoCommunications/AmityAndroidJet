@@ -1,11 +1,9 @@
 package co.amity.android.presenter
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import co.amity.android.data.model.Book
 import co.amity.android.data.repository.DEFAULT_PAGE_SIZE
 import co.amity.android.databinding.ActivityMainBinding
@@ -13,9 +11,13 @@ import co.amity.presentation.ViewBindingActivity
 import co.amity.rxlifecycle.untilLifecycleEnd
 import co.amity.rxremotemediator.AmityPagingDataRefresher
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class BookActivity : ViewBindingActivity<ActivityMainBinding>() {
+
+    private var disposable: Disposable? = null
 
     private val viewModel: BookViewModel by viewModels()
 
@@ -32,21 +34,12 @@ class BookActivity : ViewBindingActivity<ActivityMainBinding>() {
             }
         })
 
-        val stackFromEnd = false
-
-        val layoutManager = LinearLayoutManager(this)
-        layoutManager.stackFromEnd = stackFromEnd
-
-        binding.bookRecyclerView.layoutManager = layoutManager
+        binding.bookRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.bookRecyclerView.adapter = adapter
-        binding.bookRecyclerView.addOnScrollListener(AmityPagingDataRefresher(stackFromEnd = true, pageSize = DEFAULT_PAGE_SIZE))
-        binding.bookRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                Log.e("testtest", layoutManager.findFirstCompletelyVisibleItemPosition().toString())
-            }
-        })
+        binding.bookRecyclerView.addOnScrollListener(AmityPagingDataRefresher(pageSize = DEFAULT_PAGE_SIZE))
 
-        viewModel.getAllBooks(context = this, title = "", category = "", stackFromEnd = stackFromEnd)
+        disposable = viewModel.getAllBooks(context = this, title = "", category = "")
+            .throttleLast(100, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { adapter.submitData(lifecycle, it) }
             .untilLifecycleEnd(this)

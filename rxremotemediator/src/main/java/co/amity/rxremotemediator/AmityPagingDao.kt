@@ -13,7 +13,7 @@ interface AmityPagingDao<ENTITY : Any> {
         additionalPrimaryKeys: Map<String, Any> = emptyMap(),
         queryParameters: Map<String, Any>,
         nonce: Int,
-        order: Order = Order.ASC
+        order: Order
     ): SimpleSQLiteQuery {
         return SimpleSQLiteQuery(
             String.format(

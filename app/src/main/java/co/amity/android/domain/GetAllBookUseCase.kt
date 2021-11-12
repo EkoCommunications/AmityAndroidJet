@@ -8,7 +8,7 @@ import io.reactivex.Flowable
 
 class GetAllBookUseCase {
 
-    fun getAllBooks(context: Context, title: String, category: String, stackFromEnd: Boolean): Flowable<PagingData<Book>> {
-        return BookRepository().getAllBooks(context = context, title = title, category = category, stackFromEnd = stackFromEnd)
+    fun getAllBooks(context: Context, title: String, category: String): Flowable<PagingData<Book>> {
+        return BookRepository().getAllBooks(context = context, title = title, category = category)
     }
 }

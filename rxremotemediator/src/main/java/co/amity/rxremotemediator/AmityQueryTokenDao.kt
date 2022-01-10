@@ -30,6 +30,20 @@ interface AmityQueryTokenDao {
         return deleteAfterPageNumber(pageNumber, queryParameters.hashCode(), nonce)
     }
 
+    @Query("delete from amity_paging_id where hash = :hash and nonce = :nonce")
+    fun clearPagingIds(hash: Int, nonce: Int): Completable
+
+    fun clearPagingIds(queryParameters: Map<String, Any>, nonce: Int): Completable {
+        return clearPagingIds(queryParameters.hashCode(), nonce)
+    }
+
+    @Query("delete from amity_query_token where hash = :hash and nonce = :nonce")
+    fun clearQueryToken(hash: Int, nonce: Int): Completable
+
+    fun clearQueryToken(queryParameters: Map<String, Any>, nonce: Int): Completable {
+        return clearQueryToken(queryParameters.hashCode(), nonce)
+    }
+
     @Query("select * from amity_query_token where hash = :hash and nonce = :nonce order by pageNumber asc limit 1")
     fun getFirstQueryToken(hash: Int, nonce: Int): Maybe<AmityQueryToken>
 

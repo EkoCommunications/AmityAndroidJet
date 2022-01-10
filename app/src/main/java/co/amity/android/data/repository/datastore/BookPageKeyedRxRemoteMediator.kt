@@ -11,6 +11,7 @@ import co.amity.rxremotemediator.PageKeyedRxRemoteMediator
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.reactivex.Single
+import java.util.concurrent.TimeUnit
 
 @OptIn(ExperimentalPagingApi::class)
 class BookPageKeyedRxRemoteMediator(
@@ -23,6 +24,8 @@ class BookPageKeyedRxRemoteMediator(
     queryParameters = mapOf("title" to title, "category" to category),
     tokenDao = tokenDao
 ) {
+
+    override fun forceRefresh(): Boolean = true
 
     override fun fetchFirstPage(pageSize: Int): Single<BookQueryToken> {
         return BookRemoteDataStore().fetchFirstPage(
@@ -67,5 +70,6 @@ class BookPageKeyedRxRemoteMediator(
                         }
                     ))
             }
+            .delay(1, TimeUnit.SECONDS)
     }
 }

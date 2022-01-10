@@ -36,6 +36,15 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         }.onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
                 } ?: run {
                     fetchFirstPage(pageSize = pageSize)
+                        .flatMap {
+                            if (forceRefresh()) {
+                                tokenDao.clearPagingIds(queryParameters, nonce)
+                                    .andThen(Completable.defer { tokenDao.clearQueryToken(queryParameters,nonce) })
+                                    .andThen(Single.defer { Single.just(it) })
+                            } else {
+                                Single.just(it)
+                            }
+                        }
                         .subscribeOn(Schedulers.io())
                         .map {
                             it.apply {
@@ -74,6 +83,8 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
     final override fun stackFromEnd(): Boolean {
         return false
     }
+
+    open fun forceRefresh():Boolean = false
 
     abstract fun fetchFirstPage(pageSize: Int): Single<TOKEN>
 

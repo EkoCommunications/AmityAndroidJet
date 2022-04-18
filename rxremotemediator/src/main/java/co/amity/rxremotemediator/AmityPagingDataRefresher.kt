@@ -4,7 +4,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class AmityPagingDataRefresher(private val stackFromEnd: Boolean = false, private val pageSize: Int) : RecyclerView.OnScrollListener() {
+class AmityPagingDataRefresher(private val pageSize: Int) : RecyclerView.OnScrollListener() {
 
     private var pageNumber = INVALID_PAGE_NUMBER
 
@@ -17,11 +17,7 @@ class AmityPagingDataRefresher(private val stackFromEnd: Boolean = false, privat
             ?.takeIf { it is LinearLayoutManager }
             ?.let { it as LinearLayoutManager } ?: return
 
-        val lastItem = when (stackFromEnd) {
-            true -> linearLayoutManager.findFirstCompletelyVisibleItemPosition()
-            false -> linearLayoutManager.findLastCompletelyVisibleItemPosition()
-        }
-
+        val lastItem = linearLayoutManager.findLastCompletelyVisibleItemPosition()
         val pageNumber = lastItem / pageSize
 
         if (this.pageNumber != pageNumber) {

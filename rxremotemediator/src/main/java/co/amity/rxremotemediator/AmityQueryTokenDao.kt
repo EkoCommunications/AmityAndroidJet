@@ -16,11 +16,32 @@ interface AmityQueryTokenDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPagingIds(pagingIds: List<AmityPagingId>): Completable
 
-    @Query("delete from amity_query_token where pageNumber > :pageNumber and nonce = :nonce and hash = :hash")
-    fun deleteAfterPageNumber(pageNumber: Int, nonce: Int, hash: Int): Completable
+    @Query("delete from amity_paging_id where position > :position and hash = :hash and nonce = :nonce")
+    fun deleteAfterPosition(position: Int, hash: Int, nonce: Int): Completable
+
+    fun deleteAfterPosition(position: Int, queryParameters: Map<String, Any>, nonce: Int): Completable {
+        return deleteAfterPosition(position, queryParameters.hashCode(), nonce)
+    }
+
+    @Query("delete from amity_query_token where pageNumber > :pageNumber and hash = :hash and nonce = :nonce")
+    fun deleteAfterPageNumber(pageNumber: Int, hash: Int, nonce: Int): Completable
 
     fun deleteAfterPageNumber(pageNumber: Int, queryParameters: Map<String, Any>, nonce: Int): Completable {
         return deleteAfterPageNumber(pageNumber, queryParameters.hashCode(), nonce)
+    }
+
+    @Query("delete from amity_paging_id where hash = :hash and nonce = :nonce")
+    fun clearPagingIds(hash: Int, nonce: Int): Completable
+
+    fun clearPagingIds(queryParameters: Map<String, Any>, nonce: Int): Completable {
+        return clearPagingIds(queryParameters.hashCode(), nonce)
+    }
+
+    @Query("delete from amity_query_token where hash = :hash and nonce = :nonce")
+    fun clearQueryToken(hash: Int, nonce: Int): Completable
+
+    fun clearQueryToken(queryParameters: Map<String, Any>, nonce: Int): Completable {
+        return clearQueryToken(queryParameters.hashCode(), nonce)
     }
 
     @Query("select * from amity_query_token where hash = :hash and nonce = :nonce order by pageNumber asc limit 1")

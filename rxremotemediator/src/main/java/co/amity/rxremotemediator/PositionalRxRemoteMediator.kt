@@ -16,6 +16,10 @@ abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParam
 
     private var maxPageNumber = DEFAULT_MAX_PAGE_NUMBER
 
+    final override fun initializeSingle(): Single<InitializeAction> {
+        return Single.just(InitializeAction.LAUNCH_INITIAL_REFRESH)
+    }
+
     final override fun loadSingle(loadType: LoadType, state: PagingState<Int, ENTITY>): Single<MediatorResult> {
         val pageSize = state.config.pageSize
         return when (loadType) {
@@ -29,8 +33,7 @@ abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParam
                                 this.nonce = this@PositionalRxRemoteMediator.nonce
                                 this.pageNumber = pageNumber
                             }
-                        }
-                        .flatMap { insertParams(it, pageSize) }
+                        }.flatMap { insertParams(it, pageSize) }
                 } ?: run {
                     fetch(skip = 0, limit = pageSize)
                         .map {
@@ -38,8 +41,7 @@ abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParam
                                 this.nonce = this@PositionalRxRemoteMediator.nonce
                                 this.pageNumber = 1
                             }
-                        }
-                        .flatMap { insertParams(it, pageSize) }
+                        }.flatMap { insertParams(it, pageSize) }
                 }
             }
             LoadType.PREPEND -> Single.just(MediatorResult.Success(true))
@@ -51,10 +53,13 @@ abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParam
                             this.nonce = this@PositionalRxRemoteMediator.nonce
                             this.pageNumber = maxPageNumber
                         }
-                    }
-                    .flatMap { insertParams(it, pageSize) }
+                    }.flatMap { insertParams(it, pageSize) }
             }
         }
+    }
+
+    final override fun stackFromEnd(): Boolean {
+        return false
     }
 
     abstract fun fetch(skip: Int, limit: Int): Single<PARAMS>
@@ -78,10 +83,6 @@ abstract class PositionalRxRemoteMediator<ENTITY : Any, PARAMS : AmityQueryParam
                         this.position = ((params.pageNumber - 1) * pageSize) + index + 1
                     }
             }))
-            .andThen(Single.just<MediatorResult>(MediatorResult.Success(endOfPaginationReached = params.endOfPaginationReached)))
-    }
-
-    final override fun stackFromEnd(): Boolean {
-        return false
+            .andThen(Single.just(MediatorResult.Success(endOfPaginationReached = params.endOfPaginationReached)))
     }
 }

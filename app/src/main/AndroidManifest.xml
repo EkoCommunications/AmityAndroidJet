@@ -9,8 +9,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AmityAndroidJet">
-        <activity android:name=".viewbinding.SampleActivity"></activity>
-        <activity android:name=".rxremotemediator.BookActivity" />
+        <activity android:name=".presenter.BookActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

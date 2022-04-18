@@ -11,10 +11,10 @@ open class AmityQueryToken(
     @Ignore var queryParameters: Map<String, Any> = emptyMap(),
     @Ignore var primaryKeys: List<String> = emptyList(),
     var next: String? = null,
-    var previous: String? = null
+    var previous: String? = null,
+    var pageNumber: Int = INVALID_PAGE_NUMBER
 ) {
 
     var hash: Int = queryParameters.hashCode()
     var nonce: Int = DEFAULT_NONCE
-    var pageNumber: Int = INVALID_PAGE_NUMBER
 }

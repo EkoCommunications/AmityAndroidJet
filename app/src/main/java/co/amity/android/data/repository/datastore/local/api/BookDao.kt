@@ -25,7 +25,9 @@ interface BookDao : AmityPagingDao<Book> {
                 additionalPrimaryKeys = emptyMap(),
                 queryParameters = mapOf("title" to title, "category" to category),
                 nonce = Book.NONCE,
-                order = AmityPagingDao.Order.ASC
+                order = AmityPagingDao.Order.ASC,
+//                sortColumn = "title",
+//                additionalFilter = "(book.bookId = '11' or book.bookId = '1' or book.bookId =  '22')"
             )
         )
     }

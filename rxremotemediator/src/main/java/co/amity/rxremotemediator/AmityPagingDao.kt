@@ -14,7 +14,8 @@ interface AmityPagingDao<ENTITY : Any> {
         queryParameters: Map<String, Any>,
         nonce: Int,
         order: Order,
-        sortColumn: String? = null
+        sortColumn: String? = null,
+        additionalFilter: String? = null
     ): SimpleSQLiteQuery {
         val additionalPrimaryKeyString = additionalPrimaryKeys.takeIf { it.isNotEmpty() }?.map {
             when (val value = it.value) {
@@ -24,20 +25,27 @@ interface AmityPagingDao<ENTITY : Any> {
             }
         }?.joinToString(separator = " and ", prefix = "and ") ?: ""
 
+        //base query statement
         var queryStatement = "select $tableName.*, " +
                 "amity_paging_id.* from $tableName, " +
                 "amity_paging_id where amity_paging_id.id = $tableName.$primaryKeyColumnName $additionalPrimaryKeyString" +
                 " and " +
                 "amity_paging_id.hash = ${queryParameters.hashCode()}" +
                 " and " +
-                "amity_paging_id.nonce = $nonce" +
-                " order by "
+                "amity_paging_id.nonce = $nonce"
 
+        //add filter
+        additionalFilter?.let {
+            queryStatement.plus(" and $additionalFilter")
+                .also { queryStatement = it }
+        }
+
+        //add sort
         sortColumn?.let {
-            queryStatement.plus("$tableName.$sortColumn ${order.value}")
+            queryStatement.plus(" order by $tableName.$sortColumn ${order.value}")
                 .also { queryStatement = it }
         } ?: apply {
-            queryStatement.plus("amity_paging_id.position ${order.value}")
+            queryStatement.plus(" order by amity_paging_id.position ${order.value}")
                 .also { queryStatement = it }
         }
         return SimpleSQLiteQuery(queryStatement)

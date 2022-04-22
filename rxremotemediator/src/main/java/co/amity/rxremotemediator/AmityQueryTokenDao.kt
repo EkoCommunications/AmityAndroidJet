@@ -16,6 +16,9 @@ interface AmityQueryTokenDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPagingIds(pagingIds: List<AmityPagingId>): Completable
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertPagingIdsIfNeeded(pagingIds: List<AmityPagingId>): Completable
+
     @Query("delete from amity_paging_id where position > :position and hash = :hash and nonce = :nonce")
     fun deleteAfterPosition(position: Int, hash: Int, nonce: Int): Completable
 

@@ -3,7 +3,8 @@ package co.amity.rxremotemediator
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
-import io.reactivex.*
+import io.reactivex.Completable
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kotlin.math.ceil
 import kotlin.math.max
@@ -115,5 +116,14 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                         this.position = ((token.pageNumber - 1) * pageSize) + index + 1
                     }
             }))
+    }
+
+    fun insertPagingIds(ids: List<String>) {
+        tokenDao.insertPagingIdsIfNeeded(ids.map { id ->
+            AmityPagingId(queryParameters = queryParameters, id = id)
+                .apply {
+                    this.nonce = this@PageKeyedRxRemoteMediator.nonce
+                }
+        })
     }
 }

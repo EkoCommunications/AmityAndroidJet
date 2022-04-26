@@ -13,6 +13,8 @@ import kotlin.math.max
 abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(val nonce: Int, val queryParameters: Map<String, Any> = mapOf(), val tokenDao: AmityQueryTokenDao) :
     AmityRxRemoteMediator<ENTITY>() {
 
+    var generatedPosition = Integer.MAX_VALUE
+
     final override fun initializeSingle(): Single<InitializeAction> {
         return Single.just(InitializeAction.LAUNCH_INITIAL_REFRESH)
     }
@@ -122,7 +124,9 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
         tokenDao.insertPagingIdsIfNeeded(ids.map { id ->
             AmityPagingId(queryParameters = queryParameters, id = id)
                 .apply {
+                    this@PageKeyedRxRemoteMediator.generatedPosition--
                     this.nonce = this@PageKeyedRxRemoteMediator.nonce
+                    this.position = this@PageKeyedRxRemoteMediator.generatedPosition
                 }
         })
     }

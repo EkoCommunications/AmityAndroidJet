@@ -13,27 +13,42 @@ interface AmityPagingDao<ENTITY : Any> {
         additionalPrimaryKeys: Map<String, Any> = emptyMap(),
         queryParameters: Map<String, Any>,
         nonce: Int,
-        order: Order
+        order: Order,
+        sortColumn: String? = null,
+        additionalFilter: String? = null
     ): SimpleSQLiteQuery {
-        return SimpleSQLiteQuery(
-            String.format(
-                "select %s.*, amity_paging_id.* from %s, amity_paging_id where amity_paging_id.id = %s.%s %s and amity_paging_id.hash = %s and amity_paging_id.nonce = %s order by amity_paging_id.position %s",
-                tableName,
-                tableName,
-                tableName,
-                primaryKeyColumnName,
-                additionalPrimaryKeys.takeIf { it.isNotEmpty() }?.map {
-                    when (val value = it.value) {
-                        is String -> String.format("%s.%s = '%s'", tableName, it.key, value)
-                        is Boolean -> String.format("%s.%s = '%s'", tableName, it.key, if (value) 1 else 0)
-                        else -> String.format("%s.%s = %s", tableName, it.key, it.value)
-                    }
-                }?.joinToString(separator = " and ", prefix = "and ") ?: "",
-                queryParameters.hashCode(),
-                nonce,
-                order.value
-            )
-        )
+        val additionalPrimaryKeyString = additionalPrimaryKeys.takeIf { it.isNotEmpty() }?.map {
+            when (val value = it.value) {
+                is String -> "$tableName.${it.key} = '$value'"
+                is Boolean -> "$tableName.${it.key} = '${if (value) 1 else 0}'"
+                else -> String.format("%s.%s = %s", tableName, it.key, it.value)
+            }
+        }?.joinToString(separator = " and ", prefix = "and ") ?: ""
+
+        //base query statement
+        var queryStatement = "select $tableName.*, " +
+                "amity_paging_id.* from $tableName, " +
+                "amity_paging_id where amity_paging_id.id = $tableName.$primaryKeyColumnName $additionalPrimaryKeyString" +
+                " and " +
+                "amity_paging_id.hash = ${queryParameters.hashCode()}" +
+                " and " +
+                "amity_paging_id.nonce = $nonce"
+
+        //add filter
+        additionalFilter?.let {
+            queryStatement.plus(" and $additionalFilter")
+                .also { queryStatement = it }
+        }
+
+        //add sort
+        sortColumn?.let {
+            queryStatement.plus(" order by $tableName.$sortColumn ${order.value}")
+                .also { queryStatement = it }
+        } ?: apply {
+            queryStatement.plus(" order by amity_paging_id.position ${order.value}")
+                .also { queryStatement = it }
+        }
+        return SimpleSQLiteQuery(queryStatement)
     }
 
     enum class Order(val value: String) {

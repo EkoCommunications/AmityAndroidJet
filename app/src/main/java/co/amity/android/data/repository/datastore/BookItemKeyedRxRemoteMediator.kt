@@ -47,7 +47,7 @@ class BookItemKeyedRxRemoteMediator(
     }
 
     override fun fetchByCursor(cursorId: String): Single<PagingCursor> {
-        return BookRemoteDataStore().fetchByCursor(cursorId = cursorId)
+        return BookRemoteDataStore().fetchByCursor(token = cursorId)
             .flatMap {
                 // insert books into database and return token
                 val books = it["books"].asJsonArray

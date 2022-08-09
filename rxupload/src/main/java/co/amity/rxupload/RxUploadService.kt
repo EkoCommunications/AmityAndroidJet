@@ -8,7 +8,7 @@ import java.util.*
 
 private const val DEFAULT_CONNECT_TIMEOUT_MILLIS: Long = 30 * 1000
 private const val DEFAULT_READ_TIMEOUT_MILLIS: Long = 60 * 1000
-private const val DEFAULT_WRITE_TIMEOUT_MILLIS: Long = 10 * 60 * 1000
+private const val DEFAULT_WRITE_TIMEOUT_MILLIS: Long = 120 * 60 * 1000
 private const val DEFAULT_MAXIMUM_FILE_SIZE: Int = 1000 * 1000 * 1000
 
 class RxUploadService {

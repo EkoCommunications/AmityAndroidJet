@@ -10,6 +10,7 @@ interface MultipartUploadApi {
 
     // https://github.com/square/retrofit/issues/3275
     @JvmSuppressWildcards
+    @Streaming
     @Multipart
     @POST("{path}")
     fun upload(

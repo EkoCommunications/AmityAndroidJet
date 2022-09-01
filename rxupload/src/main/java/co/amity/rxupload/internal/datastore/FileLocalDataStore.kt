@@ -103,7 +103,6 @@ class FileLocalDataStore {
         return Single.fromPublisher {
             mimeTypeFromUri(context, uri)
                 ?.let { mimeType ->
-                    Log.e("testtest", "mimeType:$mimeType")
                     it.onNext(mimeType)
                     it.onComplete()
                 } ?: run { it.onError(FileNotFoundException()) }
@@ -114,7 +113,6 @@ class FileLocalDataStore {
         return Single.fromPublisher {
             fileNameFromUri(context, uri)
                 ?.let { fileName ->
-                    Log.e("testtest", "fileName:$fileName")
                     it.onNext(fileName)
                     it.onComplete()
                 } ?: run { it.onError(FileNotFoundException()) }
@@ -125,7 +123,6 @@ class FileLocalDataStore {
         return Single.fromPublisher {
             fileSizeFromUri(context, uri)
                 ?.let { fileSize ->
-                    Log.e("testtest", "fileSize:$fileSize")
                     it.onNext(fileSize)
                     it.onComplete()
                 } ?: run { it.onError(FileNotFoundException()) }
@@ -136,34 +133,9 @@ class FileLocalDataStore {
         return Single.fromPublisher {
             fileFromUri(context, uri)
                 ?.let { file ->
-                    Log.e(
-                        "testtest",
-                        String.format(
-                            "path:%s absolutePath:%s exists:%s",
-                            file.path,
-                            file.absolutePath,
-                            file.exists()
-                        )
-                    )
                     it.onNext(file)
                     it.onComplete()
                 } ?: run { it.onError(FileNotFoundException()) }
-        }
-    }
-
-    fun test(context: Context, uri: Uri): Completable {
-        return Completable.fromAction {
-            Log.e("testtest", "uri:${uri.path}")
-            Log.e("testtest", "uri:$uri")
-            Log.e(
-                "testtest",
-                String.format(
-                    "isFile:%s isContent:%s :isDocument:%s",
-                    isFile(uri),
-                    isContent(uri),
-                    isDocument(context, uri)
-                )
-            )
         }
     }
 
@@ -171,7 +143,6 @@ class FileLocalDataStore {
         return Completable.fromAction {
             val directory = File(context.cacheDir, cacheDirectory)
             directory.deleteRecursively()
-            Log.e("testtest", "deleteRecursively")
         }
     }
 }

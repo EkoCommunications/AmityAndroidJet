@@ -21,14 +21,7 @@ interface AmityQueryTokenDao {
     fun insertPagingIdsIgnoreStrategy(pagingIds: List<AmityPagingId>): Completable
 
     fun insertPagingIdsIfNeeded(pagingId: AmityPagingId): Completable {
-        return pagingIdExists(pagingId.hash, pagingId.nonce, pagingId.id ?: "")
-            .flatMapCompletable { exists ->
-                if (exists) {
-                    return@flatMapCompletable Completable.complete()
-                } else {
-                    return@flatMapCompletable insertPagingIdsIgnoreStrategy(listOf(pagingId))
-                }
-            }
+        return insertPagingIdsIgnoreStrategy(listOf(pagingId))
     }
 
     @Query("delete from amity_paging_id where position > :position and hash = :hash and nonce = :nonce")

@@ -167,7 +167,7 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                     this.nonce = this@PageKeyedRxRemoteMediator.nonce
                     this.position = this@PageKeyedRxRemoteMediator.generatedPosition
                 }
-        ).subscribeOn(Schedulers.io())
+        ).subscribeOn(Schedulers.single())
             .subscribe()
     }
 }

@@ -2,14 +2,12 @@ package co.amity.rxupload.internal.repository
 
 import android.content.Context
 import android.net.Uri
-import android.os.LimitExceededException
 import co.amity.rxupload.FileProperties
 import co.amity.rxupload.internal.datastore.FileLocalDataStore
 import co.amity.rxupload.internal.datastore.FileRemoteDataStore
 import co.amity.rxupload.service.MultipartUploadService
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.reactivex.functions.Function3
 import java.util.*
 
 class FileRepository {
@@ -25,60 +23,62 @@ class FileRepository {
     ): Flowable<FileProperties> {
         val localDataStore = FileLocalDataStore()
         val remoteDataStore = FileRemoteDataStore()
-        return localDataStore.test(context, uri)
-            .andThen(Single.zip(localDataStore.getFileName(context, uri),
-                localDataStore.getFileSize(context, uri)
-                    .flatMap {
-                        return@flatMap when (it > MultipartUploadService.getSettings().maximumFileSize) {
-                            true -> Single.error<Long>(
-                                LimitExceededException(
-                                    String.format(
-                                        "a file size is %s, the maximum file size is %s",
-                                        it,
-                                        MultipartUploadService.getSettings().maximumFileSize
-                                    )
+        return Single.zip(localDataStore.getFileName(context, uri),
+            localDataStore.getFileSize(context, uri)
+                .flatMap {
+                    return@flatMap when (it > MultipartUploadService.getSettings().maximumFileSize) {
+                        true -> Single.error<Long>(
+                            Exception(
+                                String.format(
+                                    "a file size is %s, the maximum file size is %s",
+                                    it,
+                                    MultipartUploadService.getSettings().maximumFileSize
                                 )
                             )
-                            false -> Single.just(it)
-                        }
-                    },
-                localDataStore.getMimeType(context, uri)
-                    .flatMap {
-                        val supportedMimeTypes = MultipartUploadService.getSettings().supportedMimeTypes
-                        return@flatMap when (supportedMimeTypes.isNotEmpty() && !supportedMimeTypes.contains(it)) {
-                            true -> Single.error<String>(
-                                UnsupportedOperationException(
-                                    String.format(
-                                        "the library doesn't support '%s' mime type",
-                                        it
-                                    )
+                        )
+                        false -> Single.just(it)
+                    }
+                },
+            localDataStore.getMimeType(context, uri)
+                .flatMap {
+                    val supportedMimeTypes =
+                        MultipartUploadService.getSettings().supportedMimeTypes
+                    return@flatMap when (supportedMimeTypes.isNotEmpty() && !supportedMimeTypes.contains(
+                        it
+                    )) {
+                        true -> Single.error<String>(
+                            UnsupportedOperationException(
+                                String.format(
+                                    "the library doesn't support '%s' mime type",
+                                    it
                                 )
                             )
-                            false -> Single.just(it)
-                        }
-                    },
-                Function3<String, Long, String, FileProperties> { fileName, fileSize, mimeType ->
-                    FileProperties(
-                        uri,
-                        fileSize,
-                        fileName,
-                        mimeType
-                    )
-                })
-                .flatMapPublisher { fileProperties ->
-                    localDataStore.getFile(context, uri)
-                        .flatMapPublisher {
-                            remoteDataStore.upload(
-                                it,
-                                fileProperties,
-                                path,
-                                headers,
-                                params,
-                                id,
-                                multipartDataKey
-                            )
-                        }
-                })
+                        )
+                        false -> Single.just(it)
+                    }
+                }
+        ) { fileName, fileSize, mimeType ->
+            FileProperties(
+                uri,
+                fileSize,
+                fileName,
+                mimeType
+            )
+        }
+            .flatMapPublisher { fileProperties ->
+                localDataStore.getFile(context, uri)
+                    .flatMapPublisher {
+                        remoteDataStore.upload(
+                            it,
+                            fileProperties,
+                            path,
+                            headers,
+                            params,
+                            id,
+                            multipartDataKey
+                        )
+                    }
+            }
             .doOnTerminate { localDataStore.clearCache(context) }
             .doOnCancel { /*do not clear cache here! just because the subscription is cancelled doesn't mean the upload is also cancel (silent upload!)*/ }
             .distinct { Objects.hash(it.progress, it.responseBody) }

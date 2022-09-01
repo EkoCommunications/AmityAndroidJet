@@ -3,6 +3,7 @@ package co.amity.rxupload
 import co.amity.rxupload.service.MultipartUploadService
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
+import okhttp3.CertificatePinner
 import okhttp3.Interceptor
 import java.util.*
 
@@ -18,7 +19,8 @@ class RxUploadService {
         fun init(
             baseUrl: String,
             settings: Settings = Settings.build(),
-            interceptors: List<Interceptor> = emptyList()
+            interceptors: List<Interceptor> = emptyList(),
+            certificatePinner: CertificatePinner? = null
         ) {
             MultipartUploadService.init(baseUrl, settings, interceptors)
         }

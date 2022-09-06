@@ -94,35 +94,64 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
                 }
             }
             LoadType.PREPEND -> {
-                Single.just(MediatorResult.Success(endOfPaginationReached = true))
-            }
-            LoadType.APPEND -> {
-                tokenDao.getLastQueryToken(queryParameters = queryParameters, nonce = nonce)
-                    .subscribeOn(Schedulers.io())
-                    .flatMapSingle<MediatorResult> { token ->
-                        fetchByToken(token = token.next!!)
-                            .map {
-                                it.apply {
-                                    this.nonce = this@PageKeyedRxRemoteMediator.nonce
-                                    this.pageNumber = token.pageNumber + 1
+                if(stackFromEnd()) {
+                    tokenDao.getFirstQueryToken(queryParameters = queryParameters, nonce = nonce)
+                        .subscribeOn(Schedulers.io())
+                        .flatMapSingle<MediatorResult> { token ->
+                            fetchByToken(token = token.previous!!)
+                                .map {
+                                    it.apply {
+                                        this.nonce = this@PageKeyedRxRemoteMediator.nonce
+                                        this.pageNumber = token.pageNumber + 1
+                                    }
                                 }
-                            }
-                            .flatMap {
-                                insertToken(it, pageSize)
-                                    .andThen(
-                                        Single.just(
-                                            MediatorResult.Success(
-                                                endOfPaginationReached = it.next == null
+                                .flatMap {
+                                    insertToken(it, pageSize)
+                                        .andThen(
+                                            Single.just(
+                                                MediatorResult.Success(
+                                                    endOfPaginationReached = it.previous == null
+                                                )
                                             )
                                         )
-                                    )
-                            }
-                    }.onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
+                                }
+                        }.onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
+                } else {
+                    Single.just(MediatorResult.Success(endOfPaginationReached = true))
+                }
+
+            }
+            LoadType.APPEND -> {
+                if(stackFromEnd()) {
+                    Single.just(MediatorResult.Success(endOfPaginationReached = true))
+                } else {
+                    tokenDao.getLastQueryToken(queryParameters = queryParameters, nonce = nonce)
+                        .subscribeOn(Schedulers.io())
+                        .flatMapSingle<MediatorResult> { token ->
+                            fetchByToken(token = token.next!!)
+                                .map {
+                                    it.apply {
+                                        this.nonce = this@PageKeyedRxRemoteMediator.nonce
+                                        this.pageNumber = token.pageNumber + 1
+                                    }
+                                }
+                                .flatMap {
+                                    insertToken(it, pageSize)
+                                        .andThen(
+                                            Single.just(
+                                                MediatorResult.Success(
+                                                    endOfPaginationReached = it.next == null
+                                                )
+                                            )
+                                        )
+                                }
+                        }.onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
+                }
             }
         }
     }
 
-    final override fun stackFromEnd(): Boolean {
+    override fun stackFromEnd(): Boolean {
         return false
     }
 

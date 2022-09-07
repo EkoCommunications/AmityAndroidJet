@@ -4,6 +4,7 @@ import co.amity.rxupload.FileProperties
 import co.amity.rxupload.RxUploadService
 import co.amity.rxupload.service.api.MultipartUploadApi
 import io.reactivex.subjects.PublishSubject
+import okhttp3.CertificatePinner
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -23,7 +24,12 @@ class MultipartUploadService {
         private val calls = mutableMapOf<String, Call<ResponseBody>>()
         private val propertiesSubjects = mutableMapOf<String, PublishSubject<FileProperties>>()
 
-        fun init(baseUrl: String, baseSettings: RxUploadService.Settings, interceptors: List<Interceptor>) {
+        fun init(
+            baseUrl: String,
+            baseSettings: RxUploadService.Settings,
+            interceptors: List<Interceptor>,
+            certificatePinner: CertificatePinner? = null
+        ) {
             val httpClient = OkHttpClient.Builder()
                 .also {
                     interceptors.forEach { interceptor ->
@@ -33,6 +39,11 @@ class MultipartUploadService {
                 .connectTimeout(baseSettings.connectTimeOutMillis, TimeUnit.MILLISECONDS)
                 .readTimeout(baseSettings.readTimeOutMillis, TimeUnit.MILLISECONDS)
                 .writeTimeout(baseSettings.writeTimeOutMillis, TimeUnit.MILLISECONDS)
+                .also {
+                    certificatePinner?.let { pinner ->
+                        it.certificatePinner(pinner)
+                    }
+                }
                 .build()
 
             retrofit = Retrofit.Builder()

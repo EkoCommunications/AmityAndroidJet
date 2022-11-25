@@ -48,4 +48,11 @@ dependencies {
     api 'com.trello.rxlifecycle3:rxlifecycle-components-preference:3.1.0'
     api 'com.trello.rxlifecycle3:rxlifecycle-android-lifecycle:3.1.0'
     api 'com.trello.rxlifecycle3:rxlifecycle-kotlin:3.1.0'
+
+    api 'com.trello.rxlifecycle4:rxlifecycle:4.0.2'
+    api 'com.trello.rxlifecycle4:rxlifecycle-android:4.0.2'
+    api 'com.trello.rxlifecycle4:rxlifecycle-components:4.0.2'
+    api 'com.trello.rxlifecycle4:rxlifecycle-components-preference:4.0.2'
+    api 'com.trello.rxlifecycle4:rxlifecycle-android-lifecycle:4.0.2'
+    api 'com.trello.rxlifecycle4:rxlifecycle-kotlin:4.0.2'
 }

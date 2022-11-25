@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.annotation.WorkerThread
 import co.amity.rxupload.internal.repository.FileRepository
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 class UploadFileUseCase {
 

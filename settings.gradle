@@ -2,5 +2,6 @@ include ':viewbinding'
 include ':rxupload'
 include ':rxremotemediator'
 include ':rxlifecycle'
+include ':rxbridge'
 include ':app'
 rootProject.name = "AmityAndroidJet"

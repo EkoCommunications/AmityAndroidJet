@@ -17,7 +17,11 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
 ) :
     AmityRxRemoteMediator<ENTITY>() {
 
-    var generatedPosition = Integer.MAX_VALUE
+    //var generatedPosition = Integer.MAX_VALUE
+    var highestPosition = 0
+    var lowestPosition = 0
+    var prevToken: String? = null
+    var nextToken: String? = null
 
     final override fun initializeSingle(): Single<InitializeAction> {
         return Single.just(InitializeAction.LAUNCH_INITIAL_REFRESH)
@@ -30,170 +34,106 @@ abstract class PageKeyedRxRemoteMediator<ENTITY : Any, TOKEN : AmityQueryToken>(
         val pageSize = state.config.pageSize
         return when (loadType) {
             LoadType.REFRESH -> {
-                state.anchorPosition?.let { anchorPosition ->
-                    val pageNumber = ceil(
-                        max(
-                            1,
-                            anchorPosition
-                        ).toDouble() / state.config.pageSize.toDouble()
-                    ).toInt()
-                    tokenDao.getTokenByPageNumber(
-                        pageNumber = pageNumber,
-                        queryParameters = queryParameters,
-                        nonce = nonce
-                    )
-                        .subscribeOn(Schedulers.io())
-                        .flatMapSingle { fetchByToken(token = it) }
-                        .map {
-                            it.apply {
-                                this.nonce = this@PageKeyedRxRemoteMediator.nonce
-                                this.pageNumber = pageNumber
-                            }
-                        }.flatMap {
-                            insertToken(it, pageSize)
-                                .andThen(
-                                    Single.just<MediatorResult>(
-                                        MediatorResult.Success(
-                                            endOfPaginationReached = it.next == null
-                                        )
-                                    )
+                fetchFirstPage(pageSize = pageSize)
+                    .flatMap {
+                        tokenDao.clearPagingIds(queryParameters, nonce)
+                            .andThen(Completable.defer {
+                                tokenDao.clearQueryToken(
+                                    queryParameters,
+                                    nonce
                                 )
-                        }.onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
-                } ?: run {
-                    fetchFirstPage(pageSize = pageSize)
-                        .flatMap {
-                            if (forceRefresh()) {
-                                tokenDao.clearPagingIds(queryParameters, nonce)
-                                    .andThen(Completable.defer {
-                                        tokenDao.clearQueryToken(
-                                            queryParameters,
-                                            nonce
-                                        )
-                                    })
-                                    .andThen(Single.defer { Single.just(it) })
-                            } else {
-                                Single.just(it)
-                            }
+                            })
+                            .andThen(Single.defer { Single.just(it) })
+                    }
+                    .subscribeOn(Schedulers.io())
+                    .map {
+                        it.apply {
+                            this.nonce = this@PageKeyedRxRemoteMediator.nonce
+                            this.pageNumber = 1
                         }
-                        .subscribeOn(Schedulers.io())
-                        .map {
-                            it.apply {
-                                this.nonce = this@PageKeyedRxRemoteMediator.nonce
-                                this.pageNumber = 1
-                            }
-                        }.flatMap {
-                            insertToken(it, pageSize)
-                                .andThen(
-                                    Single.just<MediatorResult>(
-                                        MediatorResult.Success(
-                                            endOfPaginationReached = if(stackFromEnd()) it.previous == null else it.next == null
-                                        )
+                    }.flatMap {
+                        insertToken(it, loadType)
+                            .andThen(
+                                Single.just<MediatorResult>(
+                                    MediatorResult.Success(
+                                        endOfPaginationReached = false
                                     )
                                 )
-                        }.onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
-                }
+                            )
+                    }.onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
             }
+
             LoadType.PREPEND -> {
-                if(stackFromEnd()) {
-                    tokenDao.getLastQueryToken(queryParameters = queryParameters, nonce = nonce)
-                        .subscribeOn(Schedulers.io())
-                        .flatMapSingle<MediatorResult> { token ->
-                            fetchByToken(token = token.previous!!)
-                                .map {
-                                    it.apply {
-                                        this.nonce = this@PageKeyedRxRemoteMediator.nonce
-                                        this.pageNumber = token.pageNumber + 1
-                                    }
-                                }
-                                .flatMap {
-                                    insertToken(it, pageSize)
-                                        .andThen(
-                                            Single.just(
-                                                MediatorResult.Success(
-                                                    endOfPaginationReached = it.previous == null
-                                                )
-                                            )
-                                        )
-                                }
-                        }.onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
+                if (prevToken != null) {
+                    fetchByToken(token = prevToken!!)
+                        .flatMap {
+                            insertToken(it, loadType)
+                                .andThen(
+                                    Single.just(
+                                        MediatorResult.Success(endOfPaginationReached = it.previous == null) as MediatorResult
+                                    )
+                                )
+                        }
+                        .onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
                 } else {
                     Single.just(MediatorResult.Success(endOfPaginationReached = true))
                 }
             }
+
             LoadType.APPEND -> {
-                if(stackFromEnd()) {
+                if (nextToken == null) {
                     Single.just(MediatorResult.Success(endOfPaginationReached = true))
                 } else {
-                    tokenDao.getLastQueryToken(queryParameters = queryParameters, nonce = nonce)
-                        .subscribeOn(Schedulers.io())
-                        .flatMapSingle<MediatorResult> { token ->
-                            fetchByToken(token = token.next!!)
-                                .map {
-                                    it.apply {
-                                        this.nonce = this@PageKeyedRxRemoteMediator.nonce
-                                        this.pageNumber = token.pageNumber + 1
-                                    }
-                                }
-                                .flatMap {
-                                    insertToken(it, pageSize)
-                                        .andThen(
-                                            Single.just(
-                                                MediatorResult.Success(
-                                                    endOfPaginationReached = it.next == null
-                                                )
-                                            )
-                                        )
-                                }
-                        }.onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
+                    fetchByToken(token = nextToken!!)
+                        .flatMap {
+                            insertToken(it, loadType)
+                                .andThen(
+                                    Single.just(
+                                        MediatorResult.Success(endOfPaginationReached = it.next == null) as MediatorResult
+                                    )
+                                )
+                        }
+                        .onErrorResumeNext { Single.just(MediatorResult.Error(it)) }
                 }
             }
         }
     }
 
-    override fun stackFromEnd(): Boolean {
-        return false
-    }
-
-    open fun forceRefresh(): Boolean = false
+    open fun forceRefresh(): Boolean = true
 
     abstract fun fetchFirstPage(pageSize: Int): Single<TOKEN>
 
     abstract fun fetchByToken(token: String): Single<TOKEN>
 
-    private fun insertToken(token: TOKEN, pageSize: Int): Completable {
-        return tokenDao.insertToken(token)
-            .andThen(
-                when (token.next == null) {
-                    true -> tokenDao.deleteAfterPageNumber(
-                        pageNumber = token.pageNumber,
-                        nonce = nonce,
-                        queryParameters = queryParameters
-                    ).andThen(
-                        tokenDao.deleteAfterPosition(
-                            position = ((token.pageNumber - 1) * pageSize) + token.primaryKeys.size,
-                            nonce = nonce,
-                            queryParameters = queryParameters
-                        )
-                    )
-                    false -> Completable.complete()
+    private fun insertToken(token: TOKEN, loadType: LoadType): Completable {
+        return Completable.fromAction {
+            when (loadType) {
+                LoadType.REFRESH -> {
+                    prevToken = token.previous
+                    nextToken = token.next
                 }
-            )
-            .andThen(tokenDao.insertPagingIds(token.primaryKeys.mapIndexed { index, id ->
+                LoadType.PREPEND -> {
+                    prevToken = token.previous
+                }
+                LoadType.APPEND -> {
+                    nextToken = token.next
+                }
+            }
+        }.andThen(tokenDao.insertPagingIds(token.primaryKeys.mapIndexed { index, id ->
                 AmityPagingId(queryParameters = queryParameters, id = id)
                     .apply {
                         this.nonce = this@PageKeyedRxRemoteMediator.nonce
-                        this.position = ((token.pageNumber - 1) * pageSize) + index + 1
+                        this.position = if(loadType == LoadType.PREPEND) { --lowestPosition } else { ++highestPosition }
                     }
             }))
     }
 
-    fun insertPagingIds(id: String) {
+    fun insertPagingIds(id: String, isAppending: Boolean = true) {
         tokenDao.insertPagingIdsIfNeeded(
             AmityPagingId(queryParameters = queryParameters, id = id)
                 .apply {
-                    this@PageKeyedRxRemoteMediator.generatedPosition--
                     this.nonce = this@PageKeyedRxRemoteMediator.nonce
-                    this.position = this@PageKeyedRxRemoteMediator.generatedPosition
+                    this.position = if(isAppending) { ++highestPosition } else { --lowestPosition }
                 }
         ).subscribeOn(Schedulers.single())
             .subscribe()

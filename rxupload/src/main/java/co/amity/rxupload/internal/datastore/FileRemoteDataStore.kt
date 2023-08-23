@@ -5,7 +5,7 @@ import co.amity.rxupload.service.MultipartUploadService
 import co.amity.rxupload.service.api.MultipartUploadApi
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody

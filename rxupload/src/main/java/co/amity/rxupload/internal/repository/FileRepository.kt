@@ -6,8 +6,8 @@ import co.amity.rxupload.FileProperties
 import co.amity.rxupload.internal.datastore.FileLocalDataStore
 import co.amity.rxupload.internal.datastore.FileRemoteDataStore
 import co.amity.rxupload.service.MultipartUploadService
-import io.reactivex.Flowable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Single
 import java.util.*
 
 class FileRepository {

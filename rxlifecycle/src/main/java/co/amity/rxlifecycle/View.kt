@@ -26,7 +26,35 @@ fun View.lifecycleProviderFromView(): LifecycleProvider<ViewEvent> {
         }
 
         override fun <T : Any?> bindUntilEvent(event: ViewEvent): LifecycleTransformer<T> {
-            return RxLifecycle.bindUntilEvent<T, ViewEvent>(lifecycle(), event)
+            return RxLifecycle.bindUntilEvent(lifecycle(), event)
+        }
+
+        override fun <T : Any?> bindToLifecycle(): LifecycleTransformer<T> {
+            return bindUntilEvent(ViewEvent.DETACH)
+        }
+    }
+}
+
+fun View.lifecycleProviderFromViewRx3(): LifecycleProvider<ViewEvent> {
+    val subject = BehaviorSubject.create<ViewEvent>()
+
+    addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+        override fun onViewAttachedToWindow(view: View?) {
+            subject.onNext(ViewEvent.ATTACH)
+        }
+
+        override fun onViewDetachedFromWindow(view: View) {
+            subject.onNext(ViewEvent.DETACH)
+        }
+    })
+
+    return object : LifecycleProvider<ViewEvent> {
+        override fun lifecycle(): Observable<ViewEvent> {
+            return subject.hide()
+        }
+
+        override fun <T : Any?> bindUntilEvent(event: ViewEvent): LifecycleTransformer<T> {
+            return RxLifecycle.bindUntilEvent(lifecycle(), event)
         }
 
         override fun <T : Any?> bindToLifecycle(): LifecycleTransformer<T> {

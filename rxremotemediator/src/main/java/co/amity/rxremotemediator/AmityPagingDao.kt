@@ -44,11 +44,10 @@ interface AmityPagingDao<ENTITY : Any> {
         sortColumn?.let {
             queryStatement.plus(" order by $tableName.$sortColumn ${order.value}")
                 .also { queryStatement = it }
+        } ?: apply {
+            queryStatement.plus(" order by amity_paging_id.position ${order.value}")
+                .also { queryStatement = it }
         }
-//            ?: apply {
-//            queryStatement.plus(" order by amity_paging_id.position ${order.value}")
-//                .also { queryStatement = it }
-//        }
         return SimpleSQLiteQuery(queryStatement)
     }
 

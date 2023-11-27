@@ -2,6 +2,7 @@ package co.amity.rxupload.internal.datastore
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
@@ -42,7 +43,9 @@ class FileLocalDataStore {
             return uri.path?.let { File(it).name }
         }
 
-        context.contentResolver.query(
+        val contentResolver = context.contentResolver
+        contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        contentResolver.query(
             uri,
             arrayOf(OpenableColumns.DISPLAY_NAME),
             null,
@@ -62,8 +65,9 @@ class FileLocalDataStore {
         if (isFile(uri)) {
             return uri.path?.let { File(it).length() }
         }
-
-        context.contentResolver.query(
+        val contentResolver = context.contentResolver
+        contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        contentResolver.query(
             uri,
             arrayOf(OpenableColumns.SIZE),
             null,
@@ -85,7 +89,9 @@ class FileLocalDataStore {
         }
 
         return try {
-            context.contentResolver.openInputStream(uri)
+            val contentResolver = context.contentResolver
+            contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            contentResolver.openInputStream(uri)
                 ?.use {
                     val directory = File(context.cacheDir, cacheDirectory)
                     directory.mkdirs()

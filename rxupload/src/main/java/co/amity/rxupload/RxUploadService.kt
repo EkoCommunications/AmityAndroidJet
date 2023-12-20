@@ -29,9 +29,6 @@ class RxUploadService {
             return (MultipartUploadService.properties(id)?.toFlowable(BackpressureStrategy.BUFFER)
                 ?: Flowable.never<FileProperties>())
                     .distinct { Objects.hash(it.progress, it.responseBody) }
-                    .doOnComplete {
-                        MultipartUploadService.invalidate(id)
-                    }
         }
         
         fun invalidate(id: String) {

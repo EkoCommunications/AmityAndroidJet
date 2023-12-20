@@ -81,7 +81,6 @@ class MultipartUploadService {
 
         fun onResponse(id: String?) {
             id?.let {
-                propertiesSubjects.remove(it)
                 calls.remove(it)
             }
         }
@@ -91,6 +90,12 @@ class MultipartUploadService {
                 propertiesSubjects[it] =
                     propertiesSubjects[it] ?: PublishSubject.create<FileProperties>()
                 propertiesSubjects[it]
+            }
+        }
+        
+        fun invalidate(id: String?) {
+            id?.let {
+                propertiesSubjects.remove(it)
             }
         }
 

@@ -44,7 +44,7 @@ class FileLocalDataStore {
         }
 
         val contentResolver = context.contentResolver
-        contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        
         contentResolver.query(
             uri,
             arrayOf(OpenableColumns.DISPLAY_NAME),
@@ -66,7 +66,7 @@ class FileLocalDataStore {
             return uri.path?.let { File(it).length() }
         }
         val contentResolver = context.contentResolver
-        contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        grantPersistableUriPermissionIfNeeded(contentResolver, uri)
         contentResolver.query(
             uri,
             arrayOf(OpenableColumns.SIZE),
@@ -90,7 +90,7 @@ class FileLocalDataStore {
 
         return try {
             val contentResolver = context.contentResolver
-            contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            grantPersistableUriPermissionIfNeeded(contentResolver, uri)
             contentResolver.openInputStream(uri)
                 ?.use {
                     val directory = File(context.cacheDir, cacheDirectory)
@@ -148,6 +148,16 @@ class FileLocalDataStore {
         return Completable.fromAction {
             val directory = File(context.cacheDir, cacheDirectory)
             directory.deleteRecursively()
+        }
+    }
+    
+    private fun grantPersistableUriPermissionIfNeeded(contentResolver: ContentResolver, uri: Uri) {
+        if (uri.scheme == "content") {
+            try {
+                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } catch (e: Exception) {
+                // Fail to grant persistable Uri permission
+            }
         }
     }
 }

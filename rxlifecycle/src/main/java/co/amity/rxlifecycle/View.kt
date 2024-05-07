@@ -11,7 +11,7 @@ fun View.lifecycleProviderFromView(): LifecycleProvider<ViewEvent> {
     val subject = BehaviorSubject.create<ViewEvent>()
 
     addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-        override fun onViewAttachedToWindow(view: View?) {
+        override fun onViewAttachedToWindow(view: View) {
             subject.onNext(ViewEvent.ATTACH)
         }
 

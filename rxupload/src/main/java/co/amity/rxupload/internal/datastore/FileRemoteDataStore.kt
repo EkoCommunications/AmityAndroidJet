@@ -62,10 +62,9 @@ class FileRemoteDataStore {
             val multipartBody = MultipartBody.Part.createFormData(
                 multipartDataKey,
                 //fileProperties.fileName,
-                null,
-                requestBody
+                requestBody.toString()
             )
-
+            
             val multipartUploadApi: MultipartUploadApi = MultipartUploadService.getUploadApi()
 
             val call = multipartUploadApi.upload(

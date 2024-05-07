@@ -61,7 +61,8 @@ class FileRemoteDataStore {
 
             val multipartBody = MultipartBody.Part.createFormData(
                 multipartDataKey,
-                fileProperties.fileName,
+                //fileProperties.fileName,
+                null,
                 requestBody
             )
 

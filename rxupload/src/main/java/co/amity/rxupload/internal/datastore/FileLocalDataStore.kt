@@ -54,7 +54,12 @@ class FileLocalDataStore {
             null
         )?.use {
             if (it.moveToFirst()) {
-                return it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (index > -1) {
+                    return it.getString(index)
+                } else {
+                    return null
+                }
             }
         }
 
@@ -76,7 +81,12 @@ class FileLocalDataStore {
             null
         )?.use {
             if (it.moveToFirst()) {
-                return it.getLong(it.getColumnIndex(OpenableColumns.SIZE))
+                val index = it.getColumnIndex(OpenableColumns.SIZE)
+                if(index > -1) {
+                    return it.getLong(index)
+                } else {
+                    return null
+                }
             }
         }
 

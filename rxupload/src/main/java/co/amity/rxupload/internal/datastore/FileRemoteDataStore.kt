@@ -1,5 +1,6 @@
 package co.amity.rxupload.internal.datastore
 
+import android.util.Log
 import co.amity.rxupload.FileProperties
 import co.amity.rxupload.service.MultipartUploadService
 import co.amity.rxupload.service.api.MultipartUploadApi
@@ -59,12 +60,11 @@ class FileRemoteDataStore {
                     }
                 })
 
-            val multipartBody = MultipartBody.Part.createFormData(
-                multipartDataKey,
-                //fileProperties.fileName,
-                requestBody.toString()
+            Log.e("FileRemoteDataStore", "upload: ${fileProperties.fileName}")
+            val multipartBody = MultipartBody.Part.create(
+                requestBody
             )
-            
+
             val multipartUploadApi: MultipartUploadApi = MultipartUploadService.getUploadApi()
 
             val call = multipartUploadApi.upload(

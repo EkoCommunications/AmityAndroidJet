@@ -26,7 +26,7 @@ class MultipartUploadService {
         fun init(baseUrl: String, baseSettings: RxUploadService.Settings, interceptors: List<Interceptor>) {
             val httpClient = OkHttpClient.Builder()
                 .also {
-                    interceptors.forEach { interceptor ->
+                    for (interceptor in interceptors) {
                         it.addInterceptor(interceptor)
                     }
                 }

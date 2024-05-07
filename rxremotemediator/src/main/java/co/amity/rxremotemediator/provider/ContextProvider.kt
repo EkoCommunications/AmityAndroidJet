@@ -9,7 +9,7 @@ import io.reactivex.subjects.Subject
 class ContextProvider : BaseProvider() {
 
     override fun onCreate(): Boolean {
-        subject.onNext(requireContext())
+        //subject.onNext(requireContext())
         subject.onComplete()
         return false
     }

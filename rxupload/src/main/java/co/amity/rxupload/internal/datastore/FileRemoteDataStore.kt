@@ -46,7 +46,10 @@ class FileRemoteDataStore {
                     FileWritingListener {
                     override fun onWrite(bytesWritten: Long, contentLength: Long) {
                         val progress =
-                            min(floor(bytesWritten.toDouble() / contentLength.toDouble() * 100.toDouble()).toInt(), 99)
+                            min(
+                                floor(bytesWritten.toDouble() / contentLength.toDouble() * 100.toDouble()).toInt(),
+                                99
+                            )
 
                         it.onNext(fileProperties.apply {
                             this.bytesWritten = bytesWritten
@@ -68,17 +71,16 @@ class FileRemoteDataStore {
                 append("form-data; name=")
                 appendQuotedString(multipartDataKey)
 
-                if (filename != null) {
-                    append("; filename=")
-                    appendQuotedString(filename)
-                }
+                append("; filename=")
+                appendQuotedString(filename)
 
-                //append("; filename*=UTF-8")
+                append("; filename*=")
+                appendQuotedString("UTF-8''${URLEncoder.encode(filename, "UTF-8")}")
 
             }
+            Log.e("FileRemoteDataStore", "disposition: ${disposition}")
 
             val partHeaders = Headers.Builder()
-                .add("Content-Type", "application/json;charset=utf-8")
                 .addUnsafeNonAscii("Content-Disposition", disposition)
                 .build()
 
@@ -92,7 +94,6 @@ class FileRemoteDataStore {
 //                "ไทย.pdf",
 //                requestBody
 //            )
-
 
             val multipartUploadApi: MultipartUploadApi = MultipartUploadService.getUploadApi()
 
@@ -111,7 +112,10 @@ class FileRemoteDataStore {
                     MultipartUploadService.onFailure(id)
                 }
 
-                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>
+                ) {
                     response.errorBody()?.let { error ->
                         it.onError(Exception(JsonObject().apply {
                             addProperty("errorCode", response.code())

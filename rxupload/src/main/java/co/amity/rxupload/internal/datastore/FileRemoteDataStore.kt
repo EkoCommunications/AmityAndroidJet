@@ -62,12 +62,36 @@ class FileRemoteDataStore {
                     }
                 })
 
-            Log.e("FileRemoteDataStore", "upload: ${fileProperties.fileName}")
-            val multipartBody = MultipartBody.Part.createFormData(
-                multipartDataKey,
-                URLEncoder.encode("ไทย.pdf", "utf-8"),
+            val filename = fileProperties.fileName
+            Log.e("FileRemoteDataStore", "upload: ${filename}")
+            val disposition = buildString {
+                append("form-data; name=")
+                appendQuotedString(multipartDataKey)
+
+                if (filename != null) {
+                    append("; filename=")
+                    appendQuotedString(filename)
+                }
+
+                append("; filename*=UTF-8")
+
+            }
+
+            val partHeaders = Headers.Builder()
+                .addUnsafeNonAscii("Content-Disposition", disposition)
+                .build()
+
+            val multipartBody = MultipartBody.Part.create(
+                partHeaders,
                 requestBody
             )
+
+//            val multipartBody = MultipartBody.Part.createFormData(
+//                multipartDataKey,
+//                "ไทย.pdf",
+//                requestBody
+//            )
+
 
             val multipartUploadApi: MultipartUploadApi = MultipartUploadService.getUploadApi()
 
@@ -106,6 +130,19 @@ class FileRemoteDataStore {
                 }
             })
         }
+    }
+
+    internal fun StringBuilder.appendQuotedString(key: String) {
+        append('"')
+        for (i in 0 until key.length) {
+            when (val ch = key[i]) {
+                '\n' -> append("%0A")
+                '\r' -> append("%0D")
+                '"' -> append("%22")
+                else -> append(ch)
+            }
+        }
+        append('"')
     }
 
     companion object {

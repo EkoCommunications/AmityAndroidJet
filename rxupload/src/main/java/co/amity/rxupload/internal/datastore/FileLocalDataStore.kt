@@ -2,13 +2,13 @@ package co.amity.rxupload.internal.datastore
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
-import android.util.Log
 import android.webkit.MimeTypeMap
-import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.*
@@ -43,7 +43,9 @@ class FileLocalDataStore {
             return uri.path?.let { File(it).name }
         }
 
-        context.contentResolver.query(
+        val contentResolver = context.contentResolver
+        
+        contentResolver.query(
             uri,
             arrayOf(OpenableColumns.DISPLAY_NAME),
             null,
@@ -52,7 +54,12 @@ class FileLocalDataStore {
             null
         )?.use {
             if (it.moveToFirst()) {
-                return it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (index > -1) {
+                    return it.getString(index)
+                } else {
+                    return null
+                }
             }
         }
 
@@ -63,8 +70,9 @@ class FileLocalDataStore {
         if (isFile(uri)) {
             return uri.path?.let { File(it).length() }
         }
-
-        context.contentResolver.query(
+        val contentResolver = context.contentResolver
+        grantPersistableUriPermissionIfNeeded(contentResolver, uri)
+        contentResolver.query(
             uri,
             arrayOf(OpenableColumns.SIZE),
             null,
@@ -73,7 +81,12 @@ class FileLocalDataStore {
             null
         )?.use {
             if (it.moveToFirst()) {
-                return it.getLong(it.getColumnIndex(OpenableColumns.SIZE))
+                val index = it.getColumnIndex(OpenableColumns.SIZE)
+                if(index > -1) {
+                    return it.getLong(index)
+                } else {
+                    return null
+                }
             }
         }
 
@@ -86,7 +99,9 @@ class FileLocalDataStore {
         }
 
         return try {
-            context.contentResolver.openInputStream(uri)
+            val contentResolver = context.contentResolver
+            grantPersistableUriPermissionIfNeeded(contentResolver, uri)
+            contentResolver.openInputStream(uri)
                 ?.use {
                     val directory = File(context.cacheDir, cacheDirectory)
                     directory.mkdirs()
@@ -143,6 +158,16 @@ class FileLocalDataStore {
         return Completable.fromAction {
             val directory = File(context.cacheDir, cacheDirectory)
             directory.deleteRecursively()
+        }
+    }
+    
+    private fun grantPersistableUriPermissionIfNeeded(contentResolver: ContentResolver, uri: Uri) {
+        if (uri.scheme == "content") {
+            try {
+                contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            } catch (e: Exception) {
+                // Fail to grant persistable Uri permission
+            }
         }
     }
 }

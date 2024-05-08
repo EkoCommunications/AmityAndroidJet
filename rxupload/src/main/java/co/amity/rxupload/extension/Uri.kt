@@ -5,7 +5,7 @@ import android.net.Uri
 import androidx.annotation.WorkerThread
 import co.amity.rxupload.FileProperties
 import co.amity.rxupload.UploadFileUseCase
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
 
 @WorkerThread
 fun Uri.upload(

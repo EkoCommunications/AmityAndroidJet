@@ -14,7 +14,29 @@ interface AmityPagingDao<ENTITY : Any> {
         queryParameters: Map<String, Any>,
         nonce: Int,
         order: Order,
-        sortColumn: String? = null,
+        sortColumn: String?,
+        additionalFilter: String? = null
+    ): SimpleSQLiteQuery {
+        return generateSqlQuery(
+                tableName = tableName,
+                primaryKeyColumnName = primaryKeyColumnName,
+                additionalPrimaryKeys = additionalPrimaryKeys,
+                queryParameters = queryParameters,
+                nonce = nonce,
+                order = order,
+                sortColumns = sortColumn?.let { listOf(Sorting.Column(tableName, it, order)) },
+                additionalFilter = additionalFilter
+        )
+    }
+
+    fun generateSqlQuery(
+        tableName: String,
+        primaryKeyColumnName: String,
+        additionalPrimaryKeys: Map<String, Any> = emptyMap(),
+        queryParameters: Map<String, Any>,
+        nonce: Int,
+        order: Order,
+        sortColumns: List<Sorting>? = null,
         additionalFilter: String? = null
     ): SimpleSQLiteQuery {
         val additionalPrimaryKeyString = additionalPrimaryKeys.takeIf { it.isNotEmpty() }?.map {
@@ -41,10 +63,10 @@ interface AmityPagingDao<ENTITY : Any> {
         }
 
         //add sort
-        sortColumn?.let {
-            queryStatement.plus(" order by $tableName.$sortColumn ${order.value}")
+        if (sortColumns?.isNotEmpty() == true) {
+            queryStatement.plus(" order by ${sortColumns.joinToString(",") { it.toSql() }}")
                 .also { queryStatement = it }
-        } ?: apply {
+        } else {
             queryStatement.plus(" order by amity_paging_id.position ${order.value}")
                 .also { queryStatement = it }
         }
@@ -54,5 +76,42 @@ interface AmityPagingDao<ENTITY : Any> {
     enum class Order(val value: String) {
         ASC("asc"),
         DESC("desc")
+    }
+  
+    sealed class Sorting {
+    
+        abstract fun toSql(): String
+        class Column(
+            private val tableName: String,
+            private val columnName: String,
+            private val order: Order
+        ) : Sorting() {
+            override fun toSql(): String {
+                return "$tableName.$columnName ${order.value}"
+            }
+        }
+        
+        class Enum(
+            private val tableName: String,
+            private val columnName: String,
+            private val enumList: List<String>
+        ) : Sorting() {
+            override fun toSql(): String {
+                return convertEnumToOrder(tableName, columnName, enumList) ?: ""
+            }
+
+            private fun convertEnumToOrder(tableName: String, sortColumn: String, enumList: List<String>): String? {
+                return if (enumList.isNotEmpty()) {
+                    "CASE $tableName.$sortColumn " +
+                            enumList.joinToString(" ") {
+                                "WHEN '$it' THEN ${enumList.indexOf(it)}"
+                            } +
+                            " ELSE ${enumList.size}" +
+                            " END ASC "
+                } else {
+                    null
+                }
+            }
+        }
     }
 }

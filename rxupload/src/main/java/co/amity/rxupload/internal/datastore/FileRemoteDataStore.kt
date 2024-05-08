@@ -1,11 +1,13 @@
 package co.amity.rxupload.internal.datastore
 
+import android.util.Log
 import co.amity.rxupload.FileProperties
 import co.amity.rxupload.service.MultipartUploadService
 import co.amity.rxupload.service.api.MultipartUploadApi
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import io.reactivex.Flowable
+import io.reactivex.rxjava3.core.Flowable
+import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -21,6 +23,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.net.URLEncoder
 import kotlin.math.floor
 import kotlin.math.min
 
@@ -43,7 +46,10 @@ class FileRemoteDataStore {
                     FileWritingListener {
                     override fun onWrite(bytesWritten: Long, contentLength: Long) {
                         val progress =
-                            min(floor(bytesWritten.toDouble() / contentLength.toDouble() * 100.toDouble()).toInt(), 99)
+                            min(
+                                floor(bytesWritten.toDouble() / contentLength.toDouble() * 100.toDouble()).toInt(),
+                                99
+                            )
 
                         it.onNext(fileProperties.apply {
                             this.bytesWritten = bytesWritten
@@ -59,11 +65,40 @@ class FileRemoteDataStore {
                     }
                 })
 
-            val multipartBody = MultipartBody.Part.createFormData(
-                multipartDataKey,
-                fileProperties.fileName,
+            val filename = fileProperties.fileName
+            Log.e("FileRemoteDataStore", "upload: ${filename}")
+            val disposition = buildString {
+                append("form-data; name=")
+                appendQuotedString(multipartDataKey)
+
+                append("; filename=")
+                appendQuotedString(filename)
+
+                append("; filename*=")
+                append("UTF-8")
+                append('\'')
+                append('\'')
+                append(URLEncoder.encode(filename, "UTF-8"))
+
+                //appendQuotedString("UTF-8''${URLEncoder.encode(filename, "UTF-8")}")
+
+            }
+            Log.e("FileRemoteDataStore", "disposition: ${disposition}")
+
+            val partHeaders = Headers.Builder()
+                .addUnsafeNonAscii("Content-Disposition", disposition)
+                .build()
+
+            val multipartBody = MultipartBody.Part.create(
+                partHeaders,
                 requestBody
             )
+
+//            val multipartBody = MultipartBody.Part.createFormData(
+//                multipartDataKey,
+//                "ไทย.pdf",
+//                requestBody
+//            )
 
             val multipartUploadApi: MultipartUploadApi = MultipartUploadService.getUploadApi()
 
@@ -82,7 +117,10 @@ class FileRemoteDataStore {
                     MultipartUploadService.onFailure(id)
                 }
 
-                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                override fun onResponse(
+                    call: Call<ResponseBody>,
+                    response: Response<ResponseBody>
+                ) {
                     response.errorBody()?.let { error ->
                         it.onError(Exception(JsonObject().apply {
                             addProperty("errorCode", response.code())
@@ -102,6 +140,19 @@ class FileRemoteDataStore {
                 }
             })
         }
+    }
+
+    internal fun StringBuilder.appendQuotedString(key: String) {
+        append('"')
+        for (i in 0 until key.length) {
+            when (val ch = key[i]) {
+                '\n' -> append("%0A")
+                '\r' -> append("%0D")
+                '"' -> append("%22")
+                else -> append(ch)
+            }
+        }
+        append('"')
     }
 
     companion object {

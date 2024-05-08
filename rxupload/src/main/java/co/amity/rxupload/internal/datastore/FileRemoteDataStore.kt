@@ -73,11 +73,12 @@ class FileRemoteDataStore {
                     appendQuotedString(filename)
                 }
 
-                append("; filename*=UTF-8")
+                //append("; filename*=UTF-8")
 
             }
 
             val partHeaders = Headers.Builder()
+                .add("Content-Type", "application/json;charset=utf-8")
                 .addUnsafeNonAscii("Content-Disposition", disposition)
                 .build()
 

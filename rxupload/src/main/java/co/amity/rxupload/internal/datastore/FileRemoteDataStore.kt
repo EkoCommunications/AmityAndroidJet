@@ -61,7 +61,9 @@ class FileRemoteDataStore {
                 })
 
             Log.e("FileRemoteDataStore", "upload: ${fileProperties.fileName}")
-            val multipartBody = MultipartBody.Part.create(
+            val multipartBody = MultipartBody.Part.createFormData(
+                multipartDataKey,
+                "ไทย.pdf",
                 requestBody
             )
 

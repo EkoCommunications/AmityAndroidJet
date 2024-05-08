@@ -75,8 +75,13 @@ class FileRemoteDataStore {
                 appendQuotedString(filename)
 
                 append("; filename*=")
-                appendQuotedString("UTF-8''${URLEncoder.encode(filename, "UTF-8")}")
-
+                append('"')
+                append("UTF-8")
+                append('\'')
+                append(' ')
+                append('\'')
+                append(URLEncoder.encode(filename, "UTF-8"))
+                append('"')
             }
             Log.e("FileRemoteDataStore", "disposition: ${disposition}")
 

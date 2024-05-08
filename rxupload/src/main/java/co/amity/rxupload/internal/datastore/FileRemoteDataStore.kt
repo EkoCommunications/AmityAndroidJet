@@ -75,12 +75,11 @@ class FileRemoteDataStore {
                 appendQuotedString(filename)
 
                 append("; filename*=")
-                append('"')
                 append("UTF-8")
                 append('\'')
                 append('\'')
                 append(URLEncoder.encode(filename, "UTF-8"))
-                append('"')
+
                 //appendQuotedString("UTF-8''${URLEncoder.encode(filename, "UTF-8")}")
 
             }

@@ -13,7 +13,7 @@ interface MultipartUploadApi {
     @Multipart
     @POST("{path}")
     fun upload(
-        @Path("path", encoded = false) path: String,
+        @Path("path", encoded = true) path: String,
         @HeaderMap headers: Map<String, Any>,
         @Part body: MultipartBody.Part,
         @PartMap params: Map<String, RequestBody>

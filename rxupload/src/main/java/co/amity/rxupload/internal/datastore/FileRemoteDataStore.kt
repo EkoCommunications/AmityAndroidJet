@@ -7,6 +7,7 @@ import co.amity.rxupload.service.api.MultipartUploadApi
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.reactivex.rxjava3.core.Flowable
+import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -22,6 +23,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.net.URLEncoder
 import kotlin.math.floor
 import kotlin.math.min
 
@@ -63,7 +65,7 @@ class FileRemoteDataStore {
             Log.e("FileRemoteDataStore", "upload: ${fileProperties.fileName}")
             val multipartBody = MultipartBody.Part.createFormData(
                 multipartDataKey,
-                "ไทย.pdf",
+                URLEncoder.encode("ไทย.pdf", "utf-8"),
                 requestBody
             )
 

@@ -1,13 +1,11 @@
 package co.amity.rxupload.internal.datastore
 
-import android.util.Log
 import co.amity.rxupload.FileProperties
 import co.amity.rxupload.service.MultipartUploadService
 import co.amity.rxupload.service.api.MultipartUploadApi
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import io.reactivex.rxjava3.core.Flowable
-import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -23,7 +21,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
-import java.net.URLEncoder
 import kotlin.math.floor
 import kotlin.math.min
 
@@ -66,47 +63,25 @@ class FileRemoteDataStore {
                 })
 
             val filename = fileProperties.fileName
-            Log.e("FileRemoteDataStore", "upload: ${filename}")
-            val disposition = buildString {
-                append("form-data; name=")
-                appendQuotedString(multipartDataKey)
-
-                append("; filename=")
-                appendQuotedString(filename)
-
-                append("; filename*=")
-                append("UTF-8")
-                append('\'')
-                append('\'')
-                append(URLEncoder.encode(filename, "UTF-8"))
-
-                //appendQuotedString("UTF-8''${URLEncoder.encode(filename, "UTF-8")}")
-
-            }
-            Log.e("FileRemoteDataStore", "disposition: ${disposition}")
-
-            val partHeaders = Headers.Builder()
-                .addUnsafeNonAscii("Content-Disposition", disposition)
-                .build()
-
-            val multipartBody = MultipartBody.Part.create(
-                partHeaders,
+            val multipartBody = MultipartBody.Part.createFormData(
+                multipartDataKey,
+                filename,
                 requestBody
             )
 
-//            val multipartBody = MultipartBody.Part.createFormData(
-//                multipartDataKey,
-//                "ไทย.pdf",
-//                requestBody
-//            )
+            val body =  params.toMutableMap().apply {
+                this["preferredFilename"] = filename
+            }.mapValues { param ->
+                param.value.toString().toRequestBody()
+            }
 
             val multipartUploadApi: MultipartUploadApi = MultipartUploadService.getUploadApi()
-
             val call = multipartUploadApi.upload(
                 path,
                 headers,
                 multipartBody,
-                params.mapValues { param -> param.value.toString().toRequestBody() })
+                body
+            )
 
             MultipartUploadService.onRequest(call, id)
 
